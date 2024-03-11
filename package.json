@@ -1,6 +1,6 @@
 {
   "name": "styled-cva",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A typesafe, class-variance-authority-based, styled-components-like library for authoring React components",
   "keywords": [
     "styled-components",

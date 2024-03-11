@@ -20,8 +20,9 @@
     "test": "vitest --run src",
     "clean": "rm -rf dist"
   },
+  "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist/**/*"
   ],
   "exports": {
     ".": {

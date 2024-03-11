@@ -111,3 +111,17 @@ For tailwindcss extension support, add this to your vscode [settings.json](/.vsc
     "strings": true // forces VS Code to trigger completions when editing "string" content
   },
 ```
+
+### Acknowledgements
+
+- [Tailwind-Styled-Components](https://github.com/MathiasGilson/Tailwind-Styled-Component)
+
+- [CVA](https://github.com/joe-bell/cva)
+
+- [CLSX](https://github.com/lukeed/clsx)
+
+- [tailwind-merge](https://github.com/dcastil/tailwind-merge)
+
+####
+
+License - [UNLICENSE](/LICENSE)

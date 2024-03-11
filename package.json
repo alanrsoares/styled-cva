@@ -17,7 +17,8 @@
     "build": "pnpm compile && pnpm bundle",
     "compile": "tsc --noEmit",
     "bundle": "NODE_OPTIONS=\"--max-old-space-size=4096\" tsup",
-    "test": "vitest --run src"
+    "test": "vitest --run src",
+    "clean": "rm -rf dist"
   },
   "exports": {
     ".": {

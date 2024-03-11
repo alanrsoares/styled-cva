@@ -26,10 +26,25 @@ bun add styled-cva
 
 ## Usage
 
+basic
+
 ```tsx
 import tw from "styled-cva";
 
-const Button = tw.button.cva("btn-base-class", {
+const StaticButton = tw.button`
+  bg-primary rounded-xl cursor-pointer
+`;
+
+// ...
+<StaticButton>Click Me</StaticButton>;
+```
+
+variants
+
+```tsx
+import tw from "styled-cva";
+
+const VariantButton = tw.button.cva("btn-base-class", {
   variants: {
     // variant keys start with $ will not be sent to the DOM,
     // this avoids extraneous props warning
@@ -40,7 +55,39 @@ const Button = tw.button.cva("btn-base-class", {
   },
 });
 
-const myButton = <Button $variant="primary">Click Me</Button>;
+// ...
+
+// $variant is infered to 'primary' | 'secondary'
+<VariantButton $variant="primary">Click Me</VariantButton>;
+```
+
+proxy
+
+```tsx
+import Link from "next/link";
+
+const Button = tw.button.cva("btn", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+// ...
+
+// works with known jsx elements
+
+<Button $as="a" href="/some/url">
+  I'm a link that looks like a button
+</Button>;
+
+// also with custom components
+
+<Button $as={Link} href="/some/url">
+  I'm a link that looks like a button
+</Button>;
 ```
 
 ## VSCode intellisense

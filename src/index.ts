@@ -1,7 +1,7 @@
-import { createTailwindCVA } from "./tailwind-styled-cva";
+import { createStyledCVA } from "./styled-cva";
 
-export * from "./tailwind-styled-cva";
+export * from "./styled-cva";
 
-const tw = createTailwindCVA();
+const tw = createStyledCVA();
 
 export default tw;

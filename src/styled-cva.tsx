@@ -335,7 +335,7 @@ type StyledExtension = {
   $as?: ElementKey | ComponentType<any>;
 };
 
-export type TailwindCVA = TailwindInterface & {
+export type StyledCVA = TailwindInterface & {
   [K in ElementKey]: TailwindInterface[K] & {
     cva: <T>(
       ...args: Parameters<CVA<T>>
@@ -347,7 +347,7 @@ export type TailwindCVA = TailwindInterface & {
   };
 };
 
-export function createTailwindCVA(): TailwindCVA {
+export function createStyledCVA(): StyledCVA {
   const twCVA = Object.fromEntries(
     Object.entries(tw).map(([key, styledFn]) => [
       key,
@@ -380,5 +380,5 @@ export function createTailwindCVA(): TailwindCVA {
     ])
   );
 
-  return Object.assign(tw, twCVA) as TailwindCVA;
+  return Object.assign(tw, twCVA) as StyledCVA;
 }

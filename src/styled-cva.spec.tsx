@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import tw from "./";
+import tw from ".";
 
 describe("styled-cva", () => {
   const StyledButton = tw.button.cva("btn-base", {

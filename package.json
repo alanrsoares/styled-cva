@@ -1,6 +1,9 @@
 {
   "name": "styled-cva",
   "version": "0.1.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "A typesafe, class-variance-authority-based, styled-components-like library for authoring React components",
   "keywords": [
     "styled-components",

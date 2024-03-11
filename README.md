@@ -1,1 +1,40 @@
 # tailwind-styled-cva
+
+A typesafe, class-variance-authority-based, styled-components-like library for authoring React components
+
+## Usage
+
+```tsx
+import styled from "styled-cva";
+
+const Button = styled.button.cva("btn-base-class", {
+  variants: {
+    $variant: {
+      primary: "btn-primary-class",
+      secondary: "btn-secondary-class",
+    },
+  },
+});
+
+const myButton = <Button $variant="primary">Click Me</Button>;
+```
+
+## VSCode intellisense
+
+For tailwindcss extension support, add this to your vscode settings json config
+
+```json
+ // tailwindcss intelisense settings
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript", // if you are using typescript
+    "typescriptreact": "javascript" // if you are using typescript with react
+  },
+  "tailwindCSS.experimental.classRegex": [
+    "tw`([^`]*)", // tw`...`
+    "tw\\.[^`]+`([^`]*)`", // tw.xxx<xxx>`...`
+    "tw\\(.*?\\).*?`([^`]*)", // tw(Component)<xxx>`...`
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+```

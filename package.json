@@ -9,7 +9,6 @@
     "tailwindcss",
     "variants"
   ],
-  "module": "index.ts",
   "type": "module",
   "scripts": {
     "build": "pnpm compile && pnpm bundle",

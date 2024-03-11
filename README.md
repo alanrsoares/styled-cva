@@ -2,6 +2,26 @@
 
 A typesafe, class-variance-authority-based, styled-components-like library for authoring React components
 
+## Installation
+
+npm
+
+```bash
+npm i --save styled-cva
+```
+
+pnpm
+
+```bash
+pnpm add styled-cva
+```
+
+bun
+
+```bash
+bun add styled-cva
+```
+
 ## Usage
 
 ```tsx

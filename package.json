@@ -1,5 +1,6 @@
 {
   "name": "styled-cva",
+  "version": "0.1.0",
   "description": "A typesafe, class-variance-authority-based, styled-components-like library for authoring React components",
   "keywords": [
     "styled-components",
@@ -8,7 +9,6 @@
     "tailwindcss",
     "variants"
   ],
-  "version": "0.1.0",
   "module": "index.ts",
   "type": "module",
   "scripts": {

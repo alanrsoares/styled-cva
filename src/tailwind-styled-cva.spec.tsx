@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import tw from "./";
 
-describe("tailwind-styled-cva", () => {
+describe("styled-cva", () => {
   const StyledButton = tw.button.cva("bg-red-500", {
     variants: {
       // variant keys starting with $ will not be sent to the DOM,

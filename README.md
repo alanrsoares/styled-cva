@@ -1,5 +1,7 @@
 # styled-cva
 
+[![npm version](https://badge.fury.io/js/styled-cva.svg)](https://badge.fury.io/js/styled-cva)
+
 A typesafe, class-variance-authority-based, styled-components-like library for authoring React components
 
 ## Installation

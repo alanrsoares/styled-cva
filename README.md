@@ -1,4 +1,4 @@
-# tailwind-styled-cva
+# styled-cva
 
 A typesafe, class-variance-authority-based, styled-components-like library for authoring React components
 

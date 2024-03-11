@@ -15,3 +15,6 @@ import { twMerge } from "tailwind-merge";
  * ```
  */
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+
+export const capitalize = ([fst, ...str]: string) =>
+  fst?.toUpperCase() + str.join("");

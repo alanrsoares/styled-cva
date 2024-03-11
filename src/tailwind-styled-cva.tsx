@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -15,11 +10,12 @@ import React, {
 
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "./utils";
+import { capitalize, cn } from "./utils";
 import domElements from "./domElements";
 
 const isTwElement = Symbol("isTwElement?");
 
+export type Nullish<T> = T | null | undefined;
 export type IsTwElement = { [isTwElement]: true };
 export type FalseyValue = undefined | null | false;
 
@@ -36,7 +32,8 @@ export type Interpolation<P> =
   | FlattenInterpolation<P>;
 
 export type InterpolationFunction<P> = (props: P) => Interpolation<P>;
-type TailwindComponentInterpolation = PickU<
+
+type TailwindComponentInterpolation = Pick<
   TailwindComponentBase<any, any>,
   keyof TailwindComponentBase<any, any>
 >;
@@ -51,19 +48,18 @@ type IsAny<T, True, False = never> = True | False extends (
 
 export const mergeArrays = (
   template: TemplateStringsArray,
-  templateElements: (string | undefined | null)[]
-) => {
-  return template.reduce(
+  templateElements: Array<Nullish<string>>
+) =>
+  template.reduce<string[]>(
     (acc, c, i) => acc.concat(c || [], templateElements[i] || []), //  x || [] to remove false values e.g '', null, undefined. as Array.concat() ignores empty arrays i.e []
-    [] as string[]
+    []
   );
-};
 
-export const cleanTemplate = (
+export function cleanTemplate(
   template: Array<Interpolation<any>>,
   inheritedClasses: string = ""
-) => {
-  const newClasses: string[] = template
+) {
+  const newClasses = template
     .join(" ")
     .trim()
     .replace(/\n/g, " ") // replace newline with space
@@ -71,7 +67,7 @@ export const cleanTemplate = (
     .split(" ")
     .filter((c) => c !== ","); // remove comma introduced by template to string
 
-  const inheritedClassesArray: string[] = inheritedClasses
+  const inheritedClassesArray = inheritedClasses
     ? inheritedClasses.split(" ")
     : [];
 
@@ -80,12 +76,8 @@ export const cleanTemplate = (
       .concat(inheritedClassesArray) // add new classes to inherited classes
       .filter((c: string) => c !== " ") // remove empty classes
   );
-};
+}
 
-export type PickU<T, K extends keyof T> = T extends any
-  ? { [P in K]: T[P] }
-  : never;
-// export type OmitU<T, K extends keyof T> = T extends any ? PickU<T, Exclude<keyof T, K>> : never
 export type RemoveIndex<T> = {
   [K in keyof T as string extends K
     ? never
@@ -97,7 +89,7 @@ export type RemoveIndex<T> = {
 /**
  * ForwardRef typings
  */
-export type TailwindExoticComponent<P> = PickU<
+export type TailwindExoticComponent<P> = Pick<
   React.ForwardRefExoticComponent<P>,
   keyof React.ForwardRefExoticComponent<any>
 >;
@@ -110,8 +102,8 @@ type MergeProps<O extends object, P extends {} = {}> =
 type TailwindPropHelper<
   P extends {},
   O extends object = {}
-  // PickU is needed here to make $as typing work
-> = PickU<MergeProps<O, P>, keyof MergeProps<O, P>>;
+  // Pick is needed here to make $as typing work
+> = Pick<MergeProps<O, P>, keyof MergeProps<O, P>>;
 
 type TailwindComponentPropsWith$As<
   P extends object,
@@ -370,7 +362,7 @@ export function createTailwindCVA(): TailwindCVA {
 
           const StyledComponent = styledFn`` as FC<Props>;
 
-          return forwardRef<HTMLElement, Props>(
+          const WithRef = forwardRef<HTMLElement, Props>(
             ({ className, ...props }, ref) => (
               <StyledComponent
                 className={cn(variance({ ...props, className }), className)}
@@ -379,6 +371,10 @@ export function createTailwindCVA(): TailwindCVA {
               />
             )
           );
+
+          WithRef.displayName = `Styled${capitalize(key)}`;
+
+          return WithRef;
         },
       }),
     ])

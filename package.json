@@ -18,7 +18,8 @@
     "compile": "tsc --noEmit",
     "bundle": "NODE_OPTIONS=\"--max-old-space-size=4096\" tsup",
     "test": "vitest --run src",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "lint": "eslint ./src --ext .ts,.tsx"
   },
   "types": "dist/index.d.ts",
   "files": [
@@ -38,9 +39,12 @@
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@types/testing-library__jest-dom": "^5.14.9",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react": "^4.2.1",
     "class-variance-authority": "^0.7.0",
     "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.0",
     "happy-dom": "^13.7.3",
     "matchers": "link:@testing-library/jest-dom/matchers",
     "react": "^18.2.0",

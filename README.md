@@ -1,4 +1,4 @@
-![npm version](/assets/styled-cva.svg)
+![styled-cva banner](https://raw.githubusercontent.com/alanrsoares/styled-cva/main/assets/styled-cva.svg)
 
 # styled-cva
 

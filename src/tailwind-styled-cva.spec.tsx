@@ -2,13 +2,13 @@ import { render } from "@testing-library/react";
 import tw from "./";
 
 describe("styled-cva", () => {
-  const StyledButton = tw.button.cva("bg-red-500", {
+  const StyledButton = tw.button.cva("btn-base", {
     variants: {
       // variant keys starting with $ will not be sent to the DOM,
       // this avoids extraneous props warning
       $variant: {
-        primary: "bg-red-500",
-        secondary: "bg-blue-500",
+        primary: "btn-primary",
+        secondary: "btn-secondary",
       },
     },
   });
@@ -17,14 +17,14 @@ describe("styled-cva", () => {
 
   it("should render the button with the primary variant", () => {
     const { container } = render(
-      <StyledButton $variant="primary">Test</StyledButton>
+      <StyledButton $variant="primary">Click me</StyledButton>
     );
 
     expect(container.firstChild).toMatchInlineSnapshot(`
       <button
-        class="bg-red-500"
+        class="btn-base btn-primary"
       >
-        Test
+        Click me
       </button>
     `);
   });
@@ -35,7 +35,7 @@ describe("styled-cva", () => {
     );
     expect(container.firstChild).toMatchInlineSnapshot(`
       <button
-        class="bg-blue-500"
+        class="btn-base btn-secondary"
       >
         Test
       </button>
@@ -51,34 +51,59 @@ describe("styled-cva", () => {
 
     expect(container.firstChild).toMatchInlineSnapshot(`
       <button
-        class="bg-green-500"
+        class="btn-base bg-green-500"
       >
         Extended
       </button>
     `);
   });
 
-  it("should render a different component using $as prop", () => {
-    const StyledDiv = tw.div.cva("bg-red-500", {
+  it("should render a different jsx element using $as prop", () => {
+    const StyledDiv = tw.div.cva("div-base", {
       variants: {
         $variant: {
-          primary: "bg-red-500",
-          secondary: "bg-blue-500",
+          primary: "div-primary",
+          secondary: "div-secondary",
+        },
+      },
+    });
+
+    const { container } = render(
+      <StyledDiv $as="button" $variant="primary">
+        I&apos;m originally a div, but I&apos;m rendered as a button
+      </StyledDiv>
+    );
+
+    expect(container.firstChild).toMatchInlineSnapshot(`
+      <button
+        class="div-base div-primary"
+      >
+        I'm originally a div, but I'm rendered as a button
+      </button>
+    `);
+  });
+
+  it("should render a different component using $as prop", () => {
+    const StyledDiv = tw.div.cva("div-base", {
+      variants: {
+        $variant: {
+          primary: "div-primary",
+          secondary: "div-secondary",
         },
       },
     });
 
     const { container } = render(
       <StyledDiv $as={StyledButton} $variant="primary">
-        Test
+        I was once a div, but now I&apos;m a button
       </StyledDiv>
     );
 
     expect(container.firstChild).toMatchInlineSnapshot(`
       <button
-        class="bg-red-500"
+        class="btn-base div-base div-primary div-base div-primary"
       >
-        Test
+        I was once a div, but now I'm a button
       </button>
     `);
   });

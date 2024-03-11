@@ -1,5 +1,3 @@
-![styled-cva banner](https://raw.githubusercontent.com/alanrsoares/styled-cva/main/assets/styled-cva.svg)
-
 # styled-cva
 
 [![npm version](https://badge.fury.io/js/styled-cva.svg)](https://badge.fury.io/js/styled-cva)

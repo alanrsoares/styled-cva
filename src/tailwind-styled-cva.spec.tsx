@@ -4,7 +4,7 @@ import tw from "./";
 describe("tailwind-styled-cva", () => {
   const StyledButton = tw.button.cva("bg-red-500", {
     variants: {
-      // variant keys start with $ will not be sent to the DOM,
+      // variant keys starting with $ will not be sent to the DOM,
       // this avoids extraneous props warning
       $variant: {
         primary: "bg-red-500",

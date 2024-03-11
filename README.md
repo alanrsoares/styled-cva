@@ -46,7 +46,7 @@ import tw from "styled-cva";
 
 const VariantButton = tw.button.cva("btn-base-class", {
   variants: {
-    // variant keys start with $ will not be sent to the DOM,
+    // variant keys starting with $ will not be sent to the DOM,
     // this avoids extraneous props warning
     $variant: {
       primary: "btn-primary-class",

@@ -9,7 +9,6 @@
     "tailwindcss",
     "variants"
   ],
-  "type": "module",
   "scripts": {
     "build": "pnpm compile && pnpm bundle",
     "compile": "tsc --noEmit",

@@ -352,7 +352,7 @@ export function createTailwindCVA(): TailwindCVA {
     Object.entries(tw).map(([key, styledFn]) => [
       key,
       Object.assign(styledFn, {
-        cva: (...args: Parameters<typeof cva>) => {
+        cva: (...args: Parameters<CVA>) => {
           const variance = cva(...args);
 
           type Props = VariantProps<typeof variance> & {

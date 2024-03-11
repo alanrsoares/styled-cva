@@ -1,3 +1,5 @@
+![npm version](/assets/styled-cva.svg)
+
 # styled-cva
 
 [![npm version](https://badge.fury.io/js/styled-cva.svg)](https://badge.fury.io/js/styled-cva)

@@ -20,6 +20,9 @@
     "test": "vitest --run src",
     "clean": "rm -rf dist"
   },
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.mjs",

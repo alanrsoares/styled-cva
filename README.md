@@ -5,9 +5,9 @@ A typesafe, class-variance-authority-based, styled-components-like library for a
 ## Usage
 
 ```tsx
-import styled from "styled-cva";
+import tw from "styled-cva";
 
-const Button = styled.button.cva("btn-base-class", {
+const Button = tw.button.cva("btn-base-class", {
   variants: {
     $variant: {
       primary: "btn-primary-class",
@@ -21,10 +21,10 @@ const myButton = <Button $variant="primary">Click Me</Button>;
 
 ## VSCode intellisense
 
-For tailwindcss extension support, add this to your vscode settings json config
+For tailwindcss extension support, add this to your vscode [settings.json](/.vscode/settings.json)
 
 ```json
- // tailwindcss intelisense settings
+  // tailwindcss intelisense settings
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
     "typescript": "javascript", // if you are using typescript
@@ -34,7 +34,9 @@ For tailwindcss extension support, add this to your vscode settings json config
     "tw`([^`]*)", // tw`...`
     "tw\\.[^`]+`([^`]*)`", // tw.xxx<xxx>`...`
     "tw\\(.*?\\).*?`([^`]*)", // tw(Component)<xxx>`...`
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
+  "editor.quickSuggestions": {
+    "strings": true // forces VS Code to trigger completions when editing "string" content
+  },
 ```

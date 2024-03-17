@@ -1,6 +1,7 @@
-import { createStyledCVA } from "./styled-cva";
+import { createStyledCVA } from "./lib/styled-cva";
 
-export * from "./styled-cva";
+export * from "./lib/styled-cva";
+export * from "./lib/cva";
 
 const tw = createStyledCVA();
 

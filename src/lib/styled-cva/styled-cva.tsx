@@ -8,10 +8,10 @@ import React, {
   type FC,
 } from "react";
 
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from "../cva";
 
-import { capitalize, cn } from "./utils";
-import domElements from "./domElements";
+import { capitalize, cn } from "../../utils";
+import domElements from "../../domElements";
 
 const isTwElement = Symbol("isTwElement?");
 

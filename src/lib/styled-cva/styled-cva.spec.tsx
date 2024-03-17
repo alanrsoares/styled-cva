@@ -1,5 +1,9 @@
 import { render } from "@testing-library/react";
-import tw from ".";
+import { TypeEqual, expectType } from "ts-expect";
+import { createStyledCVA } from "./styled-cva";
+import { ComponentProps } from "react";
+
+const tw = createStyledCVA();
 
 describe("styled-cva", () => {
   const StyledButton = tw.button.cva("btn-base", {
@@ -13,7 +17,13 @@ describe("styled-cva", () => {
     },
   });
 
-  expect(StyledButton).toBeDefined();
+  it("should derive a union type from the variant prop", () => {
+    type StyledButtonProps = ComponentProps<typeof StyledButton>;
+    type VariantProp = NonNullable<StyledButtonProps["$variant"]>;
+
+    expectType<TypeEqual<"primary" | "secondary", VariantProp>>(true);
+    expectType<TypeEqual<string, VariantProp>>(false);
+  });
 
   it("should render the button with the primary variant", () => {
     const { container } = render(

@@ -68,7 +68,7 @@ const templateFunctionFactory: TailwindInterface = (<
   C extends React.ElementType
 >(
   Element: C
-): any => {
+) => {
   return (
     template: TemplateStringsArray,
     ...templateElements: ((props: any) => string | undefined | null)[]
@@ -97,11 +97,13 @@ const templateFunctionFactory: TailwindInterface = (<
             : {};
 
           // filter out props that starts with "$" props except when styling a tailwind-styled-component
-          const filteredProps = isTw(FinalElement)
-            ? props
-            : (Object.fromEntries(
-                Object.entries(props).filter(removeTransientProps)
-              ) as any);
+          const filteredProps =
+            isTw(FinalElement) || typeof Element !== "string"
+              ? props
+              : (Object.fromEntries(
+                  Object.entries(props).filter(removeTransientProps)
+                ) as any);
+
           return (
             <FinalElement
               // forward props

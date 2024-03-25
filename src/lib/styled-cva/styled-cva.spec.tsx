@@ -56,6 +56,22 @@ describe("styled-cva", () => {
     const ExtendedStyledButton = tw(StyledButton)`bg-green-500`;
 
     const { container } = render(
+      <ExtendedStyledButton $variant="secondary">Extended</ExtendedStyledButton>
+    );
+
+    expect(container.firstChild).toMatchInlineSnapshot(`
+      <button
+        class="btn-base btn-secondary bg-green-500"
+      >
+        Extended
+      </button>
+    `);
+  });
+
+  it("should extend the component with additional variant", () => {
+    const ExtendedStyledButton = tw(StyledButton)`bg-green-500`;
+
+    const { container } = render(
       <ExtendedStyledButton>Extended</ExtendedStyledButton>
     );
 

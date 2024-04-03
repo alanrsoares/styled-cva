@@ -46,6 +46,7 @@ import tw from "styled-cva";
 
 const VariantButton = tw.button.cva("btn-base-class", {
   variants: {
+    // smart disappearing props:
     // variant keys starting with $ will not be sent to the DOM,
     // this avoids extraneous props warning
     $variant: {
@@ -59,6 +60,9 @@ const VariantButton = tw.button.cva("btn-base-class", {
 
 // $variant is infered to 'primary' | 'secondary'
 <VariantButton $variant="primary">Click Me</VariantButton>;
+
+// actual element in the dom will be:
+// <button class="btn-primary-class">Click Me</button>
 ```
 
 proxy

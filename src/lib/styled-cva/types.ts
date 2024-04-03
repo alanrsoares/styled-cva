@@ -161,15 +161,44 @@ export type IntrinsicElementsTemplateFunctionsMap = {
 
 export interface TailwindInterface
   extends IntrinsicElementsTemplateFunctionsMap {
+  /**
+   * A factory function that creates a styled component from a wrapped component
+   * @example
+   * ```tsx
+   * const StyledButton = tw.button`bg-blue-500`;
+   *
+   * const ExtendedStyledButton = tw(StyledButton)`bg-green-500`;
+   *
+   * // the resultin component will have both classes, with the last one taking precedence
+   * ```
+   */
   <C extends TailwindComponent<any, any>>(component: C): TemplateFunction<
     TailwindComponentInnerProps<C>,
     TailwindComponentInnerOtherProps<C>
   >;
+  /**
+   * A factory function that creates a styled component from a wrapped component
+   *
+   * @example
+   * ```tsx
+   * const StyledButton = tw.button`bg-blue-500`;
+   *
+   * const ExtendedStyledButton = tw(StyledButton)`bg-green-500`;
+   *
+   * // the resultin component will have both classes, with the last one taking precedence
+   * ```
+   */
   <C extends React.ComponentType<any>>(component: C): TemplateFunction<
     // Prevent functional components without props infering props as `unknown`
     C extends (P?: never) => any ? {} : React.ComponentPropsWithoutRef<C>
   >;
-
+  /**
+   * A factory function that creates a styled component from an intrinsic element
+   * @example
+   * ```tsx
+   * const StyledButton = tw.button.cva("btn-base", {});
+   * ```
+   */
   <C extends keyof JSX.IntrinsicElements>(component: C): TemplateFunction<
     JSX.IntrinsicElements[C]
   >;

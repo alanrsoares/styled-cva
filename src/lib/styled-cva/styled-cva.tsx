@@ -174,7 +174,34 @@ type StyledExtension = {
 };
 
 export type StyledCVA = TailwindInterface & {
+  /**
+   * A factory function that creates a styled component with variant props
+   */
   [K in ElementKey]: TailwindInterface[K] & {
+    /**
+     * A factory function that creates a styled component with variant props
+     *
+     * @param args - a tuple containing the `cva` function arguments
+     * @returns A styled component with variant props
+     *
+     * @example
+     * ```tsx
+     * const StyledButton = tw.button.cva("btn-base", {
+     *  variants: {
+     *  // variant keys starting with $ will not be sent to the DOM,
+     *  // this avoids extraneous props warning
+     *    $variant: {
+     *      primary: "btn-primary",
+     *      secondary: "btn-secondary",
+     *    },
+     *  }
+     * });
+     *
+     * // ...
+     *
+     * <StyledButton $variant="primary">Click me</StyledButton>
+     * ```
+     */
     cva: <T>(
       ...args: Parameters<CVA<T>>
     ) => FC<

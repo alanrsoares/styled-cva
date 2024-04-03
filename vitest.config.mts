@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "happy-dom",
-    setupFiles: resolve(__dirname, "vitest.setup.ts"),
+    setupFiles: resolve(__dirname, "vitest.setup.mts"),
     globals: true,
   },
   resolve: {

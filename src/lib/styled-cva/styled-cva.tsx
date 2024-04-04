@@ -9,7 +9,8 @@ import React, {
 
 import { cva, type VariantProps } from "../cva";
 
-import { capitalize, cn } from "../../utils";
+import { capitalize } from "../utils";
+import { cn } from "../cn";
 import domElements from "../../domElements";
 import {
   isTwElement,

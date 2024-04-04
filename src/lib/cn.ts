@@ -8,13 +8,10 @@ import { twMerge } from "tailwind-merge";
  *
  * @example
  * ```ts
- * import { cn } from "@axelarjs/ui";
+ * import { cn } from "styled-cva";
  *
  * const className = cn("text-red-500", "bg-blue-500");
  * // className = "text-red-500 bg-blue-500"
  * ```
  */
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
-
-export const capitalize = ([fst, ...str]: string) =>
-  fst?.toUpperCase() + str.join("");

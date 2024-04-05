@@ -1,6 +1,12 @@
-# styled-cva
+<p align="center">
+  <a href="https://github.com/prettier/prettier"><img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg" /></a>
+  <a href="https://github.com/alanrsoares/styled-cva"><img alt="License" src="https://img.shields.io/github/license/alanrsoares/styled-cva" /></a>
+  <a href="https://www.npmjs.com/package/styled-cva"><img alt="Types" src="https://img.shields.io/npm/types/styled-cva" /></a>
+  <a href="https://www.npmjs.com/package/styled-cva" rel="nofollow"><img src="https://img.shields.io/npm/v/styled-cva.svg?sanitize=true"></a>
+</p>
 
-[![npm version](https://badge.fury.io/js/styled-cva.svg)](https://badge.fury.io/js/styled-cva)
+
+# styled-cva
 
 A typesafe, [class-variance-authority-based](https://github.com/joe-bell/cva), styled-components-like library for authoring React components
 
@@ -128,4 +134,4 @@ For tailwindcss extension support, add this to your vscode [settings.json](/.vsc
 
 ####
 
-License - [UNLICENSE](/LICENSE)
+License - [Apache-2.0](/LICENSE)

@@ -39,8 +39,8 @@ export type RemoveIndex<T> = {
   [K in keyof T as string extends K
     ? never
     : number extends K
-    ? never
-    : K]: T[K];
+      ? never
+      : K]: T[K];
 };
 
 /**
@@ -58,7 +58,7 @@ type MergeProps<O extends object, P extends {} = {}> =
 
 type TailwindPropHelper<
   P extends {},
-  O extends object = {}
+  O extends object = {},
   // Pick is needed here to make $as typing work
 > = Pick<MergeProps<O, P>, keyof MergeProps<O, P>>;
 
@@ -69,8 +69,8 @@ type TailwindComponentPropsWith$As<
   P2 extends {} = $As extends AnyTailwindComponent
     ? TailwindComponentAllInnerProps<$As>
     : $As extends IntrinsicElementsKeys | React.ComponentType<any>
-    ? React.ComponentPropsWithRef<$As>
-    : never
+      ? React.ComponentPropsWithRef<$As>
+      : never,
 > = P & O & TailwindPropHelper<P2> & { $as?: $As };
 
 /**
@@ -83,7 +83,7 @@ type TailwindComponentPropsWith$As<
  */
 export type TailwindComponent<
   P extends object,
-  O extends object = {}
+  O extends object = {},
 > = IsTwElement & TailwindComponentBase<P, O> & WithStyle<P, O>;
 
 /**
@@ -99,11 +99,11 @@ export interface TailwindComponentBase<P extends object, O extends object = {}>
   extends TailwindExoticComponent<TailwindPropHelper<P, O>> {
   // add our own fake call signature to implement the polymorphic '$as' prop
   (
-    props: TailwindPropHelper<P, O> & { $as?: never | undefined }
+    props: TailwindPropHelper<P, O> & { $as?: never | undefined },
   ): React.ReactElement<TailwindPropHelper<P, O>>;
 
   <$As extends string | React.ComponentType<any> = React.ComponentType<P>>(
-    props: TailwindComponentPropsWith$As<P, O, $As>
+    props: TailwindComponentPropsWith$As<P, O, $As>,
   ): React.ReactElement<TailwindComponentPropsWith$As<P, O, $As>>;
 }
 
@@ -117,7 +117,7 @@ export interface TailwindComponentBase<P extends object, O extends object = {}>
  */
 export interface WithStyle<P extends object, O extends object = {}> {
   withStyle: <S extends object = {}>(
-    styles: React.CSSProperties | ((p: P & O & S) => React.CSSProperties)
+    styles: React.CSSProperties | ((p: P & O & S) => React.CSSProperties),
   ) => TailwindComponent<P, O & S>;
 }
 /**
@@ -172,7 +172,9 @@ export interface TailwindInterface
    * // the resultin component will have both classes, with the last one taking precedence
    * ```
    */
-  <C extends TailwindComponent<any, any>>(component: C): TemplateFunction<
+  <C extends TailwindComponent<any, any>>(
+    component: C,
+  ): TemplateFunction<
     TailwindComponentInnerProps<C>,
     TailwindComponentInnerOtherProps<C>
   >;
@@ -188,7 +190,9 @@ export interface TailwindInterface
    * // the resultin component will have both classes, with the last one taking precedence
    * ```
    */
-  <C extends React.ComponentType<any>>(component: C): TemplateFunction<
+  <C extends React.ComponentType<any>>(
+    component: C,
+  ): TemplateFunction<
     // Prevent functional components without props infering props as `unknown`
     C extends (P?: never) => any ? {} : React.ComponentPropsWithoutRef<C>
   >;
@@ -199,7 +203,7 @@ export interface TailwindInterface
    * const StyledButton = tw.button.cva("btn-base", {});
    * ```
    */
-  <C extends keyof JSX.IntrinsicElements>(component: C): TemplateFunction<
-    JSX.IntrinsicElements[C]
-  >;
+  <C extends keyof JSX.IntrinsicElements>(
+    component: C,
+  ): TemplateFunction<JSX.IntrinsicElements[C]>;
 }

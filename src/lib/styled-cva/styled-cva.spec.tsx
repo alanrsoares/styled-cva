@@ -1,7 +1,8 @@
 import { render } from "@testing-library/react";
-import { TypeEqual, expectType } from "ts-expect";
-import { createStyledCVA } from "./styled-cva";
 import { ComponentProps } from "react";
+import { expectType, TypeEqual } from "ts-expect";
+
+import { createStyledCVA } from "./styled-cva";
 
 const tw = createStyledCVA();
 
@@ -27,7 +28,7 @@ describe("styled-cva", () => {
 
   it("should render the button with the primary variant", () => {
     const { container } = render(
-      <StyledButton $variant="primary">Click me</StyledButton>
+      <StyledButton $variant="primary">Click me</StyledButton>,
     );
 
     expect(container.firstChild).toMatchInlineSnapshot(`
@@ -41,7 +42,7 @@ describe("styled-cva", () => {
 
   it("should render the button with the secondary variant", () => {
     const { container } = render(
-      <StyledButton $variant="secondary">Test</StyledButton>
+      <StyledButton $variant="secondary">Test</StyledButton>,
     );
     expect(container.firstChild).toMatchInlineSnapshot(`
       <button
@@ -56,7 +57,9 @@ describe("styled-cva", () => {
     const ExtendedStyledButton = tw(StyledButton)`bg-green-500`;
 
     const { container } = render(
-      <ExtendedStyledButton $variant="secondary">Extended</ExtendedStyledButton>
+      <ExtendedStyledButton $variant="secondary">
+        Extended
+      </ExtendedStyledButton>,
     );
 
     expect(container.firstChild).toMatchInlineSnapshot(`
@@ -72,7 +75,7 @@ describe("styled-cva", () => {
     const ExtendedStyledButton = tw(StyledButton)`bg-green-500`;
 
     const { container } = render(
-      <ExtendedStyledButton>Extended</ExtendedStyledButton>
+      <ExtendedStyledButton>Extended</ExtendedStyledButton>,
     );
 
     expect(container.firstChild).toMatchInlineSnapshot(`
@@ -97,7 +100,7 @@ describe("styled-cva", () => {
     const { container } = render(
       <StyledDiv $as="button" $variant="primary">
         I&apos;m originally a div, but I&apos;m rendered as a button
-      </StyledDiv>
+      </StyledDiv>,
     );
 
     expect(container.firstChild).toMatchInlineSnapshot(`
@@ -122,7 +125,7 @@ describe("styled-cva", () => {
     const { container } = render(
       <StyledDiv $as={StyledButton} $variant="primary">
         I was once a div, but now I&apos;m a button
-      </StyledDiv>
+      </StyledDiv>,
     );
 
     expect(container.firstChild).toMatchInlineSnapshot(`

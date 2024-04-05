@@ -2,16 +2,15 @@
 
 import React, {
   forwardRef,
-  type CSSProperties,
   type ComponentType,
+  type CSSProperties,
   type FC,
 } from "react";
 
-import { cva, type VariantProps } from "../cva";
-
-import { capitalize } from "../utils";
-import { cn } from "../cn";
 import domElements from "../../domElements";
+import { cn } from "../cn";
+import { cva, type VariantProps } from "../cva";
+import { capitalize } from "../utils";
 import {
   isTwElement,
   type AnyTailwindComponent,
@@ -24,16 +23,16 @@ import {
 
 export const mergeArrays = (
   template: TemplateStringsArray,
-  templateElements: Array<Nullish<string>>
+  templateElements: Array<Nullish<string>>,
 ) =>
   template.reduce<string[]>(
     (acc, c, i) => acc.concat(c || [], templateElements[i] || []), //  x || [] to remove false values e.g '', null, undefined. as Array.concat() ignores empty arrays i.e []
-    []
+    [],
   );
 
 export function cleanTemplate(
   template: Array<Interpolation<any>>,
-  inheritedClasses: string = ""
+  inheritedClasses: string = "",
 ) {
   const newClasses = template
     .join(" ")
@@ -50,7 +49,7 @@ export function cleanTemplate(
   return cn(
     ...newClasses
       .concat(inheritedClassesArray) // add new classes to inherited classes
-      .filter((c: string) => c !== " ") // remove empty classes
+      .filter((c: string) => c !== " "), // remove empty classes
   );
 }
 
@@ -66,16 +65,16 @@ const removeTransientProps = ([key]: [string, any]): boolean =>
 const isTw = (c: any): c is AnyTailwindComponent => c[isTwElement] === true;
 
 const templateFunctionFactory: TailwindInterface = (<
-  C extends React.ElementType
+  C extends React.ElementType,
 >(
-  Element: C
+  Element: C,
 ) => {
   return (
     template: TemplateStringsArray,
     ...templateElements: ((props: any) => string | undefined | null)[]
   ) => {
     const TwComponentConstructor = (
-      styleArray: (CSSProperties | ((p: any) => CSSProperties))[] = []
+      styleArray: (CSSProperties | ((p: any) => CSSProperties))[] = [],
     ) => {
       const TwComponent = React.forwardRef(
         (baseProps: any, ref: any): JSX.Element => {
@@ -91,9 +90,9 @@ const templateFunctionFactory: TailwindInterface = (<
                     acc,
                     typeof intStyle === "function"
                       ? intStyle(baseProps)
-                      : intStyle
+                      : intStyle,
                   ),
-                {} as CSSProperties
+                {} as CSSProperties,
               )
             : {};
 
@@ -102,7 +101,7 @@ const templateFunctionFactory: TailwindInterface = (<
             isTw(FinalElement) || typeof Element !== "string"
               ? props
               : (Object.fromEntries(
-                  Object.entries(props).filter(removeTransientProps)
+                  Object.entries(props).filter(removeTransientProps),
                 ) as any);
 
           return (
@@ -116,15 +115,15 @@ const templateFunctionFactory: TailwindInterface = (<
               className={cleanTemplate(
                 mergeArrays(
                   template,
-                  templateElements.map((t) => t({ ...props, $as }))
+                  templateElements.map((t) => t({ ...props, $as })),
                 ),
-                props.className
+                props.className,
               )}
               // forward $as prop when styling a tailwind-styled-component
               {...(isTw(Element) ? { $as } : {})}
             />
           );
-        }
+        },
       ) as any;
       // symbol identifier for detecting tailwind-styled-components
       TwComponent[isTwElement] = true;
@@ -138,7 +137,7 @@ const templateFunctionFactory: TailwindInterface = (<
         TwComponent.displayName = "tw." + Element;
       }
       TwComponent.withStyle = (
-        styles: ((p: any) => CSSProperties) | CSSProperties
+        styles: ((p: any) => CSSProperties) | CSSProperties,
       ) => TwComponentConstructor(styleArray.concat(styles)) as any;
 
       return TwComponent;
@@ -151,17 +150,17 @@ const intrinsicElementsMap: IntrinsicElementsTemplateFunctionsMap =
   domElements.reduce(
     <K extends IntrinsicElementsKeys>(
       acc: IntrinsicElementsTemplateFunctionsMap,
-      DomElement: K
+      DomElement: K,
     ) => ({
       ...acc,
       [DomElement]: templateFunctionFactory(DomElement),
     }),
-    {} as IntrinsicElementsTemplateFunctionsMap
+    {} as IntrinsicElementsTemplateFunctionsMap,
   );
 
 const tw: TailwindInterface = Object.assign(
   templateFunctionFactory,
-  intrinsicElementsMap
+  intrinsicElementsMap,
 );
 
 export default tw;
@@ -235,7 +234,7 @@ export function createStyledCVA(): StyledCVA {
                 {...props}
                 ref={ref}
               />
-            )
+            ),
           );
 
           WithRef.displayName = `Styled${capitalize(key)}`;
@@ -243,7 +242,7 @@ export function createStyledCVA(): StyledCVA {
           return WithRef;
         },
       }),
-    ])
+    ]),
   );
 
   return Object.assign(tw, twCVA) as StyledCVA;

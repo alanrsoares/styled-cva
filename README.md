@@ -5,6 +5,8 @@
   <a href="https://www.npmjs.com/package/styled-cva" rel="nofollow"><img src="https://img.shields.io/npm/v/styled-cva.svg?sanitize=true"></a>
 </p>
 
+> ⚠️ styled-cva 0.4.x only supports React 19.x. If you're on React 18, use the latest 0.3.x ⚠️
+
 
 # styled-cva
 

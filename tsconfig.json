@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "moduleDetection": "force",
     "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
     "strict": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,

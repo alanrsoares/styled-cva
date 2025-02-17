@@ -5,6 +5,7 @@ import React, {
   type ComponentType,
   type CSSProperties,
   type FC,
+  type JSX,
 } from "react";
 
 import domElements from "../../domElements";
@@ -146,17 +147,16 @@ const templateFunctionFactory: TailwindInterface = (<
   };
 }) as any;
 
-const intrinsicElementsMap: IntrinsicElementsTemplateFunctionsMap =
-  domElements.reduce(
-    <K extends IntrinsicElementsKeys>(
-      acc: IntrinsicElementsTemplateFunctionsMap,
-      DomElement: K,
-    ) => ({
-      ...acc,
-      [DomElement]: templateFunctionFactory(DomElement),
-    }),
-    {} as IntrinsicElementsTemplateFunctionsMap,
-  );
+const intrinsicElementsMap = domElements.reduce(
+  <K extends IntrinsicElementsKeys>(
+    acc: IntrinsicElementsTemplateFunctionsMap,
+    DomElement: K,
+  ) => ({
+    ...acc,
+    [DomElement]: templateFunctionFactory(DomElement),
+  }),
+  {} as IntrinsicElementsTemplateFunctionsMap,
+);
 
 const tw: TailwindInterface = Object.assign(
   templateFunctionFactory,

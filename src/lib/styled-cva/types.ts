@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { JSX } from "react";
+
 export const isTwElement = Symbol("isTwElement?");
 
 export type Nullish<T> = T | null | undefined;

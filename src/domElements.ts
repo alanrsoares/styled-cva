@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 export type ElementKey = keyof JSX.IntrinsicElements;
 
 const elementsArray: ElementKey[] = [

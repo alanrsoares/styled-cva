@@ -7,7 +7,6 @@
 
 > ⚠️ styled-cva 0.4.x only supports React 19.x. If you're on React 18, use the latest 0.3.x ⚠️
 
-
 # styled-cva
 
 A typesafe, [class-variance-authority-based](https://github.com/joe-bell/cva), styled-components-like library for authoring React components
@@ -71,6 +70,33 @@ const VariantButton = tw.button.cva("btn-base-class", {
 
 // actual element in the dom will be:
 // <button class="btn-primary-class">Click Me</button>
+```
+
+withProps
+
+```tsx
+const StyledButton = tw.button
+  .cva("btn-base", {
+    variants: {
+      $variant: {
+        primary: "btn-primary",
+        secondary: "btn-secondary",
+      },
+    },
+  })
+  .withProps({
+    "data-testid": "my-button",
+    type: "button",
+    $variant: "primary", // Valid variant value
+  });
+
+// The component now has default props applied
+<StyledButton>Click Me</StyledButton>;
+
+// User props override defaults
+<StyledButton $variant="secondary" type="submit">
+  Submit
+</StyledButton>;
 ```
 
 proxy

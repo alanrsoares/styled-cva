@@ -209,3 +209,5 @@ export interface TailwindInterface
     component: C,
   ): TemplateFunction<JSX.IntrinsicElements[C]>;
 }
+
+export type ElementKey = keyof TailwindInterface;

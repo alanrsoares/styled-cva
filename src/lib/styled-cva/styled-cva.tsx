@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, {
+import {
   forwardRef,
   type ComponentType,
   type CSSProperties,
+  type ElementType,
   type FC,
+  type ForwardRefExoticComponent,
   type JSX,
+  type PropsWithoutRef,
+  type Ref,
+  type RefAttributes,
 } from "react";
 
 import domElements from "../../domElements";
@@ -15,6 +20,7 @@ import { capitalize } from "../utils";
 import {
   isTwElement,
   type AnyTailwindComponent,
+  type ElementKey,
   type Interpolation,
   type IntrinsicElementsKeys,
   type IntrinsicElementsTemplateFunctionsMap,
@@ -65,9 +71,7 @@ const removeTransientProps = ([key]: [string, any]): boolean =>
 
 const isTw = (c: any): c is AnyTailwindComponent => c[isTwElement] === true;
 
-const templateFunctionFactory: TailwindInterface = (<
-  C extends React.ElementType,
->(
+const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
   Element: C,
 ) => {
   return (
@@ -77,7 +81,7 @@ const templateFunctionFactory: TailwindInterface = (<
     const TwComponentConstructor = (
       styleArray: (CSSProperties | ((p: any) => CSSProperties))[] = [],
     ) => {
-      const TwComponent = React.forwardRef(
+      const TwComponent = forwardRef(
         (baseProps: any, ref: any): JSX.Element => {
           const { $as = Element, style = {}, ...props } = baseProps;
 
@@ -165,12 +169,72 @@ const tw: TailwindInterface = Object.assign(
 
 export default tw;
 
-type ElementKey = keyof TailwindInterface;
-
 type CVA<T = unknown> = typeof cva<T>;
 
 type StyledExtension = {
   $as?: ElementKey | ComponentType<any>;
+};
+
+// Type for valid withProps input: element props + data-* attributes + variant props
+// This type uses a mapped type to only allow valid keys
+type ValidElementProps<K extends ElementKey> = {
+  [P in keyof JSX.IntrinsicElements[K] as P extends `$${string}`
+    ? never
+    : P]?: JSX.IntrinsicElements[K][P];
+};
+
+// ValidWithProps includes element props, data attributes, and variant props
+type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
+  [key: `data-${string}`]: string;
+} & Partial<VariantProps<ReturnType<CVA<T>>>>;
+
+type CVAWithPropsReturn<K extends ElementKey, T> = ForwardRefExoticComponent<
+  PropsWithoutRef<
+    JSX.IntrinsicElements[K] &
+      VariantProps<ReturnType<CVA<T>>> &
+      StyledExtension
+  > &
+    RefAttributes<HTMLElement>
+> & {
+  /**
+   * Sets default props for the component. User-provided props will override these defaults.
+   *
+   * @param defaultProps - An object containing default props to apply to the component.
+   *                       Accepts known element props, data-* attributes, and variant props.
+   *                       Variant prop values are validated against the variant definitions.
+   * @returns A component with the default props applied
+   *
+   * @example
+   * ```tsx
+   * const StyledButton = tw.button.cva("btn-base", {
+   *   variants: {
+   *     $variant: {
+   *       primary: "btn-primary",
+   *       secondary: "btn-secondary",
+   *     },
+   *   },
+   * }).withProps({
+   *   'data-some-prop': 'some-value',
+   *   type: 'button',
+   *   $variant: 'primary' // Valid variant value
+   * });
+   *
+   * // The component will have data-some-prop="some-value", type="button", and $variant="primary" by default
+   * <StyledButton>Click me</StyledButton>
+   * ```
+   */
+  withProps: <DefaultProps extends ValidWithProps<K, T>>(
+    defaultProps: DefaultProps & {
+      [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
+    },
+  ) => ForwardRefExoticComponent<
+    PropsWithoutRef<
+      JSX.IntrinsicElements[K] &
+        VariantProps<ReturnType<CVA<T>>> &
+        StyledExtension
+    > &
+      RefAttributes<HTMLElement>
+  >;
 };
 
 export type StyledCVA = TailwindInterface & {
@@ -182,7 +246,7 @@ export type StyledCVA = TailwindInterface & {
      * A factory function that creates a styled component with variant props
      *
      * @param args - a tuple containing the `cva` function arguments
-     * @returns A styled component with variant props
+     * @returns A styled component with variant props and a `.withProps()` method
      *
      * @example
      * ```tsx
@@ -202,13 +266,7 @@ export type StyledCVA = TailwindInterface & {
      * <StyledButton $variant="primary">Click me</StyledButton>
      * ```
      */
-    cva: <T>(
-      ...args: Parameters<CVA<T>>
-    ) => FC<
-      JSX.IntrinsicElements[K] &
-        VariantProps<ReturnType<CVA<T>>> &
-        StyledExtension
-    >;
+    cva: <T>(...args: Parameters<CVA<T>>) => CVAWithPropsReturn<K, T>;
   };
 };
 
@@ -222,7 +280,7 @@ export function createStyledCVA(): StyledCVA {
 
           type Props = VariantProps<typeof variance> & {
             className?: string;
-            ref?: React.Ref<HTMLElement>;
+            ref?: Ref<HTMLElement>;
           } & StyledExtension;
 
           const StyledComponent = styledFn`` as FC<Props>;
@@ -239,7 +297,39 @@ export function createStyledCVA(): StyledCVA {
 
           WithRef.displayName = `Styled${capitalize(key)}`;
 
-          return WithRef;
+          // Add withProps method to the component
+          // Type constraint is enforced by the type definition (ValidWithProps<K, T>)
+          // Implementation uses 'as any' to match the type signature while allowing runtime flexibility
+          // We use the variance type to get the correct variant props
+          type ValidPropsForImplementation = ValidElementProps<
+            typeof key & ElementKey
+          > & {
+            [key: `data-${string}`]: string;
+          } & Partial<VariantProps<typeof variance>>;
+
+          const ComponentWithProps = WithRef as typeof WithRef & {
+            withProps: <DefaultProps extends ValidPropsForImplementation>(
+              defaultProps: DefaultProps,
+            ) => ForwardRefExoticComponent<
+              PropsWithoutRef<Props> & RefAttributes<HTMLElement>
+            >;
+          };
+
+          ComponentWithProps.withProps = ((defaultProps: any) => {
+            const ComponentWithDefaultProps = forwardRef<HTMLElement, Props>(
+              (userProps, ref) => {
+                // Merge default props with user props (user props take precedence)
+                const mergedProps = { ...defaultProps, ...userProps } as Props;
+                return <WithRef {...mergedProps} ref={ref} />;
+              },
+            );
+
+            ComponentWithDefaultProps.displayName = `${WithRef.displayName}.withProps`;
+
+            return ComponentWithDefaultProps;
+          }) as typeof ComponentWithProps.withProps;
+
+          return ComponentWithProps;
         },
       }),
     ]),

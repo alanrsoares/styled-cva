@@ -136,4 +136,264 @@ describe("styled-cva", () => {
       </button>
     `);
   });
+
+  describe("withProps", () => {
+    it("should apply default props to the component", () => {
+      const StyledButtonWithProps = tw.button
+        .cva("btn-base", {
+          variants: {
+            $variant: {
+              primary: "btn-primary",
+              secondary: "btn-secondary",
+            },
+          },
+        })
+        .withProps({
+          "data-some-prop": "some-value",
+          $variant: "secondary",
+        });
+
+      const { container } = render(
+        <StyledButtonWithProps>Click me</StyledButtonWithProps>,
+      );
+
+      expect(container.firstChild).toMatchInlineSnapshot(`
+        <button
+          class="btn-base btn-secondary"
+          data-some-prop="some-value"
+        >
+          Click me
+        </button>
+      `);
+    });
+
+    it("should allow variant props to be overridden by user props", () => {
+      const StyledButtonWithProps = tw.button
+        .cva("btn-base", {
+          variants: {
+            $variant: {
+              primary: "btn-primary",
+              secondary: "btn-secondary",
+            },
+          },
+        })
+        .withProps({
+          $variant: "primary",
+        });
+
+      const { container } = render(
+        <StyledButtonWithProps $variant="secondary">
+          Click me
+        </StyledButtonWithProps>,
+      );
+
+      // User prop should override default
+      expect(container.firstChild).toMatchInlineSnapshot(`
+        <button
+          class="btn-base btn-secondary"
+        >
+          Click me
+        </button>
+      `);
+    });
+
+    it("should allow user props to override default props", () => {
+      const StyledButtonWithProps = tw.button
+        .cva("btn-base", {
+          variants: {
+            $variant: {
+              primary: "btn-primary",
+              secondary: "btn-secondary",
+            },
+          },
+        })
+        .withProps({
+          "data-testid": "default-id",
+          "data-some-prop": "default-value",
+        });
+
+      const { container } = render(
+        <StyledButtonWithProps $variant="primary" data-testid="user-id">
+          Click me
+        </StyledButtonWithProps>,
+      );
+
+      const button = container.firstChild as HTMLElement;
+      expect(button.getAttribute("data-testid")).toBe("user-id");
+      expect(button.getAttribute("data-some-prop")).toBe("default-value");
+    });
+
+    it("should work with multiple default props", () => {
+      const StyledButtonWithProps = tw.button
+        .cva("btn-base", {
+          variants: {
+            $variant: {
+              primary: "btn-primary",
+            },
+          },
+        })
+        .withProps({
+          "data-prop1": "value1",
+          "data-prop2": "value2",
+          type: "button" as const,
+        });
+
+      const { container } = render(
+        <StyledButtonWithProps $variant="primary">
+          Click me
+        </StyledButtonWithProps>,
+      );
+
+      const button = container.firstChild as HTMLElement;
+      expect(button.getAttribute("data-prop1")).toBe("value1");
+      expect(button.getAttribute("data-prop2")).toBe("value2");
+      expect(button.getAttribute("type")).toBe("button");
+    });
+
+    it("should not have withProps method on the returned component", () => {
+      const StyledButtonWithProps = tw.button
+        .cva("btn-base", {
+          variants: {
+            $variant: {
+              primary: "btn-primary",
+            },
+          },
+        })
+        .withProps({
+          "data-some-prop": "some-value",
+        });
+
+      // Verify that withProps is not available on the returned component
+      // This is a runtime check - TypeScript will catch this at compile time
+      expect("withProps" in StyledButtonWithProps).toBe(false);
+    });
+
+    it("should accept variant props in withProps", () => {
+      const StyledButton = tw.button.cva("btn-base", {
+        variants: {
+          $variant: {
+            primary: "btn-primary",
+            secondary: "btn-secondary",
+          },
+        },
+      });
+
+      type WithPropsParams = Parameters<typeof StyledButton.withProps>[0];
+
+      // Verify that $variant IS in the allowed props
+      type HasVariant = "$variant" extends keyof WithPropsParams ? true : false;
+      expectType<TypeEqual<HasVariant, true>>(true);
+
+      // Verify that variant prop values are validated (excluding undefined)
+      type VariantValue = NonNullable<WithPropsParams["$variant"]>;
+      expectType<TypeEqual<VariantValue, "primary" | "secondary">>(true);
+    });
+
+    it("should reject invalid variant prop values in withProps", () => {
+      const StyledButton = tw.button.cva("btn-base", {
+        variants: {
+          $variant: {
+            primary: "btn-primary",
+            secondary: "btn-secondary",
+          },
+        },
+      });
+
+      type WithPropsParams = Parameters<typeof StyledButton.withProps>[0];
+
+      // Verify that "tertiary" is NOT a valid variant value
+      type HasTertiary = "tertiary" extends WithPropsParams["$variant"]
+        ? true
+        : false;
+      expectType<TypeEqual<HasTertiary, false>>(true);
+    });
+
+    it("should reject unknown props in withProps", () => {
+      const StyledButton = tw.button.cva("btn-base", {
+        variants: {
+          $variant: {
+            primary: "btn-primary",
+          },
+        },
+      });
+
+      type WithPropsParams = Parameters<typeof StyledButton.withProps>[0];
+
+      // Verify that unknown props are NOT in the allowed props
+      type HasUnknownProp = "unknownProp" extends keyof WithPropsParams
+        ? true
+        : false;
+      expectType<TypeEqual<HasUnknownProp, false>>(true);
+    });
+
+    it("should accept valid element props in withProps", () => {
+      const StyledButton = tw.button.cva("btn-base", {
+        variants: {
+          $variant: {
+            primary: "btn-primary",
+          },
+        },
+      });
+
+      type WithPropsParams = Parameters<typeof StyledButton.withProps>[0];
+
+      // Verify that valid button props ARE in the allowed props
+      type HasType = "type" extends keyof WithPropsParams ? true : false;
+      type HasDisabled = "disabled" extends keyof WithPropsParams
+        ? true
+        : false;
+      type HasClassName = "className" extends keyof WithPropsParams
+        ? true
+        : false;
+
+      expectType<TypeEqual<HasType, true>>(true);
+      expectType<TypeEqual<HasDisabled, true>>(true);
+      expectType<TypeEqual<HasClassName, true>>(true);
+    });
+
+    it("should accept data attributes in withProps", () => {
+      const StyledButton = tw.button.cva("btn-base", {
+        variants: {
+          $variant: {
+            primary: "btn-primary",
+          },
+        },
+      });
+
+      type WithPropsParams = Parameters<typeof StyledButton.withProps>[0];
+
+      // Verify that data attributes ARE in the allowed props
+      type HasDataTestId = `data-testid` extends keyof WithPropsParams
+        ? true
+        : false;
+      type HasDataCustom = `data-custom-attr` extends keyof WithPropsParams
+        ? true
+        : false;
+
+      expectType<TypeEqual<HasDataTestId, true>>(true);
+      expectType<TypeEqual<HasDataCustom, true>>(true);
+    });
+
+    it("should reject extraneous props at compile time", () => {
+      const StyledButton = tw.button.cva("btn-base", {
+        variants: {
+          $variant: {
+            primary: "btn-primary",
+          },
+        },
+      });
+
+      type WithPropsParams = Parameters<typeof StyledButton.withProps>[0];
+
+      // Verify that extraneous props are NOT in the allowed props
+      type HasFasdas = "fasdas" extends keyof WithPropsParams ? true : false;
+      expectType<TypeEqual<HasFasdas, false>>(true);
+
+      // Verify that other unknown props are also excluded
+      type HasUnknown = "completelyUnknownProp" extends keyof WithPropsParams
+        ? true
+        : false;
+      expectType<TypeEqual<HasUnknown, false>>(true);
+    });
+  });
 });

@@ -112,7 +112,9 @@ const Button = tw.button.cva("btn-base", {
 
 ### Transient Props
 
-Variant keys starting with `$` are transient props that won't be passed to the DOM element. This prevents React warnings about unknown props.
+<Callout type="info" emoji="💡">
+  Variant keys starting with `$` are transient props that won't be passed to the DOM element. This prevents React warnings about unknown props.
+</Callout>
 
 ## `.withProps()`
 
@@ -214,7 +216,9 @@ const buttonVariants = cva("btn-base", {
 <button className={buttonVariants({ variant: "primary" })}>Click me</button>;
 ```
 
-**Note:** When using `cva` directly (not through `tw.element.cva()`), variant keys don't need the `$` prefix since they're not passed as props to components. The `$` prefix is only needed when using `tw.element.cva()` to prevent props from being passed to the DOM.
+<Callout type="important" emoji="⚠️">
+  When using `cva` directly (not through `tw.element.cva()`), variant keys don't need the `$` prefix since they're not passed as props to components. The `$` prefix is only needed when using `tw.element.cva()` to prevent props from being passed to the DOM.
+</Callout>
 
 ## TypeScript Types
 
@@ -255,4 +259,6 @@ const Button = tw.button`btn`.withStyle({
 });
 ```
 
-**Note:** This is only available on basic styled components created with template literals. CVA components do not support this method.
+<Callout type="warning" emoji="⚠️">
+  This is only available on basic styled components created with template literals. CVA components do not support this method.
+</Callout>

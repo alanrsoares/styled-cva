@@ -2,109 +2,117 @@
 
 This guide will help you get started with styled-cva.
 
-## Installation
+<Steps>
+  ### Installation
 
-<Tabs items={["npm", "pnpm", "bun"]}>
-  <Tabs.Tab>```bash npm i --save styled-cva ```</Tabs.Tab>
-  <Tabs.Tab>```bash pnpm add styled-cva ```</Tabs.Tab>
-  <Tabs.Tab>```bash bun add styled-cva ```</Tabs.Tab>
-</Tabs>
+  Install styled-cva using your preferred package manager:
 
-## Basic Usage
+  <Tabs items={["npm", "pnpm", "bun"]}>
+    <Tabs.Tab>```bash npm i --save styled-cva ```</Tabs.Tab>
+    <Tabs.Tab>```bash pnpm add styled-cva ```</Tabs.Tab>
+    <Tabs.Tab>```bash bun add styled-cva ```</Tabs.Tab>
+  </Tabs>
 
-Create a styled component using template literals:
+  ### Basic Usage
 
-```tsx
-import tw from "styled-cva";
+  Create a styled component using template literals:
 
-const StaticButton = tw.button`
-  bg-primary rounded-xl cursor-pointer
-`;
+  ```tsx
+  import tw from "styled-cva";
 
-// Use it like a regular React component
-<StaticButton>Click Me</StaticButton>;
-```
+  const StaticButton = tw.button`
+    bg-primary rounded-xl cursor-pointer
+  `;
 
-## Variants
+  // Use it like a regular React component
+  <StaticButton>Click Me</StaticButton>;
+  ```
 
-Use the `.cva()` method to create components with variants:
+  ### Variants
 
-```tsx
-import tw from "styled-cva";
+  Use the `.cva()` method to create components with variants:
 
-const VariantButton = tw.button.cva("btn-base-class", {
-  variants: {
-    // Variant keys starting with $ will not be sent to the DOM,
-    // this avoids extraneous props warning
-    $variant: {
-      primary: "btn-primary-class",
-      secondary: "btn-secondary-class",
+  ```tsx
+  import tw from "styled-cva";
+
+  const VariantButton = tw.button.cva("btn-base-class", {
+    variants: {
+      // Variant keys starting with $ will not be sent to the DOM,
+      // this avoids extraneous props warning
+      $variant: {
+        primary: "btn-primary-class",
+        secondary: "btn-secondary-class",
+      },
     },
-  },
-});
+  });
 
-// $variant is inferred to 'primary' | 'secondary'
-<VariantButton $variant="primary">Click Me</VariantButton>;
+  // $variant is inferred to 'primary' | 'secondary'
+  <VariantButton $variant="primary">Click Me</VariantButton>;
 
-// The actual element in the DOM will be:
-// <button class="btn-primary-class">Click Me</button>
-```
+  // The actual element in the DOM will be:
+  // <button class="btn-primary-class">Click Me</button>
+  ```
 
-## Default Props
+  <Callout type="info" emoji="💡">
+    Variant keys starting with `$` are transient props that won't be passed to the DOM element. This prevents React warnings about unknown props.
+  </Callout>
 
-Use `.withProps()` to set default props:
+  ### Default Props
 
-```tsx
-const StyledButton = tw.button
-  .cva("btn-base", {
+  Use `.withProps()` to set default props:
+
+  ```tsx
+  const StyledButton = tw.button
+    .cva("btn-base", {
+      variants: {
+        $variant: {
+          primary: "btn-primary",
+          secondary: "btn-secondary",
+        },
+      },
+    })
+    .withProps({
+      "data-testid": "my-button",
+      type: "button",
+      $variant: "primary", // Valid variant value
+    });
+
+  // The component now has default props applied
+  <StyledButton>Click Me</StyledButton>;
+
+  // User props override defaults
+  <StyledButton $variant="secondary" type="submit">
+    Submit
+  </StyledButton>;
+  ```
+
+  ### Polymorphic Components
+
+  Use the `$as` prop to render as different elements or components:
+
+  ```tsx
+  import Link from "next/link";
+
+  const Button = tw.button.cva("btn", {
     variants: {
       $variant: {
         primary: "btn-primary",
         secondary: "btn-secondary",
       },
     },
-  })
-  .withProps({
-    "data-testid": "my-button",
-    type: "button",
-    $variant: "primary", // Valid variant value
   });
 
-// The component now has default props applied
-<StyledButton>Click Me</StyledButton>;
+  // Works with known JSX elements
+  <Button $as="a" href="/some/url">
+    I'm a link that looks like a button
+  </Button>;
 
-// User props override defaults
-<StyledButton $variant="secondary" type="submit">
-  Submit
-</StyledButton>;
-```
-
-## Polymorphic Components
-
-Use the `$as` prop to render as different elements or components:
-
-```tsx
-import Link from "next/link";
-
-const Button = tw.button.cva("btn", {
-  variants: {
-    $variant: {
-      primary: "btn-primary",
-      secondary: "btn-secondary",
-    },
-  },
-});
-
-// Works with known JSX elements
-<Button $as="a" href="/some/url">
-  I'm a link that looks like a button
-</Button>;
-
-// Also with custom components
-<Button $as={Link} href="/some/url">
-  I'm a link that looks like a button
-</Button>;
-```
+  // Also with custom components
+  <Button $as={Link} href="/some/url">
+    I'm a link that looks like a button
+  </Button>;
+  ```
+</Steps>
 
 ## VSCode IntelliSense
 
@@ -129,3 +137,7 @@ For Tailwind CSS extension support, add this to your VSCode [settings.json](/.vs
   }
 }
 ```
+
+<Callout type="info" emoji="💡">
+  These settings enable Tailwind CSS IntelliSense for styled-cva template literals and CVA variant definitions.
+</Callout>

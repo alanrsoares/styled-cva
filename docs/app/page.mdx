@@ -1,68 +1,67 @@
+import { Code, Layers, Palette, Rocket, Shapes, Shield } from "lucide-react";
+
 # styled-cva
 
 A typesafe, [class-variance-authority-based](https://github.com/joe-bell/cva), styled-components-like library for authoring React components
 
-> ⚠️ styled-cva 0.5.x only supports React 19.x. If you're on React 18, use the latest 0.3.x ⚠️
+<Callout type="warning" emoji="⚠️">
+  styled-cva 0.5.x only supports React 19.x. If you're on React 18, use the
+  latest 0.3.x
+</Callout>
 
-## Installation
+## Quick Example
 
-<Tabs items={["npm", "pnpm", "bun"]}>
-  <Tabs.Tab>```npm i --save styled-cva ```</Tabs.Tab>
-  <Tabs.Tab>```pnpm add styled-cva ```</Tabs.Tab>
-  <Tabs.Tab>```bun add styled-cva ```</Tabs.Tab>
-</Tabs>
-
-## Quick Start
-
-### Basic Usage
+Here's a simple example to get you started:
 
 ```tsx
 import tw from "styled-cva";
 
-const StaticButton = tw.button`
-  bg-primary rounded-xl cursor-pointer
-`;
+// Basic styled component
+const Button = tw.button`bg-blue-500 text-white px-4 py-2 rounded`;
 
-// ...
-<StaticButton>Click Me</StaticButton>;
-```
-
-### With Variants
-
-```tsx
-import tw from "styled-cva";
-
-const VariantButton = tw.button.cva("btn-base-class", {
+// With variants
+const VariantButton = tw.button.cva("px-4 py-2 rounded", {
   variants: {
-    // smart disappearing props:
-    // variant keys starting with $ will not be sent to the DOM,
-    // this avoids extraneous props warning
     $variant: {
-      primary: "btn-primary-class",
-      secondary: "btn-secondary-class",
+      primary: "bg-blue-500 text-white",
+      secondary: "bg-gray-500 text-white",
     },
   },
 });
 
-// ...
-
-// $variant is infered to 'primary' | 'secondary'
-<VariantButton $variant="primary">Click Me</VariantButton>;
-
-// actual element in the dom will be:
-// <button class="btn-primary-class">Click Me</button>
+// Usage
+<Button>Click me</Button>
+<VariantButton $variant="primary">Primary</VariantButton>
 ```
+
+<Callout type="info" emoji="📚">
+  For detailed installation instructions and comprehensive examples, check out
+  the [Getting Started guide](/getting-started).
+</Callout>
 
 ## Features
 
-- ✅ **Type-safe** - Full TypeScript support with intelligent prop inference
-- ✅ **CVA-based** - Built on top of class-variance-authority for variant management
-- ✅ **Styled-components-like API** - Familiar API for developers coming from styled-components
-- ✅ **Tailwind CSS** - Works seamlessly with Tailwind CSS classes
-- ✅ **Polymorphic components** - Use the `$as` prop to render as different elements or components
+<Cards num={2}>
+  <Cards.Card icon={<Shield />} title="Type-safe" href="/api" />
+  <Cards.Card icon={<Layers />} title="CVA-based" href="/api" />
+  <Cards.Card
+    icon={<Code />}
+    title="Styled-components-like API"
+    href="/getting-started"
+  />
+  <Cards.Card icon={<Palette />} title="Tailwind CSS" href="/getting-started" />
+  <Cards.Card
+    icon={<Shapes />}
+    title="Polymorphic components"
+    href="/getting-started"
+  />
+  <Cards.Card icon={<Rocket />} title="Getting Started" href="/getting-started" />
+</Cards>
 
 ## Next Steps
 
-- [Getting Started](/getting-started) - Learn the basics
-- [API Reference](/api) - Explore the full API
-- [Examples](/examples) - See more examples
+<Callout type="info">
+  Ready to get started? Check out the [Getting Started guide](/getting-started)
+  to learn the basics, or dive into the [API Reference](/api) for complete
+  documentation.
+</Callout>

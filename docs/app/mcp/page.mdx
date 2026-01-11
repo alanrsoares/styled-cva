@@ -1,0 +1,82 @@
+# MCP Docs Server
+
+This documentation site functions as an HTTP MCP (Model Context Protocol) server, making styled-cva documentation accessible to AI assistants.
+
+## Endpoint
+
+**Production URL**: `https://styled-cva.vercel.app/api/mcp`
+
+## Integration
+
+<Tabs items={["Cursor", "Claude Desktop", "Windsurf", "Gemini"]}>
+  <Tabs.Tab>
+
+Add to your Cursor MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "styled-cva-docs": {
+      "url": "https://styled-cva.vercel.app/api/mcp"
+    }
+  }
+}
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Add to your Claude Desktop MCP configuration file (typically `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "styled-cva-docs": {
+      "url": "https://styled-cva.vercel.app/api/mcp"
+    }
+  }
+}
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Configure in Windsurf's MCP settings:
+
+```
+Server URL: https://styled-cva.vercel.app/api/mcp
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Add to your Gemini MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "styled-cva-docs": {
+      "url": "https://styled-cva.vercel.app/api/mcp"
+    }
+  }
+}
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+## Available Resources
+
+The server exposes all documentation pages as MCP resources:
+
+- `styled-cva://docs/introduction`
+- `styled-cva://docs/getting-started`
+- `styled-cva://docs/api`
+- `styled-cva://docs/mcp`
+
+## Available Tools
+
+- **`list_docs`** - List all available documentation pages
+- **`search_docs`** - Search documentation by keyword (requires `query` parameter)
+
+Once configured, your AI assistant can query styled-cva documentation directly through the MCP protocol.

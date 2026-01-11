@@ -1,0 +1,258 @@
+# API Reference
+
+## `tw`
+
+The main export from styled-cva. It's a function that can be used to create styled components.
+
+### Basic Usage
+
+```tsx
+import tw from "styled-cva";
+
+const Button = tw.button`bg-blue-500 text-white`;
+```
+
+### With Element Types
+
+You can use `tw` with any HTML element:
+
+```tsx
+const Div = tw.div`container mx-auto`;
+const Input = tw.input`border rounded`;
+const A = tw.a`text-blue-500 hover:underline`;
+```
+
+### With Custom Components
+
+You can also wrap custom components:
+
+```tsx
+import MyComponent from "./MyComponent";
+
+const StyledComponent = tw(MyComponent)`bg-gray-100 p-4`;
+```
+
+### Extending Styled Components
+
+You can extend existing styled components to add additional styles:
+
+```tsx
+const BaseButton = tw.button`btn-base`;
+
+// Extend with additional classes
+const ExtendedButton = tw(BaseButton)`bg-green-500 hover:bg-green-600`;
+
+// This works with CVA components too
+const VariantButton = tw.button.cva("btn-base", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+const ExtendedVariantButton = tw(VariantButton)`rounded-lg`;
+```
+
+## `.cva()`
+
+Creates a styled component with variant support using class-variance-authority.
+
+### Signature
+
+```tsx
+tw.element.cva(baseClasses, config);
+```
+
+### Parameters
+
+- `baseClasses` (string): Base CSS classes that are always applied
+- `config` (object): CVA configuration object
+  - `variants` (object): Variant definitions
+  - `defaultVariants` (object, optional): Default variant values
+  - `compoundVariants` (array, optional): Compound variant definitions
+
+### Example
+
+```tsx
+const Button = tw.button.cva("btn-base", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+    $size: {
+      sm: "btn-sm",
+      md: "btn-md",
+      lg: "btn-lg",
+    },
+  },
+  defaultVariants: {
+    $variant: "primary",
+    $size: "md",
+  },
+  compoundVariants: [
+    {
+      $variant: "primary",
+      $size: "lg",
+      className: "btn-primary-lg",
+    },
+  ],
+});
+
+// Using default variants - they're applied automatically
+<Button>Click me</Button>; // Uses primary variant and md size
+
+// Override defaults
+<Button $variant="secondary" $size="sm">
+  Small Secondary
+</Button>;
+```
+
+### Transient Props
+
+Variant keys starting with `$` are transient props that won't be passed to the DOM element. This prevents React warnings about unknown props.
+
+## `.withProps()`
+
+Sets default props for a component. User-provided props will override these defaults.
+
+### Signature
+
+```tsx
+Component.withProps(defaultProps);
+```
+
+### Parameters
+
+- `defaultProps` (object): An object containing default props to apply
+
+### Example
+
+```tsx
+const Button = tw.button
+  .cva("btn", {
+    variants: {
+      $variant: {
+        primary: "btn-primary",
+        secondary: "btn-secondary",
+      },
+    },
+  })
+  .withProps({
+    type: "button",
+    "data-testid": "button",
+    $variant: "primary",
+  });
+```
+
+## `$as` Prop
+
+The `$as` prop allows you to render a component as a different element or component.
+
+### Example
+
+```tsx
+const Button = tw.button`btn`;
+
+// Render as an anchor tag
+<Button $as="a" href="/link">
+  Link Button
+</Button>;
+
+// Render as a custom component
+<Button $as={Link} href="/link">
+  Next.js Link
+</Button>;
+
+// Works with CVA components too
+const VariantButton = tw.button.cva("btn", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+<VariantButton $as="a" href="/link" $variant="primary">
+  Link Button
+</VariantButton>;
+```
+
+## Utilities
+
+### `cn`
+
+A utility function for combining Tailwind CSS classnames. It uses `clsx` and `tailwind-merge` to intelligently merge classes.
+
+```tsx
+import { cn } from "styled-cva";
+
+const className = cn("text-red-500", "bg-blue-500");
+// className = "text-red-500 bg-blue-500"
+```
+
+### `cva`
+
+The underlying class-variance-authority function. You can use it directly if needed:
+
+```tsx
+import { cva } from "styled-cva";
+
+const buttonVariants = cva("btn-base", {
+  variants: {
+    variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+// Use with className
+<button className={buttonVariants({ variant: "primary" })}>Click me</button>;
+```
+
+**Note:** When using `cva` directly (not through `tw.element.cva()`), variant keys don't need the `$` prefix since they're not passed as props to components. The `$` prefix is only needed when using `tw.element.cva()` to prevent props from being passed to the DOM.
+
+## TypeScript Types
+
+### `TailwindComponent<P, O>`
+
+The base type for all styled components.
+
+- `P`: The base React props
+- `O`: Additional props added by the template function
+
+### `VariantProps<T>`
+
+Extracts variant props from a CVA configuration.
+
+```tsx
+import { cva, type VariantProps } from "styled-cva";
+
+const buttonVariants = cva("btn", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+type ButtonVariants = VariantProps<typeof buttonVariants>;
+// { $variant?: 'primary' | 'secondary' }
+```
+
+## Advanced: `.withStyle()`
+
+For additional flexibility, basic styled components (not CVA components) support `.withStyle()` to add inline styles:
+
+```tsx
+const Button = tw.button`btn`.withStyle({
+  transition: "all 0.2s",
+});
+```
+
+**Note:** This is only available on basic styled components created with template literals. CVA components do not support this method.

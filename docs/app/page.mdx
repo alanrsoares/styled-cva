@@ -1,0 +1,68 @@
+# styled-cva
+
+A typesafe, [class-variance-authority-based](https://github.com/joe-bell/cva), styled-components-like library for authoring React components
+
+> ⚠️ styled-cva 0.5.x only supports React 19.x. If you're on React 18, use the latest 0.3.x ⚠️
+
+## Installation
+
+<Tabs items={["npm", "pnpm", "bun"]}>
+  <Tabs.Tab>```bash npm i --save styled-cva ```</Tabs.Tab>
+  <Tabs.Tab>```bash pnpm add styled-cva ```</Tabs.Tab>
+  <Tabs.Tab>```bash bun add styled-cva ```</Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+### Basic Usage
+
+```tsx
+import tw from "styled-cva";
+
+const StaticButton = tw.button`
+  bg-primary rounded-xl cursor-pointer
+`;
+
+// ...
+<StaticButton>Click Me</StaticButton>;
+```
+
+### With Variants
+
+```tsx
+import tw from "styled-cva";
+
+const VariantButton = tw.button.cva("btn-base-class", {
+  variants: {
+    // smart disappearing props:
+    // variant keys starting with $ will not be sent to the DOM,
+    // this avoids extraneous props warning
+    $variant: {
+      primary: "btn-primary-class",
+      secondary: "btn-secondary-class",
+    },
+  },
+});
+
+// ...
+
+// $variant is infered to 'primary' | 'secondary'
+<VariantButton $variant="primary">Click Me</VariantButton>;
+
+// actual element in the dom will be:
+// <button class="btn-primary-class">Click Me</button>
+```
+
+## Features
+
+- ✅ **Type-safe** - Full TypeScript support with intelligent prop inference
+- ✅ **CVA-based** - Built on top of class-variance-authority for variant management
+- ✅ **Styled-components-like API** - Familiar API for developers coming from styled-components
+- ✅ **Tailwind CSS** - Works seamlessly with Tailwind CSS classes
+- ✅ **Polymorphic components** - Use the `$as` prop to render as different elements or components
+
+## Next Steps
+
+- [Getting Started](/getting-started) - Learn the basics
+- [API Reference](/api) - Explore the full API
+- [Examples](/examples) - See more examples

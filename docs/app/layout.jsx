@@ -3,6 +3,8 @@ import { Banner, Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 
+import '../styles/globals.css'
+
 export const metadata = {
   title: 'styled-cva',
   description: 'A typesafe, class-variance-authority-based, styled-components-like library for authoring React components',

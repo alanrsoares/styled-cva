@@ -1,0 +1,124 @@
+# Testing
+
+`styled-cva` components are standard React components that render HTML elements with specific class names. This makes them easy to test using standard testing tools like [React Testing Library](https://testing-library.com/docs/react-testing-library/intro), [Vitest](https://vitest.dev/), or [Bun Test](https://bun.sh/docs/test/test-runner).
+
+The primary goal when testing `styled-cva` components is to verify that:
+1. The component renders the correct HTML element.
+2. The correct classes are applied based on the props (variants).
+
+## Setup
+
+We recommend using **React Testing Library** for rendering components and asserting on the DOM.
+
+If you are using **Vitest** or **Jest**, you should also install [`@testing-library/jest-dom`](https://github.com/testing-library/jest-dom) to get useful matchers like `toHaveClass`.
+
+```bash
+# Install testing dependencies
+npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
+# or
+bun add -d vitest @testing-library/react @testing-library/jest-dom jsdom
+```
+
+If you are using **Bun Test**, you can use it directly, though `jest-dom` matchers might require additional configuration or you can check attributes directly.
+
+## Basic Component Testing
+
+Here is a simple example of testing a styled button to ensure it renders with the base classes.
+
+```tsx
+// Button.tsx
+import tw from "styled-cva";
+
+export const Button = tw.button`px-4 py-2 bg-blue-500 text-white rounded`;
+
+// Button.test.tsx
+import { render, screen } from "@testing-library/react";
+import { expect, test } from "vitest";
+import { Button } from "./Button";
+
+test("renders with default styles", () => {
+  render(<Button>Click me</Button>);
+  
+  const button = screen.getByRole("button", { name: /click me/i });
+  
+  expect(button).toBeInTheDocument();
+  expect(button).toHaveClass("px-4", "py-2", "bg-blue-500", "text-white", "rounded");
+});
+```
+
+## Testing Variants
+
+When using `.cva()`, you want to ensure that passing different variant props results in the correct class names being applied.
+
+```tsx
+// Alert.tsx
+import tw from "styled-cva";
+
+export const Alert = tw.div.cva("p-4 rounded border", {
+  variants: {
+    $intent: {
+      info: "bg-blue-100 border-blue-500 text-blue-700",
+      success: "bg-green-100 border-green-500 text-green-700",
+      danger: "bg-red-100 border-red-500 text-red-700",
+    },
+  },
+  defaultVariants: {
+    $intent: "info",
+  },
+});
+
+// Alert.test.tsx
+import { render, screen } from "@testing-library/react";
+import { expect, test } from "vitest";
+import { Alert } from "./Alert";
+
+test("renders info variant by default", () => {
+  render(<Alert>Info message</Alert>);
+  
+  const alert = screen.getByText("Info message");
+  expect(alert).toHaveClass("bg-blue-100", "border-blue-500");
+});
+
+test("renders success variant", () => {
+  render(<Alert $intent="success">Success message</Alert>);
+  
+  const alert = screen.getByText("Success message");
+  expect(alert).toHaveClass("bg-green-100", "border-green-500");
+});
+```
+
+## Snapshot Testing
+
+Snapshot testing is particularly useful for styled components as it captures the entire structure and class list, allowing you to catch unintended style changes.
+
+```tsx
+// Card.test.tsx
+import { render } from "@testing-library/react";
+import { expect, test } from "vitest";
+import { Card } from "./Card";
+
+test("renders correctly", () => {
+  const { container } = render(<Card $variant="outlined">Content</Card>);
+  
+  expect(container.firstChild).toMatchSnapshot();
+});
+```
+
+## Polymorphic Components
+
+If you use the `$as` prop to change the rendered element, you can verify the tag name in your tests.
+
+```tsx
+test("renders as a link when $as prop is provided", () => {
+  render(
+    <Button $as="a" href="/login">
+      Login
+    </Button>
+  );
+  
+  const link = screen.getByRole("link", { name: /login/i });
+  expect(link).toBeInTheDocument();
+  expect(link.tagName).toBe("A");
+  expect(link).toHaveAttribute("href", "/login");
+});
+```

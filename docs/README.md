@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/styled-cva.svg" alt="styled-cva logo" width="128" height="128" />
+</p>
+
 # styled-cva Documentation
 
 This directory contains the Nextra documentation site for styled-cva.
@@ -65,6 +69,7 @@ This documentation site also functions as an HTTP MCP (Model Context Protocol) d
 ### Endpoint
 
 The MCP server is available at:
+
 - **Production**: `https://styled-cva.vercel.app/api/mcp`
 - **Development**: `http://localhost:3000/api/mcp`
 
@@ -86,16 +91,16 @@ The server exposes the following documentation pages as MCP resources:
 You can connect to this MCP server from any MCP client. For example, using the MCP SDK:
 
 ```typescript
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
 const client = new Client({
-  name: 'styled-cva-docs-client',
-  version: '1.0.0'
+  name: "styled-cva-docs-client",
+  version: "1.0.0",
 });
 
 const transport = new StreamableHTTPClientTransport(
-  new URL('https://styled-cva.vercel.app/api/mcp')
+  new URL("https://styled-cva.vercel.app/api/mcp"),
   // Or use 'http://localhost:3000/api/mcp' for local development
 );
 
@@ -107,7 +112,7 @@ console.log(resources);
 
 // Read a resource
 const content = await client.readResource({
-  uri: 'styled-cva://docs/introduction'
+  uri: "styled-cva://docs/introduction",
 });
 console.log(content);
 
@@ -117,8 +122,8 @@ console.log(tools);
 
 // Call a tool
 const result = await client.callTool({
-  name: 'search_docs',
-  arguments: { query: 'button' }
+  name: "search_docs",
+  arguments: { query: "button" },
 });
 console.log(result);
 ```
@@ -130,11 +135,11 @@ When you add a new documentation page, update the `DOCS_PAGES` array in `lib/mcp
 ```typescript
 export const DOCS_PAGES = [
   // ... existing pages
-  { 
-    path: "new-page/page.mdx", 
-    route: "/new-page", 
-    title: "New Page", 
-    resource: "styled-cva://docs/new-page" 
+  {
+    path: "new-page/page.mdx",
+    route: "/new-page",
+    title: "New Page",
+    resource: "styled-cva://docs/new-page",
   },
 ];
 ```

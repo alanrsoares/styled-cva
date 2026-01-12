@@ -7,12 +7,24 @@ import '../styles/globals.css'
 export const metadata = {
   title: 'styled-cva',
   description: 'A typesafe, class-variance-authority-based, styled-components-like library for authoring React components',
+  icons: {
+    icon: '/styled-cva.svg',
+  },
 }
 
 const banner = <Banner storageKey="styled-cva-banner">styled-cva 0.5.0 is available 🎉</Banner>
 const navbar = (
   <Navbar
-    logo={<b>styled-cva</b>}
+    logo={
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <img 
+          src="/styled-cva.svg" 
+          alt="styled-cva logo" 
+          style={{ width: '24px', height: '24px' }}
+        />
+        <b>styled-cva</b>
+      </div>
+    }
     projectLink="https://github.com/alanrsoares/styled-cva"
     docsRepositoryBase="https://github.com/alanrsoares/styled-cva/tree/main/docs"
   />
@@ -26,9 +38,7 @@ export default async function RootLayout({ children }) {
       dir="ltr"
       suppressHydrationWarning
     >
-      <Head>
-        <link rel="icon" type="image/svg+xml" href="/styled-cva.svg" />
-      </Head>
+      <Head />
       <body>
         <Layout
           banner={banner}

@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="docs/public/styled-cva.svg" alt="styled-cva logo" width="128" height="128" />
+</p>
+
+<p align="center">
   <a href="https://github.com/prettier/prettier"><img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg" /></a>
   <a href="https://github.com/alanrsoares/styled-cva"><img alt="License" src="https://img.shields.io/github/license/alanrsoares/styled-cva" /></a>
   <a href="https://www.npmjs.com/package/styled-cva"><img alt="Types" src="https://img.shields.io/npm/types/styled-cva" /></a>

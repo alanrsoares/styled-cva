@@ -89,6 +89,24 @@ describe("styled-cva", () => {
     `);
   });
 
+  it("should style a custom component with className prop", () => {
+    const MyButton = ({ className }: { className: string }) => {
+      return <button className={className}>Hello</button>;
+    };
+
+    const StyledButton = tw(MyButton)`text-red-500`;
+
+    const { container } = render(<StyledButton />);
+
+    expect(container.firstChild).toMatchInlineSnapshot(`
+      <button
+        class="text-red-500"
+      >
+        Hello
+      </button>
+    `);
+  });
+
   it("should render a different jsx element using $as prop", () => {
     const StyledDiv = tw.div.cva("div-base", {
       variants: {

@@ -160,6 +160,24 @@ const Button = tw.button.cva("font-bold py-2 px-4 rounded", {
 </Button>
 ```
 
+### Styling Custom Components
+
+Create a styled component from a custom component that accepts a `className` prop.
+
+```tsx
+import tw from "styled-cva";
+
+const MyButton = ({ className }: { className: string }) => {
+  return <button className={className}>Hello</button>;
+};
+
+const StyledButton = tw(MyButton)`text-red-500`;
+
+// ...
+
+<StyledButton />
+```
+
 ## VSCode intellisense
 
 For tailwindcss extension support, add this to your vscode [settings.json](/.vscode/settings.json)

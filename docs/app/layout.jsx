@@ -16,11 +16,11 @@ const banner = <Banner storageKey="styled-cva-banner">styled-cva 0.5.0 is availa
 const navbar = (
   <Navbar
     logo={
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="flex items-center gap-2">
         <img 
           src="/styled-cva.svg" 
           alt="styled-cva logo" 
-          style={{ width: '24px', height: '24px' }}
+          className="size-6"
         />
         <b>styled-cva</b>
       </div>

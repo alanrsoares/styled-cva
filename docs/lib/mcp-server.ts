@@ -28,6 +28,12 @@ export const DOCS_PAGES = [
     resource: "styled-cva://docs/getting-started",
   },
   {
+    path: "examples/page.mdx",
+    route: "/examples",
+    title: "Examples",
+    resource: "styled-cva://docs/examples",
+  },
+  {
     path: "testing/page.mdx",
     route: "/testing",
     title: "Testing",

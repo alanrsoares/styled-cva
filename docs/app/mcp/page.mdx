@@ -81,6 +81,12 @@ The server exposes all documentation pages as MCP resources:
 - **`list_docs`** - List all available documentation pages
 - **`search_docs`** - Search documentation by keyword (requires `query` parameter)
 
+## `llms.txt`
+
+In addition to the MCP server, we also provide a standard [`llms.txt`](/llms.txt) file. This is a markdown file that provides a concise summary of the project and its documentation, specifically designed for Large Language Models to consume.
+
+You can access it at: `/llms.txt`
+
 <Callout type="success" emoji="✅">
   Once configured, your AI assistant can query styled-cva documentation directly through the MCP protocol.
 </Callout>

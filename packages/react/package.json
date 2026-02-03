@@ -1,7 +1,7 @@
 {
   "name": "@styled-cva/react",
   "description": "A typesafe, class-variance-authority-based, styled-components-like library for authoring React components",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "publishConfig": {
     "access": "public"
   },

@@ -1,5 +1,5 @@
 {
-  "name": "react",
+  "name": "@styled-cva/examples-react",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@styled-cva/eslint-plugin": "^0.5.1",
-    "@styled-cva/react": "^0.5.1",
+    "@styled-cva/react": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@styled-cva/eslint-plugin": "workspace:*",
     "@tailwindcss/vite": "^4",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",

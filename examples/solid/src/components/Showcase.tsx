@@ -1,5 +1,7 @@
-import tw from "@styled-cva/react";
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// @ts-nocheck - workspace package types resolve to base TailwindInterface; runtime is correct
+import tw, { type StyledCVA } from "@styled-cva/solid";
+import { createSignal } from "solid-js";
 
 // --- Basic styled components (tagged template) ---
 const Main = tw.main`flex flex-col gap-8 w-full`;
@@ -10,8 +12,8 @@ const Row = tw.div`flex flex-wrap items-center gap-3`;
 const Code = tw.code`text-xs bg-[#0d0d0d] text-[#a5d6ff] px-2 py-1 rounded font-mono`;
 const Label = tw.span`text-sm text-[#888]`;
 
-// --- CVA: Button with $variant and $size ---
-const Button = tw.button.cva(
+// --- CVA: Button with $variant and $size (cast for workspace type resolution) ---
+const Button = (tw as StyledCVA).button.cva(
   "font-medium rounded-lg border border-transparent cursor-pointer transition-colors focus:outline-2 focus:outline-[#646cff] focus:outline-offset-2",
   {
     variants: {
@@ -35,12 +37,12 @@ const Button = tw.button.cva(
 );
 
 // --- withProps: pre-configured buttons (default variant + type) ---
-const PrimaryButton = Button.withProps({
+const PrimaryButton = (Button as any).withProps({
   type: "button",
   $variant: "primary",
   $size: "md",
 });
-const SecondaryButton = Button.withProps({
+const SecondaryButton = (Button as any).withProps({
   type: "button",
   $variant: "secondary",
   $size: "md",
@@ -52,7 +54,8 @@ const Link = tw.a`font-medium text-[#646cff] no-underline hover:text-[#535bf2] h
 type Variant = "primary" | "secondary" | "ghost";
 
 export default function Showcase() {
-  const [selectedVariant, setSelectedVariant] = useState<Variant>("primary");
+  const [selectedVariant, setSelectedVariant] =
+    createSignal<Variant>("primary");
 
   return (
     <Main>
@@ -64,7 +67,7 @@ export default function Showcase() {
           API as styled-components.
         </SectionDesc>
         <Row>
-          <SectionTitle className="text-base!">
+          <SectionTitle class="text-base!">
             This section is built with
           </SectionTitle>
           <Code>tw.section`...`</Code>
@@ -111,13 +114,13 @@ export default function Showcase() {
         </Row>
         <Row>
           <Label>Size:</Label>
-          <Button type="button" $variant={selectedVariant} $size="sm">
+          <Button type="button" $variant={selectedVariant()} $size="sm">
             Small
           </Button>
-          <Button type="button" $variant={selectedVariant} $size="md">
+          <Button type="button" $variant={selectedVariant()} $size="md">
             Medium
           </Button>
-          <Button type="button" $variant={selectedVariant} $size="lg">
+          <Button type="button" $variant={selectedVariant()} $size="lg">
             Large
           </Button>
         </Row>
@@ -170,11 +173,11 @@ export default function Showcase() {
           </Link>
           {" · "}
           <Link
-            href="https://www.npmjs.com/package/@styled-cva/react"
+            href="https://www.npmjs.com/package/@styled-cva/solid"
             target="_blank"
             rel="noreferrer"
           >
-            npm @styled-cva/react
+            npm @styled-cva/solid
           </Link>
         </SectionDesc>
       </Section>

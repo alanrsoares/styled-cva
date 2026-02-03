@@ -4,7 +4,7 @@ ESLint plugin for [@styled-cva/react](https://www.npmjs.com/package/@styled-cva/
 
 Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo. Published to npm as `@styled-cva/eslint-plugin`.
 
-## Rule: `extract-classes-to-styled`
+## Rule: `prefer-styled-cva`
 
 Warns when a **native HTML element** (e.g. `button`, `div`) has a `className` with more than a set number of classes, and suggests extracting it to a styled component. Only elements with lowercase tags are considered (custom components are ignored).
 
@@ -49,22 +49,18 @@ Or in another project, link the package (e.g. via `file:` or `link:` in `package
 
 ## Configuration
 
-**ESLint flat config** (e.g. `eslint.config.js`). The package exports the rule directly, so you wrap it in a plugin object:
+**ESLint flat config** (e.g. `eslint.config.js`). Import the plugin and enable the rule:
 
 ```js
-import rule from "@styled-cva/eslint-plugin";
+import styledCvaPlugin from "@styled-cva/eslint-plugin";
 
 export default [
   {
     plugins: {
-      "@styled-cva": {
-        rules: {
-          "extract-classes-to-styled": rule,
-        },
-      },
+      "@styled-cva": styledCvaPlugin,
     },
     rules: {
-      "@styled-cva/extract-classes-to-styled": ["warn", { threshold: 5 }],
+      "@styled-cva/prefer-styled-cva": ["warn", { threshold: 5 }],
     },
   },
 ];
@@ -79,5 +75,5 @@ export default [
 Example: only suggest extraction when there are more than 8 classes:
 
 ```js
-"@styled-cva/extract-classes-to-styled": ["warn", { threshold: 8 }]
+"@styled-cva/prefer-styled-cva": ["warn", { threshold: 8 }]
 ```

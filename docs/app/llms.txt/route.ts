@@ -19,12 +19,12 @@ export async function GET(request: NextRequest) {
       const filePath = join(process.cwd(), "app", examplesPage.path);
       const rawContent = await readFile(filePath, "utf-8");
       // Remove frontmatter if present and any Next.js imports/exports if they exist
+      const usageHeader = new RegExp(
+        "^# Usage Examples\\n\\nCommon patterns and real-world examples using `@styled-cva/react`\\.\\n\\n",
+      );
       examplesContent = rawContent
         .replace(/^---\n[\s\S]*?\n---\n/, "")
-        .replace(
-          /^# Usage Examples\n\nCommon patterns and real-world examples using `@styled-cva/react`\.\n\n/,
-          "",
-        );
+        .replace(usageHeader, "");
     } catch (error) {
       console.error("Failed to read examples for llms.txt", error);
     }
@@ -36,10 +36,10 @@ export async function GET(request: NextRequest) {
     "> A typesafe, class-variance-authority-based, styled-components-like library for authoring React components",
     "",
     "## Documentation",
-    ...DOCS_PAGES.map((page) => `- [${ page.title }](${ baseUrl }${ page.route })`),
+    ...DOCS_PAGES.map((page) => `- [${page.title}](${baseUrl}${page.route})`),
     "",
     "## MCP Server",
-    `- Endpoint: ${ baseUrl } / api / mcp`,
+    `- Endpoint: ${baseUrl}/api/mcp`,
     "- Description: Model Context Protocol server providing documentation as resources and tools for search.",
     "",
     "## Features",

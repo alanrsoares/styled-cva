@@ -1,7 +1,7 @@
 {
   "name": "@styled-cva/vue",
   "description": "A typesafe, class-variance-authority-based, styled-components-like library for authoring Vue components",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "publishConfig": {
     "access": "public"
   },

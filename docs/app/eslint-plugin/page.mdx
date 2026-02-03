@@ -1,0 +1,93 @@
+# ESLint Plugin
+
+The `@styled-cva/eslint-plugin` package provides an ESLint rule that suggests extracting JSX elements with many Tailwind classes into named styled components. The rule is **fixable**, so you can apply the suggestion automatically.
+
+Part of the styled-cva monorepo. The package is **private** and not published to npm — use it by linking the workspace or the built `dist/` from the repo.
+
+## Rule: `extract-classes-to-styled`
+
+The rule reports when a **native HTML element** (e.g. `button`, `div`, `span`) has a `className` with more than a configured number of classes, and suggests extracting it to a styled component. Only **lowercase** element names are checked (custom components are ignored).
+
+- **Default threshold:** 5 classes (configurable)
+- **Fixable:** yes — ESLint can add the import, create the styled component, and replace the inline element
+
+### Example
+
+**Before** (reported when class count exceeds the threshold):
+
+```tsx
+<button className="rounded bg-blue-500 px-4 py-2 text-white font-bold hover:bg-blue-600">
+  Submit
+</button>
+```
+
+**After** (auto-fix):
+
+```tsx
+import tw from "@styled-cva/react";
+
+const StyledButton = tw.button`rounded bg-blue-500 px-4 py-2 text-white font-bold hover:bg-blue-600`;
+
+// ...
+<StyledButton>Submit</StyledButton>;
+```
+
+The plugin recognizes both `styled-cva` and `@styled-cva/react` as the styled import.
+
+<Callout type="info" emoji="💡">
+  Run the ESLint fix (e.g. `eslint --fix` or your editor’s “Fix all”) to apply the extraction automatically.
+</Callout>
+
+## Installation
+
+From the monorepo root, install and build the plugin:
+
+```bash
+bun install
+bun run --filter @styled-cva/eslint-plugin build
+```
+
+In another project, link the package via `file:` or `link:` in `package.json`, or use `bun link` / `npm link`. Use the **built** output (`dist/`) so it works in Node (CJS and ESM).
+
+**Peer dependencies:** `eslint` (^9), `typescript` (^5).
+
+## Configuration
+
+Use **ESLint flat config** (e.g. `eslint.config.js`). The package exports the rule directly, so you wrap it in a plugin object:
+
+```js
+import rule from "@styled-cva/eslint-plugin";
+
+export default [
+  {
+    plugins: {
+      "@styled-cva": {
+        rules: {
+          "extract-classes-to-styled": rule,
+        },
+      },
+    },
+    rules: {
+      "@styled-cva/extract-classes-to-styled": ["warn", { threshold: 5 }],
+    },
+  },
+];
+```
+
+### Options
+
+| Option      | Type   | Default | Description                                            |
+| ----------- | ------ | ------- | ------------------------------------------------------ |
+| `threshold` | number | `5`     | Minimum number of classes before the rule is reported. |
+
+Example: only suggest extraction when there are more than 8 classes:
+
+```js
+"@styled-cva/extract-classes-to-styled": ["warn", { threshold: 8 }]
+```
+
+## When to use it
+
+- Keep components readable by moving long `className` strings into named styled components.
+- Encourage consistent use of `@styled-cva/react` (or styled-cva) in the codebase.
+- Reduce duplication when the same set of classes is used in multiple places (extract once, reuse the component).

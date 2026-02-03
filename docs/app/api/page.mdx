@@ -2,12 +2,12 @@
 
 ## `tw`
 
-The main export from styled-cva. It's a function that can be used to create styled components.
+The main export from @styled-cva/react. It's a function that can be used to create styled components.
 
 ### Basic Usage
 
 ```tsx
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
 const Button = tw.button`bg-blue-500 text-white`;
 ```
@@ -113,7 +113,8 @@ const Button = tw.button.cva("btn-base", {
 ### Transient Props
 
 <Callout type="info" emoji="💡">
-  Variant keys starting with `$` are transient props that won't be passed to the DOM element. This prevents React warnings about unknown props.
+  Variant keys starting with `$` are transient props that won't be passed to the
+  DOM element. This prevents React warnings about unknown props.
 </Callout>
 
 ## `.withProps()`
@@ -190,7 +191,7 @@ const VariantButton = tw.button.cva("btn", {
 A utility function for combining Tailwind CSS classnames. It uses `clsx` and `tailwind-merge` to intelligently merge classes.
 
 ```tsx
-import { cn } from "styled-cva";
+import { cn } from "@styled-cva/react";
 
 const className = cn("text-red-500", "bg-blue-500");
 // className = "text-red-500 bg-blue-500"
@@ -201,7 +202,7 @@ const className = cn("text-red-500", "bg-blue-500");
 The underlying class-variance-authority function. You can use it directly if needed:
 
 ```tsx
-import { cva } from "styled-cva";
+import { cva } from "@styled-cva/react";
 
 const buttonVariants = cva("btn-base", {
   variants: {
@@ -217,7 +218,10 @@ const buttonVariants = cva("btn-base", {
 ```
 
 <Callout type="important" emoji="⚠️">
-  When using `cva` directly (not through `tw.element.cva()`), variant keys don't need the `$` prefix since they're not passed as props to components. The `$` prefix is only needed when using `tw.element.cva()` to prevent props from being passed to the DOM.
+  When using `cva` directly (not through `tw.element.cva()`), variant keys don't
+  need the `$` prefix since they're not passed as props to components. The `$`
+  prefix is only needed when using `tw.element.cva()` to prevent props from
+  being passed to the DOM.
 </Callout>
 
 ## TypeScript Types
@@ -234,7 +238,7 @@ The base type for all styled components.
 Extracts variant props from a CVA configuration.
 
 ```tsx
-import { cva, type VariantProps } from "styled-cva";
+import { cva, type VariantProps } from "@styled-cva/react";
 
 const buttonVariants = cva("btn", {
   variants: {
@@ -260,5 +264,6 @@ const Button = tw.button`btn`.withStyle({
 ```
 
 <Callout type="warning" emoji="⚠️">
-  This is only available on basic styled components created with template literals. CVA components do not support this method.
+  This is only available on basic styled components created with template
+  literals. CVA components do not support this method.
 </Callout>

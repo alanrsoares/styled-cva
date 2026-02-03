@@ -9,34 +9,40 @@ Common patterns and real-world examples using `styled-cva`.
 A standard button component with `intent` and `size` variants.
 
 ```tsx
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
-const Button = tw.button.cva("inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background", {
-  variants: {
-    $variant: {
-      default: "bg-primary text-primary-foreground hover:bg-primary/90",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      ghost: "hover:bg-accent hover:text-accent-foreground",
-      link: "underline-offset-4 hover:underline text-primary",
+const Button = tw.button.cva(
+  "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+  {
+    variants: {
+      $variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "underline-offset-4 hover:underline text-primary",
+      },
+      $size: {
+        default: "h-10 py-2 px-4",
+        sm: "h-9 px-3 rounded-md",
+        lg: "h-11 px-8 rounded-md",
+        icon: "h-10 w-10",
+      },
     },
-    $size: {
-      default: "h-10 py-2 px-4",
-      sm: "h-9 px-3 rounded-md",
-      lg: "h-11 px-8 rounded-md",
-      icon: "h-10 w-10",
+    defaultVariants: {
+      $variant: "default",
+      $size: "default",
     },
   },
-  defaultVariants: {
-    $variant: "default",
-    $size: "default",
-  },
-});
+);
 
 export default function ButtonExample() {
   return (
-    <div className="flex gap-4 p-4 flex-wrap">
+    <div className="flex flex-wrap gap-4 p-4">
       <Button>Default</Button>
       <Button $variant="secondary">Secondary</Button>
       <Button $variant="destructive">Destructive</Button>
@@ -44,7 +50,7 @@ export default function ButtonExample() {
       <Button $variant="ghost">Ghost</Button>
       <Button $variant="link">Link</Button>
     </div>
-  )
+  );
 }
 ```
 
@@ -55,7 +61,7 @@ export default function ButtonExample() {
 An input component that handles error, success, and disabled states.
 
 ```tsx
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
 const Input = tw.input.cva(
   "flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
@@ -63,25 +69,34 @@ const Input = tw.input.cva(
     variants: {
       $state: {
         default: "border-input focus-visible:ring-ring",
-        error: "border-red-500 focus-visible:ring-red-500 text-red-900 placeholder:text-red-300",
+        error:
+          "border-red-500 focus-visible:ring-red-500 text-red-900 placeholder:text-red-300",
         success: "border-green-500 focus-visible:ring-green-500 text-green-900",
       },
     },
     defaultVariants: {
       $state: "default",
     },
-  }
+  },
 );
 
 export default function InputExample() {
   return (
     <div className="grid w-full max-w-sm items-center gap-4">
       <Input placeholder="Default input" />
-      <Input $state="error" placeholder="Error state" defaultValue="Invalid input" />
-      <Input $state="success" placeholder="Success state" defaultValue="Valid input" />
+      <Input
+        $state="error"
+        placeholder="Error state"
+        defaultValue="Invalid input"
+      />
+      <Input
+        $state="success"
+        placeholder="Success state"
+        defaultValue="Valid input"
+      />
       <Input disabled placeholder="Disabled input" />
     </div>
-  )
+  );
 }
 ```
 
@@ -93,7 +108,7 @@ A switch component using `aria-pressed` or a custom prop for state.
 
 ```tsx
 import { useState } from "react";
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
 const SwitchRoot = tw.button.cva(
   "peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
@@ -104,7 +119,7 @@ const SwitchRoot = tw.button.cva(
         false: "bg-input",
       },
     },
-  }
+  },
 );
 
 const SwitchThumb = tw.span.cva(
@@ -116,15 +131,15 @@ const SwitchThumb = tw.span.cva(
         false: "translate-x-0",
       },
     },
-  }
+  },
 );
 
 export default function SwitchExample() {
   const [checked, setChecked] = useState(false);
 
   return (
-    <SwitchRoot 
-      $checked={checked} 
+    <SwitchRoot
+      $checked={checked}
       onClick={() => setChecked(!checked)}
       role="switch"
       aria-checked={checked}
@@ -142,7 +157,7 @@ export default function SwitchExample() {
 A composed card component.
 
 ```tsx
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
 const Card = tw.div`rounded-lg border bg-card text-card-foreground shadow-sm`;
 const CardHeader = tw.div`flex flex-col space-y-1.5 p-6`;
@@ -163,10 +178,12 @@ export default function CardExample() {
       </CardContent>
       <CardFooter className="flex justify-between">
         <button className="text-sm">Cancel</button>
-        <button className="bg-primary text-white px-4 py-2 rounded">Deploy</button>
+        <button className="bg-primary rounded px-4 py-2 text-white">
+          Deploy
+        </button>
       </CardFooter>
     </Card>
-  )
+  );
 }
 ```
 
@@ -176,20 +193,25 @@ Using the `$as` prop to render a button as a link.
 
 ```tsx
 import Link from "next/link";
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
-const Button = tw.button.cva("inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2");
+const Button = tw.button.cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2",
+);
 
 export default function PolymorphicExample() {
   return (
     <div className="flex gap-4">
       {/* Renders as <button> */}
-      <Button onClick={() => alert("Clicked!")}>
-        Button
-      </Button>
+      <Button onClick={() => alert("Clicked!")}>Button</Button>
 
       {/* Renders as <a> */}
-      <Button $as="a" href="https://github.com/alanrsoares/styled-cva" target="_blank" rel="noreferrer">
+      <Button
+        $as="a"
+        href="https://github.com/alanrsoares/styled-cva"
+        target="_blank"
+        rel="noreferrer"
+      >
         GitHub Link
       </Button>
 
@@ -198,7 +220,7 @@ export default function PolymorphicExample() {
         Get Started
       </Button>
     </div>
-  )
+  );
 }
 ```
 
@@ -209,7 +231,7 @@ export default function PolymorphicExample() {
 Styling a custom component or extending an existing one.
 
 ```tsx
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
 // Base component
 const BaseBox = tw.div`p-4 border rounded`;
@@ -218,14 +240,22 @@ const BaseBox = tw.div`p-4 border rounded`;
 const WarningBox = tw(BaseBox)`border-yellow-500 bg-yellow-50 text-yellow-900`;
 
 // Custom React Component
-const UserProfile = ({ className, name }: { className?: string, name: string }) => (
+const UserProfile = ({
+  className,
+  name,
+}: {
+  className?: string;
+  name: string;
+}) => (
   <div className={className}>
     <span className="font-bold">{name}</span>
   </div>
 );
 
 // Styled Custom Component
-const StyledProfile = tw(UserProfile)`flex items-center gap-2 p-2 bg-gray-100 rounded-full`;
+const StyledProfile = tw(
+  UserProfile,
+)`flex items-center gap-2 p-2 bg-gray-100 rounded-full`;
 
 export default function AdvancedCompositionExample() {
   return (
@@ -234,7 +264,7 @@ export default function AdvancedCompositionExample() {
       <WarningBox>Warning Box</WarningBox>
       <StyledProfile name="John Doe" />
     </div>
-  )
+  );
 }
 ```
 
@@ -245,17 +275,20 @@ export default function AdvancedCompositionExample() {
 Using `.withProps()` to set default attributes and variant values.
 
 ```tsx
-import tw from "styled-cva";
+import tw from "@styled-cva/react";
 
 const IconButton = tw.button
-  .cva("inline-flex items-center justify-center rounded-full p-2 transition-colors", {
-    variants: {
-      $variant: {
-        primary: "bg-blue-600 text-white hover:bg-blue-700",
-        ghost: "hover:bg-gray-100 text-gray-600",
+  .cva(
+    "inline-flex items-center justify-center rounded-full p-2 transition-colors",
+    {
+      variants: {
+        $variant: {
+          primary: "bg-blue-600 text-white hover:bg-blue-700",
+          ghost: "hover:bg-gray-100 text-gray-600",
+        },
       },
     },
-  })
+  )
   .withProps({
     type: "button",
     $variant: "primary",
@@ -274,12 +307,12 @@ export default function DefaultPropsExample() {
       <IconButton $variant="ghost">
         <span className="size-4">⚙️</span>
       </IconButton>
-      
+
       {/* Overrides default aria-label */}
       <IconButton aria-label="Settings">
-         <span className="size-4">🛠️</span>
+        <span className="size-4">🛠️</span>
       </IconButton>
     </div>
-  )
+  );
 }
 ```

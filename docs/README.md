@@ -11,11 +11,9 @@ This directory contains the Nextra documentation site for styled-cva.
 To start the development server:
 
 ```bash
-npm run dev
-# or
-pnpm dev
-# or
 bun dev
+# or from repo root
+bun run --filter @styled-cva/docs dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -25,11 +23,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 To build the documentation site:
 
 ```bash
-npm run build
-# or
-pnpm build
-# or
 bun build
+# or from repo root
+bun run --filter @styled-cva/docs build
 ```
 
 ## Start Production Server
@@ -37,11 +33,9 @@ bun build
 To start the production server:
 
 ```bash
-npm run start
-# or
-pnpm start
-# or
 bun start
+# or from repo root
+bun run --filter @styled-cva/docs start
 ```
 
 ## Project Structure
@@ -100,7 +94,7 @@ const client = new Client({
 });
 
 const transport = new StreamableHTTPClientTransport(
-  new URL("https://styled-cva.vercel.app/api/mcp"),
+  new URL("https://styled-cva.vercel.app/api/mcp")
   // Or use 'http://localhost:3000/api/mcp' for local development
 );
 

@@ -46,6 +46,12 @@ export const DOCS_PAGES = [
     resource: "styled-cva://docs/api",
   },
   {
+    path: "eslint-plugin/page.mdx",
+    route: "/eslint-plugin",
+    title: "ESLint Plugin",
+    resource: "styled-cva://docs/eslint-plugin",
+  },
+  {
     path: "mcp/page.mdx",
     route: "/mcp",
     title: "MCP Docs Server",

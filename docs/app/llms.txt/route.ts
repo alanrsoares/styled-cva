@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { NextRequest } from "next/server";
+
 import { DOCS_PAGES } from "~/lib/mcp-server";
 
 export async function GET(request: NextRequest) {
@@ -20,22 +21,25 @@ export async function GET(request: NextRequest) {
       // Remove frontmatter if present and any Next.js imports/exports if they exist
       examplesContent = rawContent
         .replace(/^---\n[\s\S]*?\n---\n/, "")
-        .replace(/^# Usage Examples\n\nCommon patterns and real-world examples using `styled-cva`\.\n\n/, "");
+        .replace(
+          /^# Usage Examples\n\nCommon patterns and real-world examples using `@styled-cva/react`\.\n\n/,
+          "",
+        );
     } catch (error) {
       console.error("Failed to read examples for llms.txt", error);
     }
   }
 
   const content = [
-    "# styled-cva",
+    "# @styled-cva/react (styled-cva)",
     "",
     "> A typesafe, class-variance-authority-based, styled-components-like library for authoring React components",
     "",
     "## Documentation",
-    ...DOCS_PAGES.map((page) => `- [${page.title}](${baseUrl}${page.route})`),
+    ...DOCS_PAGES.map((page) => `- [${ page.title }](${ baseUrl }${ page.route })`),
     "",
     "## MCP Server",
-    `- Endpoint: ${baseUrl}/api/mcp`,
+    `- Endpoint: ${ baseUrl } / api / mcp`,
     "- Description: Model Context Protocol server providing documentation as resources and tools for search.",
     "",
     "## Features",

@@ -8,14 +8,15 @@
     "docs"
   ],
   "scripts": {
-    "build": "bun run --filter @styled-cva/core build && bun run --filter @styled-cva/eslint-plugin build && bun run --filter @styled-cva/react build && bun run --filter @styled-cva/solid build && bun run --filter @styled-cva/docs build",
+    "build": "bun run --filter @styled-cva/core build && bun run --filter @styled-cva/eslint-plugin build && bun run --filter @styled-cva/react build && bun run --filter @styled-cva/solid build && bun run --filter @styled-cva/vue build && bun run --filter @styled-cva/docs build",
     "dev": "bun run --filter @styled-cva/docs dev",
     "test": "bun run --filter @styled-cva/* test",
     "lint": "bun run --filter @styled-cva/* lint",
-    "clean": "bun run --filter @styled-cva/core clean && bun run --filter @styled-cva/eslint-plugin clean && bun run --filter @styled-cva/react clean && bun run --filter @styled-cva/solid clean",
+    "clean": "bun run --filter @styled-cva/core clean && bun run --filter @styled-cva/eslint-plugin clean && bun run --filter @styled-cva/react clean && bun run --filter @styled-cva/solid clean && bun run --filter @styled-cva/vue clean",
     "format": "bun run --filter @styled-cva/* format",
     "release:react": "bun run build && npm publish -w @styled-cva/react",
     "release:solid": "bun run build && npm publish -w @styled-cva/solid",
+    "release:vue": "bun run build && npm publish -w @styled-cva/vue",
     "release:eslint-plugin": "bun run build && npm publish -w @styled-cva/eslint-plugin",
     "changeset": "changeset",
     "version": "changeset version",

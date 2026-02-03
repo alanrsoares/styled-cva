@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test";
+
 import {
   capitalize,
   countClasses,
   generateName,
   normalizeClasses,
-} from "./utils";
+} from "./utils.js";
 
 describe("capitalize", () => {
   test("capitalizes first character", () => {

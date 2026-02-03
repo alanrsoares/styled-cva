@@ -9,8 +9,7 @@ declare global {
   namespace Vi {
     // @ts-expect-error - Jest's expect method is extended with react-testing-library's matchers
     interface JestAssertion<T = unknown>
-      extends jest.Matchers<void, T>,
-        TestingLibraryMatchers<T, void> {}
+      extends jest.Matchers<void, T>, TestingLibraryMatchers<T, void> {}
   }
 }
 

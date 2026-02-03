@@ -39,10 +39,10 @@ type IsAny<T, True, False = never> = True | False extends (
 
 export type RemoveIndex<T> = {
   [K in keyof T as string extends K
-  ? never
-  : number extends K
-  ? never
-  : K]: T[K];
+    ? never
+    : number extends K
+      ? never
+      : K]: T[K];
 };
 
 /**
@@ -61,7 +61,7 @@ type MergeProps<O extends object, P extends {} = {}> =
 type TailwindPropHelper<
   P extends {},
   O extends object = {},
-// Pick is needed here to make $as typing work
+  // Pick is needed here to make $as typing work
 > = Pick<MergeProps<O, P>, keyof MergeProps<O, P>>;
 
 type TailwindComponentPropsWith$As<
@@ -69,10 +69,10 @@ type TailwindComponentPropsWith$As<
   O extends object,
   $As extends string | React.ComponentType<any> = React.ComponentType<P>,
   P2 extends {} = $As extends AnyTailwindComponent
-  ? TailwindComponentAllInnerProps<$As>
-  : $As extends IntrinsicElementsKeys | React.ComponentType<any>
-  ? React.ComponentPropsWithRef<$As>
-  : never,
+    ? TailwindComponentAllInnerProps<$As>
+    : $As extends IntrinsicElementsKeys | React.ComponentType<any>
+      ? React.ComponentPropsWithRef<$As>
+      : never,
 > = P & O & TailwindPropHelper<P2> & { $as?: $As };
 
 /**
@@ -97,8 +97,10 @@ export type TailwindComponent<
  * @template P The base react props
  * @template O The props added with the template function.
  */
-export interface TailwindComponentBase<P extends object, O extends object = {}>
-  extends TailwindExoticComponent<TailwindPropHelper<P, O>> {
+export interface TailwindComponentBase<
+  P extends object,
+  O extends object = {},
+> extends TailwindExoticComponent<TailwindPropHelper<P, O>> {
   // add our own fake call signature to implement the polymorphic '$as' prop
   (
     props: TailwindPropHelper<P, O> & { $as?: never | undefined },
@@ -161,8 +163,7 @@ export type IntrinsicElementsTemplateFunctionsMap = {
   >;
 };
 
-export interface TailwindInterface
-  extends IntrinsicElementsTemplateFunctionsMap {
+export interface TailwindInterface extends IntrinsicElementsTemplateFunctionsMap {
   /**
    * A factory function that creates a styled component from a wrapped component
    * @example
@@ -197,12 +198,12 @@ export interface TailwindInterface
   ): TemplateFunction<
     // Prevent functional components without props infering props as `unknown`
     C extends (P?: never) => any
-    ? {}
-    : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
-    ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
-      className?: string;
-    }
-    : React.ComponentPropsWithoutRef<C>
+      ? {}
+      : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
+        ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
+            className?: string;
+          }
+        : React.ComponentPropsWithoutRef<C>
   >;
   /**
    * A factory function that creates a styled component from an intrinsic element

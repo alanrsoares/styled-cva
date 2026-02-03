@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/styled-cva.svg" alt="styled-cva logo" width="128" height="128" />
+  <img src="../assets/styled-cva.svg" alt="styled-cva logo" width="128" height="128" />
 </p>
 
 # styled-cva Documentation

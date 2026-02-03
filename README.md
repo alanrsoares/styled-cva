@@ -1,21 +1,45 @@
-# styled-cva
+<p align="center">
+  <img src="docs/public/styled-cva.svg" alt="styled-cva logo" width="128" height="128" />
+</p>
 
-A typesafe, [class-variance-authority](https://github.com/joe-bell/cva)-based, styled-components-like library for authoring React components with Tailwind CSS.
+<h1 align="center">styled-cva</h1>
 
-[![npm version](https://img.shields.io/npm/v/@styled-cva/react.svg)](https://www.npmjs.com/package/@styled-cva/react)
-[![License](https://img.shields.io/github/license/alanrsoares/styled-cva)](https://github.com/alanrsoares/styled-cva)
+<p align="center">
+  <strong>A typesafe, <a href="https://github.com/joe-bell/cva">class-variance-authority-based</a>, styled-components-like library for authoring React components with Tailwind CSS.</strong>
+</p>
 
-## Install
+<p align="center">
+  <a href="https://github.com/prettier/prettier"><img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg" /></a>
+  <a href="https://github.com/alanrsoares/styled-cva"><img alt="License" src="https://img.shields.io/github/license/alanrsoares/styled-cva" /></a>
+  <a href="https://www.npmjs.com/package/@styled-cva/react"><img alt="Types" src="https://img.shields.io/npm/types/@styled-cva/react" /></a>
+  <a href="https://www.npmjs.com/package/@styled-cva/react" rel="nofollow"><img src="https://img.shields.io/npm/v/@styled-cva/react.svg?sanitize=true"></a>
+</p>
+
+> ⚠️ styled-cva 0.5.x only supports React ≥19.x. If you're on React 18, use the latest 0.3.x ⚠️
+
+## Installation
+
+npm
 
 ```bash
-npm install @styled-cva/react
-# or
+npm i --save @styled-cva/react
+```
+
+pnpm
+
+```bash
+pnpm add @styled-cva/react
+```
+
+bun
+
+```bash
 bun add @styled-cva/react
 ```
 
-> React 19.x required. For React 18, use the latest 0.3.x.
+## Usage
 
-## Quick example
+### Quick example
 
 ```tsx
 import tw from "@styled-cva/react";
@@ -39,19 +63,10 @@ const Button = tw.button`bg-blue-500 text-white font-bold py-2 px-4 rounded`;
 **Requirements:** [Bun](https://bun.sh) (or Node ≥20), recommended via `packageManager` in root `package.json`.
 
 ```bash
-# Install dependencies
 bun install
-
-# Build all packages and docs
 bun run build
-
-# Run tests
 bun run test
-
-# Lint
 bun run lint
-
-# Start docs dev server
 bun run dev
 ```
 

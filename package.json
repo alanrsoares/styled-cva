@@ -15,9 +15,15 @@
     "clean": "bun run --filter @styled-cva/eslint-plugin clean && bun run --filter @styled-cva/react clean",
     "format": "bun run --filter @styled-cva/* format",
     "release:react": "bun run build && npm publish -w @styled-cva/react",
-    "release:eslint-plugin": "bun run build && npm publish -w @styled-cva/eslint-plugin"
+    "release:eslint-plugin": "bun run build && npm publish -w @styled-cva/eslint-plugin",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "bun run build && changeset publish"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8"
   }
 }

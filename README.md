@@ -57,18 +57,21 @@ bun run dev
 
 ## Scripts
 
-| Script                          | Description                                   |
-| ------------------------------- | --------------------------------------------- |
-| `bun run build`                 | Build eslint-plugin, react, and docs          |
-| `bun run dev`                   | Start docs site (Next.js)                     |
-| `bun run test`                  | Run tests in packages that have a test script |
-| `bun run lint`                  | Lint packages                                 |
-| `bun run format`                | Format with Prettier                          |
-| `bun run clean`                 | Remove build output (eslint-plugin, react)    |
-| `bun run release:react`         | Build and publish @styled-cva/react           |
-| `bun run release:eslint-plugin` | Build and publish @styled-cva/eslint-plugin   |
+| Script                          | Description                                         |
+| ------------------------------- | --------------------------------------------------- |
+| `bun run build`                 | Build eslint-plugin, react, and docs                |
+| `bun run dev`                   | Start docs site (Next.js)                           |
+| `bun run test`                  | Run tests in packages that have a test script       |
+| `bun run lint`                  | Lint packages                                       |
+| `bun run format`                | Format with Prettier                                |
+| `bun run clean`                 | Remove build output (eslint-plugin, react)          |
+| `bun run changeset`             | Add a changeset (describe a release)                |
+| `bun run version`               | Bump versions and update CHANGELOGs from changesets |
+| `bun run release`               | Build and publish all versioned packages            |
+| `bun run release:react`         | Build and publish @styled-cva/react                 |
+| `bun run release:eslint-plugin` | Build and publish @styled-cva/eslint-plugin         |
 
-See [RELEASING.md](RELEASING.md) for versioning and publish steps.
+Versioning uses [Changesets](https://github.com/changesets/changesets). See [RELEASING.md](RELEASING.md) for the full workflow.
 
 ## License
 

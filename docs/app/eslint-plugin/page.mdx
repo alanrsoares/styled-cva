@@ -2,7 +2,7 @@
 
 The `@styled-cva/eslint-plugin` package provides an ESLint rule that suggests extracting JSX elements with many Tailwind classes into named styled components. The rule is **fixable**, so you can apply the suggestion automatically.
 
-Part of the styled-cva monorepo. The package is **private** and not published to npm — use it by linking the workspace or the built `dist/` from the repo.
+Part of the styled-cva monorepo. Published to npm as `@styled-cva/eslint-plugin`. Install with your package manager or link the workspace during development.
 
 ## Rule: `extract-classes-to-styled`
 
@@ -40,14 +40,20 @@ The plugin recognizes both `styled-cva` and `@styled-cva/react` as the styled im
 
 ## Installation
 
-From the monorepo root, install and build the plugin:
+In a project that uses `@styled-cva/react`:
+
+```bash
+npm install -D @styled-cva/eslint-plugin
+# or
+bun add -d @styled-cva/eslint-plugin
+```
+
+When developing in the monorepo, from the repo root:
 
 ```bash
 bun install
 bun run --filter @styled-cva/eslint-plugin build
 ```
-
-In another project, link the package via `file:` or `link:` in `package.json`, or use `bun link` / `npm link`. Use the **built** output (`dist/`) so it works in Node (CJS and ESM).
 
 **Peer dependencies:** `eslint` (^9), `typescript` (^5).
 

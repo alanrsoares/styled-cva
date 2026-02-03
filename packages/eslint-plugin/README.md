@@ -2,7 +2,7 @@
 
 ESLint plugin for [@styled-cva/react](https://www.npmjs.com/package/@styled-cva/react) (styled-cva). Suggests extracting JSX elements with many Tailwind classes into named styled components and can auto-fix.
 
-Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo. This package is **private** and not published to npm.
+Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo. Published to npm as `@styled-cva/eslint-plugin`.
 
 ## Rule: `extract-classes-to-styled`
 

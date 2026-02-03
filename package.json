@@ -13,7 +13,9 @@
     "test": "bun run --filter @styled-cva/* test",
     "lint": "bun run --filter @styled-cva/* lint",
     "clean": "bun run --filter @styled-cva/eslint-plugin clean && bun run --filter @styled-cva/react clean",
-    "format": "bun run --filter @styled-cva/* format"
+    "format": "bun run --filter @styled-cva/* format",
+    "release:react": "bun run build && npm publish -w @styled-cva/react",
+    "release:eslint-plugin": "bun run build && npm publish -w @styled-cva/eslint-plugin"
   },
   "engines": {
     "node": ">=20"

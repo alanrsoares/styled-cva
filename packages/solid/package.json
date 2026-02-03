@@ -1,0 +1,67 @@
+{
+  "name": "@styled-cva/solid",
+  "description": "A typesafe, class-variance-authority-based, styled-components-like library for authoring SolidJS components",
+  "version": "0.5.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "LicenseRef-LICENSE",
+  "keywords": [
+    "styled-components",
+    "class-variance-authority",
+    "solid",
+    "solidjs",
+    "tailwindcss",
+    "variants"
+  ],
+  "scripts": {
+    "build": "bun compile && bun bundle",
+    "compile": "tsc --noEmit",
+    "bundle": "NODE_OPTIONS=\"--max-old-space-size=4096\" tsup",
+    "test": "vitest --run src",
+    "clean": "rm -rf dist",
+    "lint": "eslint ./src --ext .ts,.tsx",
+    "postversion": "bun run build",
+    "format": "prettier --write ."
+  },
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "files": [
+    "dist/**/*"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@solidjs/testing-library": "^0.8.10",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@tsconfig/strictest": "^2.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "esbuild-plugin-solid": "^0.6.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-solid": "^0.14.5",
+    "happy-dom": "^13.10.1",
+    "prettier-plugin-tailwindcss": "^0.5.14",
+    "solid-js": "^1.9.5",
+    "tailwind-merge": "^2.6.0",
+    "ts-expect": "^1.3.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite-plugin-solid": "^2.11.6",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.8.0",
+    "typescript": ">=5.7.0"
+  },
+  "dependencies": {
+    "@styled-cva/core": "workspace:*"
+  }
+}

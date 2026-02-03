@@ -64,6 +64,6 @@
     "typescript": ">=5.7.0"
   },
   "dependencies": {
-    "@styled-cva/core": "workspace:*"
+    "@styled-cva/core": "^0.5.1"
   }
 }

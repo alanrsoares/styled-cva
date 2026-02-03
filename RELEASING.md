@@ -49,21 +49,23 @@ git tag "v$(node -p "require('./packages/react/package.json').version")"
 To bump and publish a single package without using changesets:
 
 ```bash
-npm version patch -w @styled-cva/react
+bun run bump:patch -- "@styled-cva/react"
 bun run release:react
 # or
-npm version patch -w @styled-cva/eslint-plugin
+bun run bump:patch -- "@styled-cva/eslint-plugin"
 bun run release:eslint-plugin
 ```
 
-Dry run: `npm publish -w @styled-cva/react --dry-run`
+Dry run: `bun publish --cwd packages/react --dry-run`
 
 ## From package directory
 
 ```bash
 cd packages/react
-npm version patch && npm publish
+bun run build
+bun publish
 # or
 cd packages/eslint-plugin
-npm version patch && bun run build && npm publish
+bun run build
+bun publish
 ```

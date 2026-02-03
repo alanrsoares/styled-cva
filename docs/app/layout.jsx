@@ -1,6 +1,7 @@
 import { Footer, Layout, Navbar } from "nextra-theme-docs";
 import { Banner, Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
+import { getReactVersion } from "../lib/versions";
 
 import "../styles/globals.css";
 
@@ -13,9 +14,11 @@ export const metadata = {
   },
 };
 
+const reactVersion = getReactVersion();
+
 const banner = (
   <Banner storageKey="styled-cva-banner">
-    styled-cva 0.5.1 is available 🎉
+    styled-cva {reactVersion} is available 🎉
   </Banner>
 );
 const navbar = (

@@ -12,6 +12,7 @@ import {
   type ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+import { getReactVersion } from "./versions";
 
 // Documentation pages mapping
 export const DOCS_PAGES = [
@@ -225,7 +226,7 @@ export function createMcpServer(): Server {
   const server = new Server(
     {
       name: "styled-cva-docs",
-      version: "0.5.0",
+      version: getReactVersion(),
     },
     {
       capabilities: {

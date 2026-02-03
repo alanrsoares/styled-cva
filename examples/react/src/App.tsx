@@ -1,17 +1,12 @@
 import tw from "@styled-cva/react";
 
-import viteLogo from "/vite.svg";
-
-import reactLogo from "./assets/react.svg";
 import Showcase from "./components/Showcase";
 
 const Root = tw.div`flex flex-col items-center gap-8 max-w-[900px] mx-auto p-8 w-full`;
 const Header = tw.header`flex flex-col items-center gap-4 text-center`;
 const LogoRow = tw.div`flex flex-wrap justify-center gap-4`;
 const LogoLink = tw.a`inline-flex p-4 font-medium text-[#646cff] no-underline hover:text-[#535bf2] transition-[filter] duration-300 hover:drop-shadow-[0_0_2em_#646cffaa]`;
-const ReactLogoLink = tw.a`inline-flex p-4 font-medium text-[#646cff] no-underline hover:text-[#535bf2] transition-[filter] duration-300 hover:drop-shadow-[0_0_2em_#61dafbaa]`;
 const LogoImg = tw.img`h-16 w-auto will-change-[filter]`;
-const ReactLogoImg = tw.img`h-16 w-auto will-change-[filter] motion-safe:animate-[spin_20s_linear_infinite]`;
 const Title = tw.h1`text-3xl font-semibold text-[#646cff] m-0`;
 const Subtitle = tw.p`text-[#888] m-0 text-sm`;
 
@@ -20,21 +15,18 @@ function App() {
     <Root>
       <Header>
         <LogoRow>
-          <LogoLink href="https://vite.dev" target="_blank">
-            <LogoImg src={viteLogo} alt="Vite" />
+          <LogoLink
+            href="https://github.com/alanrsoares/styled-cva"
+            target="_blank"
+          >
+            <LogoImg src="/styled-cva.svg" alt="styled-cva" />
           </LogoLink>
-          <ReactLogoLink href="https://react.dev" target="_blank">
-            <ReactLogoImg src={reactLogo} alt="React" />
-          </ReactLogoLink>
         </LogoRow>
         <Title>styled-cva + React</Title>
         <Subtitle>
           Type-safe, CVA-based styled components for React with Tailwind
         </Subtitle>
       </Header>
-      <button className="h-5 w-12 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600">
-        Submit
-      </button>
       <Showcase />
     </Root>
   );

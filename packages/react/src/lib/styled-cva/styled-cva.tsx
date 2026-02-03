@@ -18,6 +18,7 @@ import {
   type ForwardRefExoticComponent,
   type JSX,
   type PropsWithoutRef,
+  type ReactElement,
   type Ref,
   type RefAttributes,
 } from "react";
@@ -151,6 +152,14 @@ type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
   [key: `data-${string}`]: string;
 } & Partial<VariantProps<ReturnType<CVA<T>>>>;
 
+// Polymorphic props when $as is used: accept the "as" element's props (e.g. href when $as="a")
+type PolymorphicCVAProps<T, $As extends ElementKey> = PropsWithoutRef<
+  JSX.IntrinsicElements[$As] &
+    VariantProps<ReturnType<CVA<T>>> &
+    StyledExtension & { $as?: $As }
+> &
+  RefAttributes<HTMLElement>;
+
 type CVAWithPropsReturn<K extends ElementKey, T> = ForwardRefExoticComponent<
   PropsWithoutRef<
     JSX.IntrinsicElements[K] &
@@ -159,6 +168,7 @@ type CVAWithPropsReturn<K extends ElementKey, T> = ForwardRefExoticComponent<
   > &
     RefAttributes<HTMLElement>
 > & {
+  <$As extends ElementKey>(props: PolymorphicCVAProps<T, $As>): ReactElement;
   /**
    * Sets default props for the component. User-provided props will override these defaults.
    *

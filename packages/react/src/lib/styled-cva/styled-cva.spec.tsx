@@ -132,6 +132,61 @@ describe("styled-cva", () => {
     `);
   });
 
+  it('should forward anchor props (e.g. href) when using $as="a"', () => {
+    const StyledButton = tw.button.cva("btn-base", {
+      variants: {
+        $variant: {
+          primary: "btn-primary",
+          secondary: "btn-secondary",
+        },
+      },
+    });
+
+    const { container } = render(
+      <StyledButton
+        $as="a"
+        href="https://example.com"
+        target="_blank"
+        rel="noreferrer"
+        $variant="primary"
+      >
+        Button as link
+      </StyledButton>,
+    );
+
+    const anchor = container.querySelector("a");
+    expect(anchor).not.toBeNull();
+    expect(anchor).toHaveAttribute("href", "https://example.com");
+    expect(anchor).toHaveAttribute("target", "_blank");
+    expect(anchor).toHaveAttribute("rel", "noreferrer");
+    expect(container.firstChild).toMatchInlineSnapshot(`
+      <a
+        class="btn-base btn-primary"
+        href="https://example.com"
+        rel="noreferrer"
+        target="_blank"
+      >
+        Button as link
+      </a>
+    `);
+  });
+
+  it('should accept polymorphic anchor props (href) when $as="a" at type level', () => {
+    const StyledButton = tw.button.cva("btn-base", {
+      variants: { $variant: { primary: "btn-primary" } },
+    });
+    // Polymorphic props when $as="a" must include anchor props (e.g. href)
+    const anchorProps = {
+      $as: "a" as const,
+      href: "https://example.com",
+      target: "_blank" as const,
+      rel: "noreferrer",
+      $variant: "primary" as const,
+      children: "Link",
+    };
+    expectType<ComponentProps<typeof StyledButton>>(anchorProps);
+  });
+
   it("should render a different component using $as prop", () => {
     const StyledDiv = tw.div.cva("div-base", {
       variants: {

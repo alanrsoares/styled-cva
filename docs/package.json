@@ -3,9 +3,8 @@
   "version": "0.5.0",
   "private": true,
   "scripts": {
-    "prebuild": "cp ../../assets/styled-cva.svg public/styled-cva.svg",
     "dev": "next dev",
-    "build": "bun run prebuild && next build",
+    "build": "next build",
     "start": "next start"
   },
   "dependencies": {

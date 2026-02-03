@@ -11,11 +11,11 @@ import {
 } from "@styled-cva/core";
 import {
   createMemo,
+  mergeProps,
+  splitProps,
   type Component,
   type JSX,
   type ValidComponent,
-  mergeProps,
-  splitProps,
 } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
@@ -26,14 +26,14 @@ import {
   type ElementKey,
   type IntrinsicElementsKeys,
   type IntrinsicElementsTemplateFunctionsMap,
+  type IsTwElement,
+  type TailwindComponent,
   type TailwindInterface,
 } from "./types";
 
 const isTw = (c: any): c is AnyTailwindComponent => c[isTwElement] === true;
 
-const templateFunctionFactory: TailwindInterface = (<
-  C extends ValidComponent,
->(
+const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
   Element: C,
 ) => {
   return (
@@ -176,49 +176,62 @@ type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
 } & Partial<VariantProps<ReturnType<CVA<T>>>>;
 
 // Polymorphic props when $as is used: accept the "as" element's props (e.g. href when $as="a")
-type PolymorphicCVAProps<T, $As extends ElementKey> = JSX.IntrinsicElements[$As] &
+type PolymorphicCVAProps<
+  T,
+  $As extends ElementKey,
+> = JSX.IntrinsicElements[$As] &
   VariantProps<ReturnType<CVA<T>>> &
   StyledExtension & { $as?: $As };
 
-type CVAWithPropsReturn<K extends ElementKey, T> = Component<
-  JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
-> & {
-  <$As extends ElementKey>(props: PolymorphicCVAProps<T, $As>): JSX.Element;
-  /**
-   * Sets default props for the component. User-provided props will override these defaults.
-   *
-   * @param defaultProps - An object containing default props to apply to the component.
-   *                       Accepts known element props, data-* attributes, and variant props.
-   *                       Variant prop values are validated against the variant definitions.
-   * @returns A component with the default props applied
-   *
-   * @example
-   * ```tsx
-   * const StyledButton = tw.button.cva("btn-base", {
-   *   variants: {
-   *     $variant: {
-   *       primary: "btn-primary",
-   *       secondary: "btn-secondary",
-   *     },
-   *   },
-   * }).withProps({
-   *   'data-some-prop': 'some-value',
-   *   type: 'button',
-   *   $variant: 'primary' // Valid variant value
-   * });
-   *
-   * // The component will have data-some-prop="some-value", type="button", and $variant="primary" by default
-   * <StyledButton>Click me</StyledButton>
-   * ```
-   */
-  withProps: <DefaultProps extends ValidWithProps<K, T>>(
-    defaultProps: DefaultProps & {
-      [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
-    },
-  ) => Component<
-    JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
-  >;
-};
+// CVA component props (element + variant + $as); used so tw(CVAComponent) preserves $variant, $size, etc.
+type CVAProps<K extends ElementKey, T> = JSX.IntrinsicElements[K] &
+  VariantProps<ReturnType<CVA<T>>> &
+  StyledExtension;
+
+type CVAWithPropsReturn<K extends ElementKey, T> = TailwindComponent<
+  CVAProps<K, T>,
+  {}
+> &
+  IsTwElement &
+  Component<CVAProps<K, T>> & {
+    <$As extends ElementKey>(props: PolymorphicCVAProps<T, $As>): JSX.Element;
+    /**
+     * Sets default props for the component. User-provided props will override these defaults.
+     *
+     * @param defaultProps - An object containing default props to apply to the component.
+     *                       Accepts known element props, data-* attributes, and variant props.
+     *                       Variant prop values are validated against the variant definitions.
+     * @returns A component with the default props applied
+     *
+     * @example
+     * ```tsx
+     * const StyledButton = tw.button.cva("btn-base", {
+     *   variants: {
+     *     $variant: {
+     *       primary: "btn-primary",
+     *       secondary: "btn-secondary",
+     *     },
+     *   },
+     * }).withProps({
+     *   'data-some-prop': 'some-value',
+     *   type: 'button',
+     *   $variant: 'primary' // Valid variant value
+     * });
+     *
+     * // The component will have data-some-prop="some-value", type="button", and $variant="primary" by default
+     * <StyledButton>Click me</StyledButton>
+     * ```
+     */
+    withProps: <DefaultProps extends ValidWithProps<K, T>>(
+      defaultProps: DefaultProps & {
+        [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
+      },
+    ) => Component<
+      JSX.IntrinsicElements[K] &
+        VariantProps<ReturnType<CVA<T>>> &
+        StyledExtension
+    >;
+  };
 
 export type StyledCVA = TailwindInterface & {
   /**
@@ -298,7 +311,8 @@ export function createStyledCVA(): StyledCVA {
               return <WithVariants {...merged} />;
             };
 
-            (ComponentWithDefaultProps as any).displayName = `${(WithVariants as any).displayName}.withProps`;
+            (ComponentWithDefaultProps as any).displayName =
+              `${(WithVariants as any).displayName}.withProps`;
 
             return ComponentWithDefaultProps;
           }) as typeof ComponentWithProps.withProps;

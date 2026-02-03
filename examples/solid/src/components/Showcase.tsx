@@ -56,6 +56,8 @@ export default function Showcase() {
   const [selectedVariant, setSelectedVariant] =
     createSignal<Variant>("primary");
 
+  const CustomButton = tw(Button)`text-red-500`;
+
   return (
     <Main>
       {/* 1. Basic: tagged template */}
@@ -138,9 +140,24 @@ export default function Showcase() {
         </Row>
       </Section>
 
-      {/* 4. Polymorphic $as */}
+      {/* 4. Extending CVA with tw() */}
       <Section>
-        <SectionTitle>4. Polymorphic $as</SectionTitle>
+        <SectionTitle>4. CustomButton (tw(Button))</SectionTitle>
+        <SectionDesc>
+          <Code>tw(Button)`text-red-500`</Code> — extend the CVA Button with
+          extra classes.
+        </SectionDesc>
+        <Row>
+          <CustomButton>Custom red button</CustomButton>
+          <CustomButton $variant="secondary" $size="sm">
+            Small secondary
+          </CustomButton>
+        </Row>
+      </Section>
+
+      {/* 5. Polymorphic $as */}
+      <Section>
+        <SectionTitle>5. Polymorphic $as</SectionTitle>
         <SectionDesc>
           Same Button component, render as <Code>&lt;a&gt;</Code> with{" "}
           <Code>$as="a"</Code> and <Code>href</Code>.

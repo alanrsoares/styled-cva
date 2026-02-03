@@ -15,7 +15,7 @@ export const metadata = {
 
 const banner = (
   <Banner storageKey="styled-cva-banner">
-    styled-cva 0.5.0 is available 🎉
+    styled-cva 0.5.1 is available 🎉
   </Banner>
 );
 const navbar = (

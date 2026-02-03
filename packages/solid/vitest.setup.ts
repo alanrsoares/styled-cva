@@ -7,7 +7,6 @@ import { expect } from "vitest";
 
 declare global {
   namespace Vi {
-    // @ts-expect-error - Jest's expect method is extended with testing-library's matchers
     interface JestAssertion<T = unknown>
       extends jest.Matchers<void, T>,
         TestingLibraryMatchers<T, void> {}

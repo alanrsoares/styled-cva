@@ -7,8 +7,7 @@
     "allowJs": false,
     "useDefineForClassFields": true,
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["vitest/globals"]
+    "jsxImportSource": "solid-js"
   },
   "include": ["src"],
   "exclude": [
@@ -17,5 +16,6 @@
     "src/**/*.test.tsx",
     "src/**/*.test.ts"
   ],
+  "types": ["vitest/globals"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck - workspace package types resolve to base TailwindInterface; runtime is correct
-import tw, { type StyledCVA } from "@styled-cva/solid";
+import tw from "@styled-cva/solid";
 import { createSignal } from "solid-js";
 
 // --- Basic styled components (tagged template) ---
@@ -13,7 +11,7 @@ const Code = tw.code`text-xs bg-[#0d0d0d] text-[#a5d6ff] px-2 py-1 rounded font-
 const Label = tw.span`text-sm text-[#888]`;
 
 // --- CVA: Button with $variant and $size (cast for workspace type resolution) ---
-const Button = (tw as StyledCVA).button.cva(
+const Button = tw.button.cva(
   "font-medium rounded-lg border border-transparent cursor-pointer transition-colors focus:outline-2 focus:outline-[#646cff] focus:outline-offset-2",
   {
     variants: {
@@ -37,12 +35,13 @@ const Button = (tw as StyledCVA).button.cva(
 );
 
 // --- withProps: pre-configured buttons (default variant + type) ---
-const PrimaryButton = (Button as any).withProps({
+const PrimaryButton = Button.withProps({
   type: "button",
   $variant: "primary",
   $size: "md",
 });
-const SecondaryButton = (Button as any).withProps({
+
+const SecondaryButton = Button.withProps({
   type: "button",
   $variant: "secondary",
   $size: "md",
@@ -148,7 +147,6 @@ export default function Showcase() {
         </SectionDesc>
         <Row>
           <Button
-            $as="a"
             href="https://github.com/alanrsoares/styled-cva"
             target="_blank"
             rel="noreferrer"

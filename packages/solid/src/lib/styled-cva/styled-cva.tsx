@@ -157,7 +157,7 @@ const tw: TailwindInterface = Object.assign(
 
 export default tw;
 
-type CVA<T = unknown> = typeof cva;
+type CVA<T = unknown> = typeof cva<T>;
 
 type StyledExtension = {
   $as?: ElementKey | Component<any>;
@@ -173,11 +173,17 @@ type ValidElementProps<K extends ElementKey> = {
 // ValidWithProps includes element props, data attributes, and variant props
 type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
   [key: `data-${string}`]: string;
-} & Partial<T>;
+} & Partial<VariantProps<ReturnType<CVA<T>>>>;
+
+// Polymorphic props when $as is used: accept the "as" element's props (e.g. href when $as="a")
+type PolymorphicCVAProps<T, $As extends ElementKey> = JSX.IntrinsicElements[$As] &
+  VariantProps<ReturnType<CVA<T>>> &
+  StyledExtension & { $as?: $As };
 
 type CVAWithPropsReturn<K extends ElementKey, T> = Component<
-  JSX.IntrinsicElements[K] & VariantProps<typeof cva> & StyledExtension
+  JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
 > & {
+  <$As extends ElementKey>(props: PolymorphicCVAProps<T, $As>): JSX.Element;
   /**
    * Sets default props for the component. User-provided props will override these defaults.
    *
@@ -210,7 +216,7 @@ type CVAWithPropsReturn<K extends ElementKey, T> = Component<
       [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
     },
   ) => Component<
-    JSX.IntrinsicElements[K] & VariantProps<typeof cva> & StyledExtension
+    JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
   >;
 };
 

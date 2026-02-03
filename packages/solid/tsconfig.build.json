@@ -7,9 +7,14 @@
     "allowJs": false,
     "useDefineForClassFields": true,
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "jsxImportSource": "solid-js"
   },
-  "include": ["src", "vitest.setup.ts"],
+  "include": ["src"],
+  "exclude": [
+    "src/**/*.spec.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.test.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

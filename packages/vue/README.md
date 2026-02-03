@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../../assets/styled-cva.svg" alt="styled-cva logo" width="128" height="128" />
+  <img src="https://raw.githubusercontent.com/alanrsoares/styled-cva/refs/heads/main/assets/styled-cva.svg" alt="styled-cva logo" width="128" height="128" />
 </p>
 
 <h1 align="center">styled-cva</h1>

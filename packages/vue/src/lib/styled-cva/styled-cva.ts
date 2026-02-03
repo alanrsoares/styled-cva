@@ -64,15 +64,15 @@ const templateFunctionFactory: TailwindInterface = (<
           const withStyles = computed<Record<string, any>>(() =>
             styleArray
               ? styleArray.reduce<Record<string, any>>(
-                  (acc, intStyle) =>
-                    Object.assign(
-                      acc,
-                      typeof intStyle === "function"
-                        ? intStyle(attrs)
-                        : intStyle,
-                    ),
-                  {},
-                )
+                (acc, intStyle) =>
+                  Object.assign(
+                    acc,
+                    typeof intStyle === "function"
+                      ? intStyle(attrs)
+                      : intStyle,
+                  ),
+                {},
+              )
               : {},
           );
 
@@ -105,17 +105,24 @@ const templateFunctionFactory: TailwindInterface = (<
               : withStyles.value,
           );
 
-          return () =>
-            h(
-              FinalElement.value as any,
+          return () => {
+            const el = FinalElement.value;
+            const children = slots.default
+              ? typeof el === "string"
+                ? slots.default()
+                : { default: slots.default }
+              : undefined;
+            return h(
+              el as any,
               {
                 ...filteredAttrs.value,
                 style: mergedStyle.value,
                 class: computedClass.value,
                 ...(isTw(Element) ? { $as: $as.value } : {}),
               },
-              slots.default?.(),
+              children,
             );
+          };
         },
       });
 
@@ -158,9 +165,9 @@ type StyledExtension = {
 
 // Type for valid withProps input: element props + data-* attributes + variant props
 type ValidElementProps<K extends ElementKey> = {
-  [P in keyof JSX.IntrinsicElements[K] as P extends `$${string}`
-    ? never
-    : P]?: JSX.IntrinsicElements[K][P];
+  [P in keyof JSX.IntrinsicElements[K]as P extends `$${string}`
+  ? never
+  : P]?: JSX.IntrinsicElements[K][P];
 };
 
 // ValidWithProps includes element props, data attributes, and variant props
@@ -270,7 +277,7 @@ export function createStyledCVA(): StyledCVA {
                 h(
                   StyledComponent,
                   { ...attrs, class: computedClass.value },
-                  slots.default?.(),
+                  slots.default ? { default: slots.default } : undefined,
                 );
             },
           });
@@ -294,7 +301,11 @@ export function createStyledCVA(): StyledCVA {
                 // Merge default props with user attrs (user attrs take precedence)
                 const merged = computed(() => mergeProps(defaultProps, attrs));
                 return () =>
-                  h(WithVariants, merged.value, slots.default?.());
+                  h(
+                    WithVariants,
+                    merged.value,
+                    slots.default ? { default: slots.default } : undefined,
+                  );
               },
             });
 

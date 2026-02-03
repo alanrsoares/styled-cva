@@ -1,0 +1,37 @@
+{
+  "name": "@styled-cva/core",
+  "description": "Shared utilities and CVA for styled-cva (React, Solid, etc.)",
+  "version": "0.5.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "LicenseRef-LICENSE",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "files": [
+    "dist/**/*"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "compile": "tsc --noEmit"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.6.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.7.0"
+  }
+}

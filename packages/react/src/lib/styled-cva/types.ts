@@ -5,7 +5,6 @@ import type { JSX } from "react";
 
 export const isTwElement = Symbol("isTwElement?");
 
-export type Nullish<T> = T | null | undefined;
 export type FalseyValue = undefined | null | false;
 
 export type IsTwElement = { [isTwElement]: true };
@@ -39,10 +38,10 @@ type IsAny<T, True, False = never> = True | False extends (
 
 export type RemoveIndex<T> = {
   [K in keyof T as string extends K
-    ? never
-    : number extends K
-      ? never
-      : K]: T[K];
+  ? never
+  : number extends K
+  ? never
+  : K]: T[K];
 };
 
 /**
@@ -61,7 +60,7 @@ type MergeProps<O extends object, P extends {} = {}> =
 type TailwindPropHelper<
   P extends {},
   O extends object = {},
-  // Pick is needed here to make $as typing work
+// Pick is needed here to make $as typing work
 > = Pick<MergeProps<O, P>, keyof MergeProps<O, P>>;
 
 type TailwindComponentPropsWith$As<
@@ -69,10 +68,10 @@ type TailwindComponentPropsWith$As<
   O extends object,
   $As extends string | React.ComponentType<any> = React.ComponentType<P>,
   P2 extends {} = $As extends AnyTailwindComponent
-    ? TailwindComponentAllInnerProps<$As>
-    : $As extends IntrinsicElementsKeys | React.ComponentType<any>
-      ? React.ComponentPropsWithRef<$As>
-      : never,
+  ? TailwindComponentAllInnerProps<$As>
+  : $As extends IntrinsicElementsKeys | React.ComponentType<any>
+  ? React.ComponentPropsWithRef<$As>
+  : never,
 > = P & O & TailwindPropHelper<P2> & { $as?: $As };
 
 /**
@@ -198,12 +197,12 @@ export interface TailwindInterface extends IntrinsicElementsTemplateFunctionsMap
   ): TemplateFunction<
     // Prevent functional components without props infering props as `unknown`
     C extends (P?: never) => any
-      ? {}
-      : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
-        ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
-            className?: string;
-          }
-        : React.ComponentPropsWithoutRef<C>
+    ? {}
+    : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
+    ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
+      className?: string;
+    }
+    : React.ComponentPropsWithoutRef<C>
   >;
   /**
    * A factory function that creates a styled component from an intrinsic element

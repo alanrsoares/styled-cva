@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
+  capitalize,
+  cleanTemplate,
+  cn,
+  cva,
+  mergeArrays,
+  removeTransientProps,
+  type VariantProps,
+} from "@styled-cva/core";
+import {
   forwardRef,
   type ComponentType,
   type CSSProperties,
@@ -14,60 +23,14 @@ import {
 } from "react";
 
 import domElements from "../../domElements";
-import { cn } from "../cn";
-import { cva, type VariantProps } from "../cva";
-import { capitalize } from "../utils";
 import {
   isTwElement,
   type AnyTailwindComponent,
   type ElementKey,
-  type Interpolation,
   type IntrinsicElementsKeys,
   type IntrinsicElementsTemplateFunctionsMap,
-  type Nullish,
   type TailwindInterface,
 } from "./types";
-
-export const mergeArrays = (
-  template: TemplateStringsArray,
-  templateElements: Array<Nullish<string>>,
-) =>
-  template.reduce<string[]>(
-    (acc, c, i) => acc.concat(c || [], templateElements[i] || []), //  x || [] to remove false values e.g '', null, undefined. as Array.concat() ignores empty arrays i.e []
-    [],
-  );
-
-export function cleanTemplate(
-  template: Array<Interpolation<any>>,
-  inheritedClasses: string = "",
-) {
-  const newClasses = template
-    .join(" ")
-    .trim()
-    .replace(/\n/g, " ") // replace newline with space
-    .replace(/\s{2,}/g, " ") // replace multiple spaces with single space
-    .split(" ")
-    .filter((c) => c !== ","); // remove comma introduced by template to string
-
-  const inheritedClassesArray = inheritedClasses
-    ? inheritedClasses.split(" ")
-    : [];
-
-  return cn(
-    ...newClasses
-      .concat(inheritedClassesArray) // add new classes to inherited classes
-      .filter((c: string) => c !== " "), // remove empty classes
-  );
-}
-
-/**
- * A utility function that strips out transient props from a [key,value] array of props
- *
- * @param {[string, any]} [key]
- * @return boolean
- */
-const removeTransientProps = ([key]: [string, any]): boolean =>
-  key.charAt(0) !== "$";
 
 const isTw = (c: any): c is AnyTailwindComponent => c[isTwElement] === true;
 

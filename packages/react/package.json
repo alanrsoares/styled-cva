@@ -63,6 +63,6 @@
     "typescript": ">=5.7.0"
   },
   "dependencies": {
-    "clsx": "^2.1.1"
+    "@styled-cva/core": "workspace:*"
   }
 }

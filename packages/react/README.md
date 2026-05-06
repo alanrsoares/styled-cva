@@ -162,6 +162,30 @@ const Button = tw.button.cva("font-bold py-2 px-4 rounded", {
 </Button>
 ```
 
+#### Type-safe wrapper with `PolymorphicComponentProps`
+
+When `$as` is a custom React component (TanStack Router `Link`, Next.js `Link`, etc.) and you want a typed wrapper, compose the props with `PolymorphicComponentProps`. It automatically picks up every `$`-prefixed variant on the source component.
+
+```tsx
+import Link, { type LinkProps } from "next/link";
+import tw, { type PolymorphicComponentProps } from "@styled-cva/react";
+
+const Button = tw.button.cva("btn", {
+  variants: {
+    $variant: { primary: "btn-primary", secondary: "btn-secondary" },
+  },
+});
+
+type ButtonLinkProps = PolymorphicComponentProps<typeof Button, typeof Link> &
+  LinkProps;
+
+export const ButtonLink = (props: ButtonLinkProps) => (
+  <Button {...props} $as={Link} />
+);
+
+// <ButtonLink href="/about" $variant="primary">About</ButtonLink>
+```
+
 ### Styling Custom Components
 
 Create a styled component from a custom component that accepts a `className` prop.

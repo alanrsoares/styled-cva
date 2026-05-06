@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     "- **CVA-based**: Built on top of class-variance-authority.",
     "- **Styled-components-like**: Familiar API for those coming from styled-components or emotion.",
     "- **Tailwind CSS**: Designed to work seamlessly with Tailwind CSS.",
-    "- **Polymorphic**: Support for the `$as` prop to change the rendered element.",
+    "- **Polymorphic**: Support for the `$as` prop to change the rendered element. Use the `PolymorphicComponentProps<Component, $As>` utility type to compose typed wrappers around custom-component targets (TanStack/Next/Remix Link, etc.) — automatically picks up every `$`-prefixed variant.",
     "",
     "## Usage Examples",
     "",

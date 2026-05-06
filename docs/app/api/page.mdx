@@ -184,6 +184,38 @@ const VariantButton = tw.button.cva("btn", {
 </VariantButton>;
 ```
 
+### `PolymorphicComponentProps`
+
+Utility type for rendering CVA components as **custom React components** (TanStack Router `Link`, Next.js `Link`, etc.) while preserving every `$`-prefixed variant prop (`$variant`, `$size`, `$tone`, …) from the source component.
+
+Use it when the runtime `$as={SomeComponent}` form needs explicit typing (e.g. when wrapping in your own component):
+
+```tsx
+import { Link, type LinkProps } from "@tanstack/react-router";
+import tw, { type PolymorphicComponentProps } from "@styled-cva/react";
+
+const Button = tw.button.cva("btn", {
+  variants: {
+    $variant: { primary: "btn-primary", secondary: "btn-secondary" },
+    $size: { sm: "px-2", md: "px-3" },
+  },
+});
+
+type ButtonLinkProps = PolymorphicComponentProps<typeof Button, typeof Link> &
+  LinkProps;
+
+const ButtonLink = (props: ButtonLinkProps) => (
+  <Button {...props} $as={Link} />
+);
+
+// Now type-safe end-to-end:
+<ButtonLink to="/about" $variant="primary" $size="md">
+  About
+</ButtonLink>;
+```
+
+For intrinsic elements (`$as="a"`, `$as="button"`, …) the typing already works without this utility — it's only needed when `$as` is a custom component.
+
 ## Utilities
 
 ### `cn`

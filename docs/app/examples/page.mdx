@@ -224,6 +224,32 @@ export default function PolymorphicExample() {
 }
 ```
 
+### Type-safe wrapper for custom components
+
+When you want explicit typing for a custom-component `$as` (e.g. so consumers see autocomplete for both the link's props *and* your CVA variants), use `PolymorphicComponentProps` to compose the prop type:
+
+```tsx
+import Link, { type LinkProps } from "next/link";
+import tw, { type PolymorphicComponentProps } from "@styled-cva/react";
+
+const Button = tw.button.cva("btn", {
+  variants: {
+    $variant: { primary: "btn-primary", secondary: "btn-secondary" },
+  },
+});
+
+type ButtonLinkProps = PolymorphicComponentProps<typeof Button, typeof Link> &
+  LinkProps;
+
+export const ButtonLink = (props: ButtonLinkProps) => (
+  <Button {...props} $as={Link} />
+);
+
+// <ButtonLink href="/about" $variant="primary">About</ButtonLink>
+```
+
+`PolymorphicComponentProps` automatically picks up every `$`-prefixed variant prop on the source component, so renaming or adding variants doesn't require updating the wrapper's type.
+
 ## Advanced Composition
 
 ### Extending Components

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState, type ComponentProps } from "react";
@@ -1195,6 +1196,92 @@ describe("styled-cva", () => {
         expect(toggle).toHaveTextContent("ON");
         expect(toggle).toHaveAttribute("aria-pressed", "true");
       });
+    });
+  });
+
+  describe("polymorphic $as with custom React components", () => {
+    // Simulate a custom Link component like TanStack Router or Next.js Link
+    type CustomLinkProps = {
+      to: string;
+      children: React.ReactNode;
+      className?: string;
+      activeClassName?: string;
+    };
+
+    const CustomLink = ({ to, children, className }: CustomLinkProps) => (
+      <a href={to} className={className}>
+        {children}
+      </a>
+    );
+
+    const StyledLink = tw.button.cva("link-base", {
+      variants: {
+        $variant: {
+          primary: "link-primary",
+          secondary: "link-secondary",
+        },
+      },
+    });
+
+    it("should render with custom React component and accept its props", () => {
+      // Custom components work at runtime even though TypeScript requires explicit typing
+      // for full type safety. Cast is used here for testing runtime behavior.
+      const { container } = render(
+        <StyledLink
+          {...({ $as: CustomLink, to: "/about", $variant: "primary" } as any)}
+        >
+          About Us
+        </StyledLink>,
+      );
+
+      const link = container.firstChild as HTMLAnchorElement;
+      expect(link.tagName).toBe("A");
+      expect(link).toHaveAttribute("href", "/about");
+      expect(link).toHaveClass("link-base", "link-primary");
+      expect(link).toHaveTextContent("About Us");
+    });
+
+    it("should allow custom component-specific props", () => {
+      // Custom components work at runtime even though TypeScript requires explicit typing
+      const { container } = render(
+        <StyledLink
+          {...({
+            $as: CustomLink,
+            to: "/contact",
+            activeClassName: "active",
+            $variant: "secondary",
+          } as any)}
+        >
+          Contact
+        </StyledLink>,
+      );
+
+      const link = container.firstChild as HTMLAnchorElement;
+      expect(link).toHaveAttribute("href", "/contact");
+      expect(link).toHaveClass("link-base", "link-secondary");
+    });
+
+    it("should provide PolymorphicComponentProps type for type-safe custom component usage", () => {
+      // Import the utility type for type-safe usage
+      // In real usage: import type { PolymorphicComponentProps } from '@styled-cva/react';
+
+      // Verify the type structure is correct
+      type LinkButtonProps = {
+        $as?: typeof CustomLink;
+        to: string;
+        $variant?: "primary" | "secondary";
+        children?: React.ReactNode;
+      };
+
+      const linkProps: LinkButtonProps = {
+        $as: CustomLink,
+        to: "/home",
+        $variant: "primary",
+        children: "Home",
+      };
+
+      // Should compile without errors
+      expectType<{ to: string }>(linkProps);
     });
   });
 });

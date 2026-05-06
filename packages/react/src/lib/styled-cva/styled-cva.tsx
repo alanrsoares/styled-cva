@@ -152,11 +152,54 @@ type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
   [key: `data-${string}`]: string;
 } & Partial<VariantProps<ReturnType<CVA<T>>>>;
 
-// Polymorphic props when $as is used: accept the "as" element's props (e.g. href when $as="a")
+// Polymorphic props when $as is used with an intrinsic element (e.g. $as="a")
 type PolymorphicCVAProps<T, $As extends ElementKey> = PropsWithoutRef<
   JSX.IntrinsicElements[$As] &
     VariantProps<ReturnType<CVA<T>>> &
     StyledExtension & { $as?: $As }
+> &
+  RefAttributes<HTMLElement>;
+
+/**
+ * Utility type to create polymorphic props for custom React components.
+ * Use this when you need to render a CVA component as a custom React component
+ * (e.g., TanStack Router's Link, Next.js Link, etc.)
+ *
+ * Note: The component will accept custom React components at runtime, but TypeScript
+ * requires using this utility type for full type safety with custom component props.
+ *
+ * @example
+ * ```tsx
+ * import { Link, type LinkProps } from '@tanstack/react-router';
+ * import type { PolymorphicComponentProps } from '@styled-cva/react';
+ *
+ * const StyledButton = tw.button.cva("btn-base", {
+ *   variants: {
+ *     $variant: { primary: "btn-primary", secondary: "btn-secondary" }
+ *   }
+ * });
+ *
+ * // Option 1: Simple usage (works at runtime, TypeScript may show warnings)
+ * <StyledButton $as={Link} to="/about" $variant="primary">Link</StyledButton>
+ *
+ * // Option 2: Type-safe with explicit typing
+ * type StyledLinkProps = PolymorphicComponentProps<
+ *   typeof StyledButton,
+ *   typeof Link
+ * > & LinkProps;
+ *
+ * const StyledLink = (props: StyledLinkProps) => <StyledButton {...props} />;
+ * ```
+ */
+export type PolymorphicComponentProps<
+  Component extends ForwardRefExoticComponent<any>,
+  $As extends ComponentType<any>,
+  ComponentVariants = Component extends ForwardRefExoticComponent<infer P>
+    ? P extends { $variant?: infer V } ? { $variant?: V } : Record<string, never>
+    : Record<string, never>,
+> = PropsWithoutRef<
+  ($As extends ComponentType<infer P> ? P : never) &
+    ComponentVariants & { $as?: $As }
 > &
   RefAttributes<HTMLElement>;
 
@@ -168,6 +211,7 @@ type CVAWithPropsReturn<K extends ElementKey, T> = ForwardRefExoticComponent<
   > &
     RefAttributes<HTMLElement>
 > & {
+  // Polymorphic overload for intrinsic HTML elements (e.g., $as="a", $as="button")
   <$As extends ElementKey>(props: PolymorphicCVAProps<T, $As>): ReactElement;
   /**
    * Sets default props for the component. User-provided props will override these defaults.

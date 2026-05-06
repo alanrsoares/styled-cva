@@ -190,7 +190,7 @@ type CVAProps<K extends ElementKey, T> = JSX.IntrinsicElements[K] &
 
 type CVAWithPropsReturn<K extends ElementKey, T> = TailwindComponent<
   CVAProps<K, T>,
-  {}
+  Record<string, unknown>
 > &
   IsTwElement &
   Component<CVAProps<K, T>> & {

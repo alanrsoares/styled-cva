@@ -24,7 +24,6 @@ import {
   isTwElement,
   type AnyTailwindComponent,
   type ElementKey,
-  type IntrinsicElementsKeys,
   type IntrinsicElementsTemplateFunctionsMap,
   type JSX,
   type TailwindInterface,
@@ -157,7 +156,7 @@ const tw: TailwindInterface = Object.assign(
 
 export default tw;
 
-type CVA<T = unknown> = typeof cva;
+type CVA<T = unknown> = typeof cva<T>;
 
 type StyledExtension = {
   $as?: ElementKey | Component;

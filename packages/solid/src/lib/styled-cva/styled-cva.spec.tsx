@@ -2,7 +2,7 @@
 /// <reference types="@testing-library/jest-dom" />
 import { render, screen, waitFor } from "@solidjs/testing-library";
 import userEvent from "@testing-library/user-event";
-import { createSignal, type Component, type JSX } from "solid-js";
+import { createSignal, type Component } from "solid-js";
 import { expectType, type TypeEqual } from "ts-expect";
 import { vi } from "vitest";
 

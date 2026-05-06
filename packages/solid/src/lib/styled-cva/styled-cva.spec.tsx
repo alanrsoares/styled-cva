@@ -34,6 +34,17 @@ describe("styled-cva", () => {
     expectType<TypeEqual<string, VariantProp>>(false);
   });
 
+  it("should preserve $variant union at the JSX call site (not widen to string)", () => {
+    // Regression: previously, the second TailwindComponent generic in
+    // CVAWithPropsReturn used `Record<string, never>` / `Record<string, unknown>`,
+    // which added an index signature and widened keyof inside TailwindPropHelper —
+    // making `$variant` infer as `string` when hovering JSX attributes.
+    type JsxProps = Parameters<typeof StyledButton>[0];
+    type V = NonNullable<JsxProps extends { $variant?: infer X } ? X : never>;
+    expectType<TypeEqual<"primary" | "secondary", V>>(true);
+    expectType<TypeEqual<string, V>>(false);
+  });
+
   it("should render the button with the primary variant", () => {
     const { container } = render(() => (
       <StyledButton $variant="primary">Click me</StyledButton>

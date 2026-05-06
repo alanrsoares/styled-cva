@@ -188,9 +188,13 @@ type CVAProps<K extends ElementKey, T> = JSX.IntrinsicElements[K] &
   VariantProps<ReturnType<CVA<T>>> &
   StyledExtension;
 
+// Use `object` (not `Record<string, unknown>`) for the second TailwindComponent
+// generic: `Record<string, unknown>` adds an index signature, which widens
+// `keyof` inside TailwindPropHelper and collapses variant literal unions
+// (e.g. `$variant: "primary" | "secondary"`) to `string` at the JSX call site.
 type CVAWithPropsReturn<K extends ElementKey, T> = TailwindComponent<
   CVAProps<K, T>,
-  Record<string, unknown>
+  object
 > &
   IsTwElement &
   Component<CVAProps<K, T>> & {
@@ -226,11 +230,7 @@ type CVAWithPropsReturn<K extends ElementKey, T> = TailwindComponent<
       defaultProps: DefaultProps & {
         [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
       },
-    ) => Component<
-      JSX.IntrinsicElements[K] &
-        VariantProps<ReturnType<CVA<T>>> &
-        StyledExtension
-    >;
+    ) => Component<CVAProps<K, T>>;
   };
 
 export type StyledCVA = TailwindInterface & {

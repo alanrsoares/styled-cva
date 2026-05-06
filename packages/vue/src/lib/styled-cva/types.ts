@@ -63,8 +63,10 @@ type MergeProps<O extends object, P extends {} = {}> =
 type TailwindPropHelper<
   P extends {},
   O extends object = {},
-  // Pick is needed here to make $as typing work
-> = Pick<MergeProps<O, P>, keyof MergeProps<O, P>>;
+  // M caches MergeProps<O, P> so the keyof and lookup share one instantiation.
+  // Pick<M, keyof M> is the identity but flattens display + stabilizes $as typing.
+  M = MergeProps<O, P>,
+> = Pick<M, keyof M>;
 
 type TailwindComponentPropsWith$As<
   P extends object,
@@ -100,8 +102,10 @@ export type TailwindComponent<
  * @template P The base Vue props
  * @template O The props added with the template function.
  */
-export interface TailwindComponentBase<P extends object, O extends object = {}>
-  extends TailwindVueComponent<TailwindPropHelper<P, O>> {
+export interface TailwindComponentBase<
+  in out P extends object,
+  in out O extends object = {},
+> extends TailwindVueComponent<TailwindPropHelper<P, O>> {
   // add our own fake call signature to implement the polymorphic '$as' prop
   (props: TailwindPropHelper<P, O> & { $as?: never | undefined }): any;
 
@@ -118,7 +122,10 @@ export interface TailwindComponentBase<P extends object, O extends object = {}>
  * @template P
  * @template O
  */
-export interface WithStyle<P extends object, O extends object = {}> {
+export interface WithStyle<
+  in out P extends object,
+  in out O extends object = {},
+> {
   withStyle: <S extends object = {}>(
     styles: Record<string, any> | ((p: P & O & S) => Record<string, any>),
   ) => TailwindComponent<P, O & S>;
@@ -136,7 +143,10 @@ export type AnyTailwindComponent = TailwindComponent<any, any>;
  * @interface TemplateFunction
  * @template E
  */
-export interface TemplateFunction<P extends object, O extends object = {}> {
+export interface TemplateFunction<
+  in out P extends object,
+  in out O extends object = {},
+> {
   (template: TemplateStringsArray): TailwindComponent<P, O>;
   (
     template: TemplateStringsArray | InterpolationFunction<P & O>,

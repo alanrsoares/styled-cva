@@ -152,6 +152,16 @@ type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
   [key: `data-${string}`]: string;
 } & Partial<VariantProps<ReturnType<CVA<T>>>>;
 
+// Shared CVA component prop shape (element + variants + $as)
+type CVAComponentProps<K extends ElementKey, T> = JSX.IntrinsicElements[K] &
+  VariantProps<ReturnType<CVA<T>>> &
+  StyledExtension;
+
+// Cached forward-ref shape so base + withProps return type share one instantiation
+type CVAComponent<K extends ElementKey, T> = ForwardRefExoticComponent<
+  PropsWithoutRef<CVAComponentProps<K, T>> & RefAttributes<HTMLElement>
+>;
+
 // Polymorphic props when $as is used with an intrinsic element (e.g. $as="a")
 type PolymorphicCVAProps<T, $As extends ElementKey> = PropsWithoutRef<
   JSX.IntrinsicElements[$As] &
@@ -159,6 +169,13 @@ type PolymorphicCVAProps<T, $As extends ElementKey> = PropsWithoutRef<
     StyledExtension & { $as?: $As }
 > &
   RefAttributes<HTMLElement>;
+
+// Capture all transient ($-prefixed) props from the source component, regardless
+// of the variant key name ($variant, $size, $tone, …). This preserves variant
+// typing when rendering polymorphically as a custom React component.
+type ExtractTransientProps<P> = {
+  [K in keyof P as K extends `$${string}` ? K : never]?: P[K];
+};
 
 /**
  * Utility type to create polymorphic props for custom React components.
@@ -194,23 +211,15 @@ type PolymorphicCVAProps<T, $As extends ElementKey> = PropsWithoutRef<
 export type PolymorphicComponentProps<
   Component extends ForwardRefExoticComponent<any>,
   $As extends ComponentType<any>,
-  ComponentVariants = Component extends ForwardRefExoticComponent<infer P>
-    ? P extends { $variant?: infer V } ? { $variant?: V } : Record<string, never>
-    : Record<string, never>,
 > = PropsWithoutRef<
   ($As extends ComponentType<infer P> ? P : never) &
-    ComponentVariants & { $as?: $As }
+    (Component extends ForwardRefExoticComponent<infer P>
+      ? ExtractTransientProps<P>
+      : object) & { $as?: $As }
 > &
   RefAttributes<HTMLElement>;
 
-type CVAWithPropsReturn<K extends ElementKey, T> = ForwardRefExoticComponent<
-  PropsWithoutRef<
-    JSX.IntrinsicElements[K] &
-      VariantProps<ReturnType<CVA<T>>> &
-      StyledExtension
-  > &
-    RefAttributes<HTMLElement>
-> & {
+type CVAWithPropsReturn<K extends ElementKey, T> = CVAComponent<K, T> & {
   // Polymorphic overload for intrinsic HTML elements (e.g., $as="a", $as="button")
   <$As extends ElementKey>(props: PolymorphicCVAProps<T, $As>): ReactElement;
   /**
@@ -244,14 +253,7 @@ type CVAWithPropsReturn<K extends ElementKey, T> = ForwardRefExoticComponent<
     defaultProps: DefaultProps & {
       [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
     },
-  ) => ForwardRefExoticComponent<
-    PropsWithoutRef<
-      JSX.IntrinsicElements[K] &
-        VariantProps<ReturnType<CVA<T>>> &
-        StyledExtension
-    > &
-      RefAttributes<HTMLElement>
-  >;
+  ) => CVAComponent<K, T>;
 };
 
 export type StyledCVA = TailwindInterface & {

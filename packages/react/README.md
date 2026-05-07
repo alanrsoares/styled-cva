@@ -31,6 +31,7 @@
 
 - ✅ Supports all HTML elements.
 - ✅ Full TypeScript support, including prop and variant inference.
+- ✅ Re-exports `@styled-cva/core` utilities (`cn`, `cva`, `isTaggedTemplateArg`, …) from the package entry.
 - ✅ `cva` and `withProps` for powerful component customization.
 - ✅ Polymorphic `as` prop to change the rendered element.
 - ✅ Smart prop filtering to avoid extraneous props on the DOM.

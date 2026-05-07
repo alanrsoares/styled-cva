@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import tw, { type StyledCVA } from '@styled-cva/vue'
+import tw, { cn } from '@styled-cva/vue'
 
 const selectedVariant = ref<'primary' | 'secondary' | 'ghost'>('primary')
 
@@ -10,30 +10,44 @@ const SectionTitle = tw.h2`text-lg font-semibold m-0 text-white`
 const SectionDesc = tw.p`text-sm text-[#888] m-0`
 const Row = tw.div`flex flex-wrap items-center gap-3`
 const Code = tw.code`text-xs bg-[#0d0d0d] text-[#a5d6ff] px-2 py-1 rounded font-mono`
+const WithStyleBadge = tw.span`text-[10px] uppercase text-[#888]`.withStyle({
+  letterSpacing: '0.12em',
+})
 
-// --- CVA: Button with $variant and $size ---
-// @ts-expect-error - tw default export type resolves to base TailwindInterface
-const Button = (tw as StyledCVA).button.cva(
-  'font-medium rounded-lg border border-transparent cursor-pointer transition-colors focus:outline-2 focus:outline-[#646cff] focus:outline-offset-2',
-  {
-    variants: {
-      $variant: {
-        primary: 'bg-[#646cff] text-white hover:bg-[#535bf2] border-[#646cff]',
-        secondary: 'bg-[#333] text-white hover:bg-[#444] border-[#444]',
-        ghost: 'bg-transparent text-[#888] hover:bg-[#222] hover:text-white border-transparent',
-      },
-      $size: {
-        sm: 'text-sm px-3 py-1.5',
-        md: 'text-base px-4 py-2',
-        lg: 'text-lg px-5 py-2.5',
-      },
+// --- CVA: Button with $variant and $size (intrinsic shorthand uses same config) ---
+const buttonBase =
+  'font-medium rounded-lg border border-transparent cursor-pointer transition-colors focus:outline-2 focus:outline-[#646cff] focus:outline-offset-2'
+
+const buttonCvaConfig = {
+  variants: {
+    $variant: {
+      primary: 'bg-[#646cff] text-white hover:bg-[#535bf2] border-[#646cff]',
+      secondary: 'bg-[#333] text-white hover:bg-[#444] border-[#444]',
+      ghost: 'bg-transparent text-[#888] hover:bg-[#222] hover:text-white border-transparent',
     },
-    defaultVariants: {
+    $size: {
+      sm: 'text-sm px-3 py-1.5',
+      md: 'text-base px-4 py-2',
+      lg: 'text-lg px-5 py-2.5',
+    },
+  },
+  defaultVariants: {
+    $variant: 'primary',
+    $size: 'md',
+  },
+  compoundVariants: [
+    {
       $variant: 'primary',
-      $size: 'md',
-    },
-  }
-)
+      $size: 'lg',
+      class:
+        'ring-2 ring-[#646cff]/60 ring-offset-2 ring-offset-[#1a1a1a]',
+    } as const,
+  ],
+}
+
+const Button = tw.button.cva(buttonBase, buttonCvaConfig)
+const ShorthandButton = tw.button(buttonBase, buttonCvaConfig)
+const CustomButton = tw(Button)`text-red-400`
 
 // --- withProps: pre-configured buttons (default variant + type) ---
 const PrimaryButton = Button.withProps({
@@ -65,14 +79,19 @@ const Link = tw.a`font-medium text-[#646cff] no-underline hover:text-[#535bf2] h
         <Code>tw.h2`...`</Code>
         <Code>tw.p`...`</Code>
       </Row>
+      <Row>
+        <label class="text-sm text-[#888]">withStyle:</label>
+        <WithStyleBadge>template span + .withStyle()</WithStyleBadge>
+      </Row>
     </Section>
 
     <!-- 2. CVA: variants + size -->
     <Section>
       <SectionTitle>2. CVA variants</SectionTitle>
       <SectionDesc>
-        <Code>tw.button.cva(base, { variants: { $variant, $size } })</Code>. Use <Code>$</Code> prefix so props
-        aren’t forwarded to the DOM.
+        <Code>tw.button.cva(base, { variants: { $variant, $size } })</Code> or shorthand{' '}
+        <Code>tw.button(base, { variants: { … } })</Code>. Use <Code>$</Code> prefix so props aren’t forwarded to the
+        DOM.
       </SectionDesc>
       <Row>
         <label class="text-sm text-[#888]">Variant:</label>
@@ -91,6 +110,14 @@ const Link = tw.a`font-medium text-[#646cff] no-underline hover:text-[#535bf2] h
         <Button type="button" v-bind="{ $variant: selectedVariant, $size: 'sm' }">Small</Button>
         <Button type="button" v-bind="{ $variant: selectedVariant, $size: 'md' }">Medium</Button>
         <Button type="button" v-bind="{ $variant: selectedVariant, $size: 'lg' }">Large</Button>
+      </Row>
+      <Row>
+        <label class="text-sm text-[#888]">compoundVariants:</label>
+        <Button type="button" v-bind="{ $variant: 'primary', $size: 'lg' }">primary + lg → ring</Button>
+      </Row>
+      <Row>
+        <label class="text-sm text-[#888]">Intrinsic shorthand:</label>
+        <ShorthandButton type="button" v-bind="{ $variant: 'ghost', $size: 'sm' }">tw.button(base, config)</ShorthandButton>
       </Row>
     </Section>
 
@@ -117,6 +144,31 @@ const Link = tw.a`font-medium text-[#646cff] no-underline hover:text-[#535bf2] h
         <Button v-bind="{ $as: 'a', href: 'https://github.com/alanrsoares/styled-cva', target: '_blank', $variant: 'primary', $size: 'md' }">
           Button as link →
         </Button>
+      </Row>
+    </Section>
+
+    <!-- 5. Extend CVA -->
+    <Section>
+      <SectionTitle>5. Extend CVA — tw(Button)</SectionTitle>
+      <SectionDesc>
+        <Code>tw(Button)`text-red-400`</Code> — wrap an existing CVA component (same as React/Solid).
+      </SectionDesc>
+      <Row>
+        <CustomButton v-bind="{ $variant: 'primary', $size: 'md' }">Extended (red label)</CustomButton>
+        <CustomButton v-bind="{ $variant: 'secondary', $size: 'sm' }">Small secondary</CustomButton>
+      </Row>
+    </Section>
+
+    <!-- 6. Utilities -->
+    <Section>
+      <SectionTitle>6. Utilities — cn()</SectionTitle>
+      <SectionDesc>
+        Re-exports from <Code>@styled-cva/vue</Code> include <Code>cn</Code>, <Code>cva</Code>,
+        <Code>isTaggedTemplateArg</Code>.
+      </SectionDesc>
+      <Row>
+        <label class="text-sm text-[#888]">cn():</label>
+        <span :class="cn('rounded px-2 py-1 text-xs', 'bg-[#333] text-[#a5d6ff]')">clsx + tailwind-merge</span>
       </Row>
     </Section>
 

@@ -5,6 +5,7 @@ import {
   cleanTemplate,
   cn,
   cva,
+  isTaggedTemplateArg,
   mergeArrays,
   removeTransientProps,
   type VariantProps,
@@ -213,6 +214,12 @@ type CVAWithPropsReturn<K extends ElementKey, T> = DefineComponent<
   >;
 };
 
+/** Factory-call overload mirroring `.cva` (`tw.button("", {})` shorthand). */
+
+type IntrinsicCVAShorthand<K extends ElementKey> = <T>(
+  ...args: Parameters<CVA<T>>
+) => CVAWithPropsReturn<K, T>;
+
 export type StyledCVA = TailwindInterface & {
   /**
    * A factory function that creates a styled component with variant props
@@ -243,79 +250,87 @@ export type StyledCVA = TailwindInterface & {
      * ```
      */
     cva: <T>(...args: Parameters<CVA<T>>) => CVAWithPropsReturn<K, T>;
-  };
+  } & IntrinsicCVAShorthand<K>;
 };
 
 export function createStyledCVA(): StyledCVA {
   const twCVA = Object.fromEntries(
-    Object.entries(tw).map(([key, styledFn]) => [
-      key,
-      Object.assign(styledFn, {
-        cva: (...args: Parameters<CVA>) => {
-          const variance = cva(...args);
+    Object.entries(tw).map(([key, styledFn]) => {
+      const cvaImpl = (...args: Parameters<CVA>) => {
+        const variance = cva(...args);
 
-          type Props = VariantProps<typeof variance> & {
-            class?: string;
-          } & StyledExtension;
+        type Props = VariantProps<typeof variance> & {
+          class?: string;
+        } & StyledExtension;
 
-          const StyledComponent = (styledFn as any)``;
+        const StyledComponent = (styledFn as any)``;
 
-          const WithVariants = defineComponent({
-            name: `Styled${capitalize(key)}`,
+        const WithVariants = defineComponent({
+          name: `Styled${capitalize(key)}`,
+          inheritAttrs: false,
+          setup(_, { slots, attrs }) {
+            // Extract class from attrs
+            const classAttr = computed(() => (attrs as any).class ?? "");
+
+            // Use computed to compute class reactively
+            const computedClass = computed(() =>
+              cn(variance(attrs as any), classAttr.value),
+            );
+
+            return () =>
+              h(
+                StyledComponent,
+                { ...attrs, class: computedClass.value },
+                slots.default ? { default: slots.default } : undefined,
+              );
+          },
+        });
+
+        // Add withProps method to the component
+        type ValidPropsForImplementation = ValidElementProps<any> & {
+          [key: `data-${string}`]: string;
+        } & Partial<VariantProps<typeof variance>>;
+
+        const ComponentWithProps = WithVariants as typeof WithVariants & {
+          withProps: <DefaultProps extends ValidPropsForImplementation>(
+            defaultProps: DefaultProps,
+          ) => DefineComponent<Props>;
+        };
+
+        ComponentWithProps.withProps = ((defaultProps: any) => {
+          const ComponentWithDefaultProps = defineComponent({
+            name: `${WithVariants.name}.withProps`,
             inheritAttrs: false,
             setup(_, { slots, attrs }) {
-              // Extract class from attrs
-              const classAttr = computed(() => (attrs as any).class ?? "");
-
-              // Use computed to compute class reactively
-              const computedClass = computed(() =>
-                cn(variance(attrs as any), classAttr.value),
-              );
-
+              // Merge default props with user attrs (user attrs take precedence)
+              const merged = computed(() => mergeProps(defaultProps, attrs));
               return () =>
                 h(
-                  StyledComponent,
-                  { ...attrs, class: computedClass.value },
+                  WithVariants,
+                  merged.value,
                   slots.default ? { default: slots.default } : undefined,
                 );
             },
           });
 
-          // Add withProps method to the component
-          type ValidPropsForImplementation = ValidElementProps<any> & {
-            [key: `data-${string}`]: string;
-          } & Partial<VariantProps<typeof variance>>;
+          return ComponentWithDefaultProps;
+        }) as typeof ComponentWithProps.withProps;
 
-          const ComponentWithProps = WithVariants as typeof WithVariants & {
-            withProps: <DefaultProps extends ValidPropsForImplementation>(
-              defaultProps: DefaultProps,
-            ) => DefineComponent<Props>;
-          };
+        return ComponentWithProps;
+      };
 
-          ComponentWithProps.withProps = ((defaultProps: any) => {
-            const ComponentWithDefaultProps = defineComponent({
-              name: `${WithVariants.name}.withProps`,
-              inheritAttrs: false,
-              setup(_, { slots, attrs }) {
-                // Merge default props with user attrs (user attrs take precedence)
-                const merged = computed(() => mergeProps(defaultProps, attrs));
-                return () =>
-                  h(
-                    WithVariants,
-                    merged.value,
-                    slots.default ? { default: slots.default } : undefined,
-                  );
-              },
-            });
+      const wrapped = function (this: unknown, ...args: unknown[]) {
+        if (isTaggedTemplateArg(args[0])) {
+          return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
+        }
+        return cvaImpl(...(args as Parameters<CVA>));
+      };
 
-            return ComponentWithDefaultProps;
-          }) as typeof ComponentWithProps.withProps;
+      Object.assign(wrapped, styledFn, { cva: cvaImpl });
 
-          return ComponentWithProps;
-        },
-      }),
-    ]),
+      return [key, wrapped];
+    }),
   );
 
-  return Object.assign(tw, twCVA) as StyledCVA;
+  return Object.assign(tw, twCVA) as unknown as StyledCVA;
 }

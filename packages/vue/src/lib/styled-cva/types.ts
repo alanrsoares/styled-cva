@@ -4,6 +4,14 @@
 import type { Component, DefineComponent } from "vue";
 import type { JSX } from "vue/jsx-runtime";
 
+import domElements from "../../domElements";
+
+/**
+ * Implemented HTML tags from `domElements` — literal union so mapped types / `$as` don’t widen to `string`
+ * (Vue `JSX.IntrinsicElements` index signature).
+ */
+export type ElementKey = (typeof domElements)[number];
+
 export const isTwElement = Symbol("isTwElement?");
 
 // Re-export JSX for use in other files
@@ -32,8 +40,8 @@ type TailwindComponentInterpolation = Pick<
   keyof TailwindComponentBase<any, any>
 >;
 
-// Vue intrinsic elements
-export type IntrinsicElementsKeys = keyof JSX.IntrinsicElements;
+/** Same as `ElementKey`; name mirrors `@styled-cva/react` / `@styled-cva/solid`. */
+export type IntrinsicElementsKeys = ElementKey;
 
 type IsAny<T, True, False = never> = True | False extends (
   T extends never ? True : False
@@ -74,11 +82,13 @@ type TailwindComponentPropsWith$As<
   $As extends string | Component = Component,
   P2 extends {} = $As extends AnyTailwindComponent
     ? TailwindComponentAllInnerProps<$As>
-    : $As extends IntrinsicElementsKeys
+    : $As extends ElementKey
       ? JSX.IntrinsicElements[$As]
-      : $As extends DefineComponent<infer ComponentProps>
-        ? ComponentProps
-        : never,
+      : $As extends keyof JSX.IntrinsicElements
+        ? JSX.IntrinsicElements[$As]
+        : $As extends DefineComponent<infer ComponentProps>
+          ? ComponentProps
+          : never,
 > = P & O & TailwindPropHelper<P2> & { $as?: $As };
 
 /**
@@ -168,9 +178,7 @@ export type TailwindComponentAllInnerProps<C extends AnyTailwindComponent> =
   TailwindComponentInnerProps<C> & TailwindComponentInnerOtherProps<C>;
 
 export type IntrinsicElementsTemplateFunctionsMap = {
-  [RTag in keyof JSX.IntrinsicElements]: TemplateFunction<
-    JSX.IntrinsicElements[RTag]
-  >;
+  [RTag in ElementKey]: TemplateFunction<JSX.IntrinsicElements[RTag]>;
 };
 
 export interface TailwindInterface
@@ -206,15 +214,12 @@ export interface TailwindInterface
    */
   <C extends Component>(component: C): TemplateFunction<Record<string, any>>;
   /**
-   * A factory function that creates a styled component from an intrinsic element
    * @example
    * ```tsx
-   * const StyledButton = tw.button.cva("btn-base", {});
+   * const StyledButton = tw.button("btn-base", { variants: { $variant: { primary: "…" } } });
    * ```
    */
   <C extends keyof JSX.IntrinsicElements>(
     component: C,
   ): TemplateFunction<JSX.IntrinsicElements[C]>;
 }
-
-export type ElementKey = keyof TailwindInterface;

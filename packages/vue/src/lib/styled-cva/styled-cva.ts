@@ -165,9 +165,9 @@ type StyledExtension = {
 
 // Type for valid withProps input: element props + data-* attributes + variant props
 type ValidElementProps<K extends ElementKey> = {
-  [P in keyof JSX.IntrinsicElements[K]as P extends `$${string}`
-  ? never
-  : P]?: JSX.IntrinsicElements[K][P];
+  [P in keyof JSX.IntrinsicElements[K] as P extends `$${string}`
+    ? never
+    : P]?: JSX.IntrinsicElements[K][P];
 };
 
 // ValidWithProps includes element props, data attributes, and variant props
@@ -214,39 +214,29 @@ type CVAWithPropsReturn<K extends ElementKey, T> = DefineComponent<
   >;
 };
 
-/** Factory-call overload mirroring `.cva` (`tw.button("", {})` shorthand). */
+/** Intrinsic CVA: `tw.button(base, config)` — preferred over `.cva(base, config)`. */
 
 type IntrinsicCVAShorthand<K extends ElementKey> = <T>(
   ...args: Parameters<CVA<T>>
 ) => CVAWithPropsReturn<K, T>;
 
+/** `TailwindInterface` + per-tag CVA (prefer shorthand; `.cva` deprecated). Indexed `StyledCVA["tag"]` unreliable — use `tw.tag`. */
 export type StyledCVA = TailwindInterface & {
-  /**
-   * A factory function that creates a styled component with variant props
-   */
-  [K in ElementKey]: TailwindInterface[K] & {
+  [K in ElementKey]: {
     /**
-     * A factory function that creates a styled component with variant props
+     * @deprecated Prefer intrinsic CVA shorthand — call `tw.button(base, config)` instead of
+     * `tw.button.cva(base, config)` (same types and runtime).
      *
-     * @param args - a tuple containing the `cva` function arguments
-     * @returns A styled component with variant props and a `.withProps()` method
+     * @param args - `cva` arguments (`base` classes + config)
+     * @returns A styled component with variant props and `.withProps()`
      *
-     * @example
+     * @example Shorthand (preferred)
      * ```tsx
-     * const StyledButton = tw.button.cva("btn-base", {
-     *  variants: {
-     *  // variant keys starting with $ will not be sent to the DOM,
-     *  // this avoids extraneous props warning
-     *    $variant: {
-     *      primary: "btn-primary",
-     *      secondary: "btn-secondary",
-     *    },
-     *  }
+     * const StyledButton = tw.button("btn-base", {
+     *   variants: {
+     *     $variant: { primary: "btn-primary", secondary: "btn-secondary" },
+     *   },
      * });
-     *
-     * // ...
-     *
-     * <StyledButton $variant="primary">Click me</StyledButton>
      * ```
      */
     cva: <T>(...args: Parameters<CVA<T>>) => CVAWithPropsReturn<K, T>;

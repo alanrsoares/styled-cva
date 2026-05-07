@@ -1,6 +1,6 @@
 # Releasing
 
-**@styled-cva/react** and **@styled-cva/eslint-plugin** are published to npm. **@styled-cva/docs** is private. This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and changelogs.
+These packages are published to npm: **@styled-cva/core**, **@styled-cva/react**, **@styled-cva/solid**, **@styled-cva/vue**, and **@styled-cva/eslint-plugin**. **@styled-cva/docs** is private. This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and changelogs.
 
 ## One-time setup
 
@@ -15,7 +15,7 @@
 bun run changeset
 ```
 
-- Choose which package(s) to bump: `@styled-cva/react`, `@styled-cva/eslint-plugin`, or both.
+- Choose which package(s) to bump (any combination of publishable packages listed above).
 - Choose bump type: patch / minor / major.
 - Write a short summary (used in the CHANGELOG).
 - Commit the new file under `.changeset/`.

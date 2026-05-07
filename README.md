@@ -54,9 +54,12 @@ const Button = tw.button`bg-blue-500 text-white font-bold py-2 px-4 rounded`;
 
 | Package                                          | Description                                                                                     |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [packages/react](packages/react)                 | **@styled-cva/react** – core library (published)                                                |
+| [packages/core](packages/core)                   | **@styled-cva/core** – shared `cva`, `cn`, helpers (published)                                   |
+| [packages/react](packages/react)                 | **@styled-cva/react** – React adapter (published)                                               |
+| [packages/solid](packages/solid)                 | **@styled-cva/solid** – Solid adapter (published)                                               |
+| [packages/vue](packages/vue)                     | **@styled-cva/vue** – Vue adapter (published)                                                   |
 | [packages/eslint-plugin](packages/eslint-plugin) | **@styled-cva/eslint-plugin** – ESLint rule to extract classes to styled components (published) |
-| [docs](docs)                                     | **@styled-cva/docs** – Nextra documentation site (private)                                      |
+| [docs](docs)                                     | **@styled-cva/docs** – documentation site (private)                                               |
 
 ## Development
 

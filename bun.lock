@@ -14,7 +14,7 @@
     },
     "docs": {
       "name": "@styled-cva/docs",
-      "version": "0.5.1",
+      "version": "0.7.0",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.25.2",
         "@tailwindcss/postcss": "^4.1.18",
@@ -37,7 +37,7 @@
     },
     "examples/react": {
       "name": "@styled-cva/examples-react",
-      "version": "0.0.0",
+      "version": "0.0.2",
       "dependencies": {
         "@styled-cva/react": "^0.5.1",
         "react": "^19.2.0",
@@ -63,7 +63,7 @@
     },
     "examples/solid": {
       "name": "@styled-cva/examples-solid",
-      "version": "0.0.0",
+      "version": "0.0.2",
       "dependencies": {
         "@styled-cva/solid": "workspace:*",
         "solid-js": "^1.9.10",
@@ -79,7 +79,7 @@
     },
     "examples/vue": {
       "name": "@styled-cva/examples-vue",
-      "version": "0.0.0",
+      "version": "0.0.2",
       "dependencies": {
         "@styled-cva/eslint-plugin": "^0.5.1",
         "@styled-cva/vue": "workspace:*",
@@ -98,7 +98,7 @@
     },
     "packages/core": {
       "name": "@styled-cva/core",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
         "clsx": "^2.1.1",
         "tailwind-merge": "^2.6.0",
@@ -133,7 +133,7 @@
     },
     "packages/react": {
       "name": "@styled-cva/react",
-      "version": "0.5.2",
+      "version": "0.7.0",
       "dependencies": {
         "@styled-cva/core": "workspace:*",
       },
@@ -167,7 +167,7 @@
     },
     "packages/solid": {
       "name": "@styled-cva/solid",
-      "version": "0.5.2",
+      "version": "0.6.0",
       "dependencies": {
         "@styled-cva/core": "workspace:*",
       },
@@ -201,9 +201,9 @@
     },
     "packages/vue": {
       "name": "@styled-cva/vue",
-      "version": "0.5.2",
+      "version": "0.6.0",
       "dependencies": {
-        "@styled-cva/core": "workspace:*",
+        "@styled-cva/core": "^0.6.0",
       },
       "devDependencies": {
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",

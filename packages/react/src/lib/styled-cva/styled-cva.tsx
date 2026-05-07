@@ -5,6 +5,7 @@ import {
   cleanTemplate,
   cn,
   cva,
+  isTaggedTemplateArg,
   mergeArrays,
   removeTransientProps,
   type VariantProps,
@@ -256,6 +257,12 @@ type CVAWithPropsReturn<K extends ElementKey, T> = CVAComponent<K, T> & {
   ) => CVAComponent<K, T>;
 };
 
+/** Factory-call overload mirroring `.cva` (`tw.button("", {})` shorthand). */
+
+type IntrinsicCVAShorthand<K extends ElementKey> = <T>(
+  ...args: Parameters<CVA<T>>
+) => CVAWithPropsReturn<K, T>;
+
 export type StyledCVA = TailwindInterface & {
   /**
    * A factory function that creates a styled component with variant props
@@ -286,73 +293,81 @@ export type StyledCVA = TailwindInterface & {
      * ```
      */
     cva: <T>(...args: Parameters<CVA<T>>) => CVAWithPropsReturn<K, T>;
-  };
+  } & IntrinsicCVAShorthand<K>;
 };
 
 export function createStyledCVA(): StyledCVA {
   const twCVA = Object.fromEntries(
-    Object.entries(tw).map(([key, styledFn]) => [
-      key,
-      Object.assign(styledFn, {
-        cva: (...args: Parameters<CVA>) => {
-          const variance = cva(...args);
+    Object.entries(tw).map(([key, styledFn]) => {
+      const cvaImpl = (...args: Parameters<CVA>) => {
+        const variance = cva(...args);
 
-          type Props = VariantProps<typeof variance> & {
-            className?: string;
-            ref?: Ref<HTMLElement>;
-          } & StyledExtension;
+        type Props = VariantProps<typeof variance> & {
+          className?: string;
+          ref?: Ref<HTMLElement>;
+        } & StyledExtension;
 
-          const StyledComponent = styledFn`` as FC<Props>;
+        const StyledComponent = styledFn`` as FC<Props>;
 
-          const WithRef = forwardRef<HTMLElement, Props>(
-            ({ className, ...props }, ref) => (
-              <StyledComponent
-                className={cn(variance({ ...props, className }), className)}
-                {...props}
-                ref={ref}
-              />
-            ),
+        const WithRef = forwardRef<HTMLElement, Props>(
+          ({ className, ...props }, ref) => (
+            <StyledComponent
+              className={cn(variance({ ...props, className }), className)}
+              {...props}
+              ref={ref}
+            />
+          ),
+        );
+
+        WithRef.displayName = `Styled${capitalize(key)}`;
+
+        // Add withProps method to the component
+        // Type constraint is enforced by the type definition (ValidWithProps<K, T>)
+        // Implementation uses 'as any' to match the type signature while allowing runtime flexibility
+        // We use the variance type to get the correct variant props
+        type ValidPropsForImplementation = ValidElementProps<
+          typeof key & ElementKey
+        > & {
+          [key: `data-${string}`]: string;
+        } & Partial<VariantProps<typeof variance>>;
+
+        const ComponentWithProps = WithRef as typeof WithRef & {
+          withProps: <DefaultProps extends ValidPropsForImplementation>(
+            defaultProps: DefaultProps,
+          ) => ForwardRefExoticComponent<
+            PropsWithoutRef<Props> & RefAttributes<HTMLElement>
+          >;
+        };
+
+        ComponentWithProps.withProps = ((defaultProps: any) => {
+          const ComponentWithDefaultProps = forwardRef<HTMLElement, Props>(
+            (userProps, ref) => {
+              // Merge default props with user props (user props take precedence)
+              const mergedProps = { ...defaultProps, ...userProps } as Props;
+              return <WithRef {...mergedProps} ref={ref} />;
+            },
           );
 
-          WithRef.displayName = `Styled${capitalize(key)}`;
+          ComponentWithDefaultProps.displayName = `${WithRef.displayName}.withProps`;
 
-          // Add withProps method to the component
-          // Type constraint is enforced by the type definition (ValidWithProps<K, T>)
-          // Implementation uses 'as any' to match the type signature while allowing runtime flexibility
-          // We use the variance type to get the correct variant props
-          type ValidPropsForImplementation = ValidElementProps<
-            typeof key & ElementKey
-          > & {
-            [key: `data-${string}`]: string;
-          } & Partial<VariantProps<typeof variance>>;
+          return ComponentWithDefaultProps;
+        }) as typeof ComponentWithProps.withProps;
 
-          const ComponentWithProps = WithRef as typeof WithRef & {
-            withProps: <DefaultProps extends ValidPropsForImplementation>(
-              defaultProps: DefaultProps,
-            ) => ForwardRefExoticComponent<
-              PropsWithoutRef<Props> & RefAttributes<HTMLElement>
-            >;
-          };
+        return ComponentWithProps;
+      };
 
-          ComponentWithProps.withProps = ((defaultProps: any) => {
-            const ComponentWithDefaultProps = forwardRef<HTMLElement, Props>(
-              (userProps, ref) => {
-                // Merge default props with user props (user props take precedence)
-                const mergedProps = { ...defaultProps, ...userProps } as Props;
-                return <WithRef {...mergedProps} ref={ref} />;
-              },
-            );
+      const wrapped = function (this: unknown, ...args: unknown[]) {
+        if (isTaggedTemplateArg(args[0])) {
+          return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
+        }
+        return cvaImpl(...(args as Parameters<CVA>));
+      };
 
-            ComponentWithDefaultProps.displayName = `${WithRef.displayName}.withProps`;
+      Object.assign(wrapped, styledFn, { cva: cvaImpl });
 
-            return ComponentWithDefaultProps;
-          }) as typeof ComponentWithProps.withProps;
-
-          return ComponentWithProps;
-        },
-      }),
-    ]),
+      return [key, wrapped];
+    }),
   );
 
-  return Object.assign(tw, twCVA) as StyledCVA;
+  return Object.assign(tw, twCVA) as unknown as StyledCVA;
 }

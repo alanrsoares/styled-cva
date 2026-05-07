@@ -43,7 +43,7 @@ const BaseButton = tw.button`btn-base`;
 const ExtendedButton = tw(BaseButton)`bg-green-500 hover:bg-green-600`;
 
 // This works with CVA components too
-const VariantButton = tw.button.cva("btn-base", {
+const VariantButton = tw.button("btn-base", {
   variants: {
     $variant: {
       primary: "btn-primary",
@@ -57,9 +57,21 @@ const ExtendedVariantButton = tw(VariantButton)`rounded-lg`;
 
 ## `.cva()`
 
+<Callout type="warning" emoji="⚠️">
+  **Deprecated on intrinsic elements** (`tw.button`, `tw.div`, …): prefer **`tw.element(base, config)`** — same types and runtime as **`tw.element.cva(base, config)`**. The `.cva()` member remains available but may be removed in a future major version.
+</Callout>
+
 Creates a styled component with variant support using class-variance-authority.
 
 ### Signature
+
+Preferred for intrinsics (see above):
+
+```tsx
+tw.element(baseClasses, config);
+```
+
+Equivalent legacy form:
 
 ```tsx
 tw.element.cva(baseClasses, config);
@@ -76,7 +88,7 @@ tw.element.cva(baseClasses, config);
 ### Example
 
 ```tsx
-const Button = tw.button.cva("btn-base", {
+const Button = tw.button("btn-base", {
   variants: {
     $variant: {
       primary: "btn-primary",
@@ -117,6 +129,18 @@ const Button = tw.button.cva("btn-base", {
   DOM element. This prevents React warnings about unknown props.
 </Callout>
 
+## Intrinsic shorthand (`tw.element(base, config)`)
+
+For **intrinsic** factories (`tw.button`, `tw.a`, `tw.div`, …), omit `.cva` and pass the same arguments (**preferred**; `.cva()` on intrinsics is deprecated — see above):
+
+```tsx
+tw.element(baseClasses, cvaConfig);
+// equivalent to:
+tw.element.cva(baseClasses, cvaConfig);
+```
+
+Tagged templates (`tw.div\`classes\``) are unchanged. Dispatch treats the first argument as CVA config when it is not a tagged-template receiver. See **`isTaggedTemplateArg`** under [Utilities](#utilities).
+
 ## `.withProps()`
 
 Sets default props for a component. User-provided props will override these defaults.
@@ -134,8 +158,7 @@ Component.withProps(defaultProps);
 ### Example
 
 ```tsx
-const Button = tw.button
-  .cva("btn", {
+const Button = tw.button("btn", {
     variants: {
       $variant: {
         primary: "btn-primary",
@@ -170,7 +193,7 @@ const Button = tw.button`btn`;
 </Button>;
 
 // Works with CVA components too
-const VariantButton = tw.button.cva("btn", {
+const VariantButton = tw.button("btn", {
   variants: {
     $variant: {
       primary: "btn-primary",
@@ -194,7 +217,7 @@ Use it when the runtime `$as={SomeComponent}` form needs explicit typing (e.g. w
 import { Link, type LinkProps } from "@tanstack/react-router";
 import tw, { type PolymorphicComponentProps } from "@styled-cva/react";
 
-const Button = tw.button.cva("btn", {
+const Button = tw.button("btn", {
   variants: {
     $variant: { primary: "btn-primary", secondary: "btn-secondary" },
     $size: { sm: "px-2", md: "px-3" },
@@ -227,6 +250,14 @@ import { cn } from "@styled-cva/react";
 
 const className = cn("text-red-500", "bg-blue-500");
 // className = "text-red-500 bg-blue-500"
+```
+
+### `isTaggedTemplateArg`
+
+From `@styled-cva/core`, re-exported by framework packages: `true` when the value is a tagged-template `TemplateStringsArray` (has `raw`). Used internally to distinguish `tw.div\`...\`` from `tw.div(base, config)`.
+
+```tsx
+import { isTaggedTemplateArg } from "@styled-cva/react";
 ```
 
 ### `cva`

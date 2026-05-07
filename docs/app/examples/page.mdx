@@ -2,6 +2,25 @@
 
 Common patterns and real-world examples using `styled-cva`.
 
+## Intrinsic CVA shorthand
+
+Preferred over **`tw.button.cva(base, config)`** (deprecated on intrinsics — same behavior):
+
+```tsx
+const Button = tw.button(
+  "inline-flex items-center justify-center rounded-md font-medium",
+  {
+    variants: {
+      $variant: {
+        primary: "bg-primary text-primary-foreground",
+        secondary: "bg-secondary text-secondary-foreground",
+      },
+    },
+    defaultVariants: { $variant: "primary" },
+  },
+);
+```
+
 ## Buttons
 
 ### Basic Button with Variants

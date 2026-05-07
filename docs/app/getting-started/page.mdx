@@ -31,12 +31,12 @@ const StaticButton = tw.button`
 
 ### Variants
 
-Use the `.cva()` method to create components with variants:
+Use **`tw.button(base, config)`** (intrinsic CVA shorthand) for variant styles:
 
 ```tsx
 import tw from "@styled-cva/react";
 
-const VariantButton = tw.button.cva("btn-base-class", {
+const VariantButton = tw.button("btn-base-class", {
   variants: {
     // Variant keys starting with $ will not be sent to the DOM,
     // this avoids extraneous props warning
@@ -54,6 +54,10 @@ const VariantButton = tw.button.cva("btn-base-class", {
 // <button class="btn-primary-class">Click Me</button>
 ```
 
+<Callout type="warning" emoji="⚠️">
+  **`tw.button.cva(base, config)` is deprecated** — same behavior as the shorthand above. Prefer calling the factory directly.
+</Callout>
+
 {" "}
 <Callout type="info" emoji="💡">
   Variant keys starting with `$` are transient props that won't be passed to the
@@ -65,8 +69,7 @@ const VariantButton = tw.button.cva("btn-base-class", {
 Use `.withProps()` to set default props:
 
 ```tsx
-const StyledButton = tw.button
-  .cva("btn-base", {
+const StyledButton = tw.button("btn-base", {
     variants: {
       $variant: {
         primary: "btn-primary",
@@ -96,7 +99,7 @@ Use the `$as` prop to render as different elements or components:
 ```tsx
 import Link from "next/link";
 
-const Button = tw.button.cva("btn", {
+const Button = tw.button("btn", {
   variants: {
     $variant: {
       primary: "btn-primary",

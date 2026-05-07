@@ -1,4 +1,12 @@
-import { Code, Layers, Palette, Rocket, Shapes, Shield } from "lucide-react";
+import {
+  Brackets,
+  Code,
+  Layers,
+  Palette,
+  Rocket,
+  Shapes,
+  Shield,
+} from "lucide-react";
 
 # styled-cva
 
@@ -19,8 +27,8 @@ import tw from "@styled-cva/react";
 // Basic styled component
 const Button = tw.button`bg-blue-500 text-white px-4 py-2 rounded`;
 
-// With variants
-const VariantButton = tw.button.cva("px-4 py-2 rounded", {
+// With variants (prefer shorthand — `.cva()` on intrinsics is deprecated)
+const VariantButton = tw.button("px-4 py-2 rounded", {
   variants: {
     $variant: {
       primary: "bg-blue-500 text-white",
@@ -50,6 +58,11 @@ const VariantButton = tw.button.cva("px-4 py-2 rounded", {
     href="/getting-started"
   />
   <Cards.Card icon={<Palette />} title="Tailwind CSS" href="/getting-started" />
+  <Cards.Card
+    icon={<Brackets />}
+    title="Intrinsic CVA shorthand"
+    href="/getting-started"
+  />
   <Cards.Card
     icon={<Shapes />}
     title="Polymorphic components"

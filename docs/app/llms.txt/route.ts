@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
     "- **Type-safe**: Full TypeScript support with variant inference.",
     "- **CVA-based**: Built on top of class-variance-authority.",
     "- **Styled-components-like**: Familiar API for those coming from styled-components or emotion.",
+    "- **Intrinsic CVA shorthand**: On HTML intrinsics, `tw.button(base, config)` is preferred; `tw.button.cva(base, config)` is deprecated but equivalent (React, Solid, Vue).",
     "- **Tailwind CSS**: Designed to work seamlessly with Tailwind CSS.",
     "- **Polymorphic**: Support for the `$as` prop to change the rendered element. Use the `PolymorphicComponentProps<Component, $As>` utility type to compose typed wrappers around custom-component targets (TanStack/Next/Remix Link, etc.) — automatically picks up every `$`-prefixed variant.",
     "",

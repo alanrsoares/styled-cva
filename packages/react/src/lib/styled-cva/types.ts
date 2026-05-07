@@ -213,10 +213,9 @@ export interface TailwindInterface extends IntrinsicElementsTemplateFunctionsMap
     : React.ComponentPropsWithoutRef<C>
   >;
   /**
-   * A factory function that creates a styled component from an intrinsic element
    * @example
    * ```tsx
-   * const StyledButton = tw.button.cva("btn-base", {});
+   * const StyledButton = tw.button("btn-base", { variants: { $variant: { primary: "…" } } });
    * ```
    */
   <C extends keyof JSX.IntrinsicElements>(

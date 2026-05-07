@@ -5,14 +5,14 @@ import { useState, type ComponentProps } from "react";
 import { expectType, type TypeEqual } from "ts-expect";
 import { vi } from "vitest";
 
-import { createStyledCVA } from "./styled-cva";
 import { isTaggedTemplateArg } from "../../index";
+import { createStyledCVA } from "./styled-cva";
 
 const tw = createStyledCVA();
 
 describe("styled-cva", () => {
   it("re-exports isTaggedTemplateArg from the package entry", () => {
-    const tag = ((strings: TemplateStringsArray) => strings) `x`;
+    const tag = ((strings: TemplateStringsArray) => strings)`x`;
     expect(isTaggedTemplateArg(tag)).toBe(true);
     expect(isTaggedTemplateArg("x")).toBe(false);
   });

@@ -170,13 +170,13 @@ type ValidElementProps<K extends ElementKey> = {
     : P]?: JSX.IntrinsicElements[K][P];
 };
 
-// ValidWithProps includes element props, data attributes, and variant props
+// ValidWithProps includes element props, data-* attributes, and variant props
 type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
   [key: `data-${string}`]: string;
-} & Partial<T>;
+} & Partial<VariantProps<ReturnType<CVA<T>>>>;
 
 type CVAWithPropsReturn<K extends ElementKey, T> = DefineComponent<
-  JSX.IntrinsicElements[K] & VariantProps<typeof cva> & StyledExtension
+  JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
 > & {
   /**
    * Sets default props for the component. User-provided props will override these defaults.
@@ -210,7 +210,7 @@ type CVAWithPropsReturn<K extends ElementKey, T> = DefineComponent<
       [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
     },
   ) => DefineComponent<
-    JSX.IntrinsicElements[K] & VariantProps<typeof cva> & StyledExtension
+    JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
   >;
 };
 

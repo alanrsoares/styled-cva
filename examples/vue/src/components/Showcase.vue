@@ -34,7 +34,7 @@ const buttonCvaConfig = {
   defaultVariants: {
     $variant: 'primary',
     $size: 'md',
-  },
+  } as const,
   compoundVariants: [
     {
       $variant: 'primary',

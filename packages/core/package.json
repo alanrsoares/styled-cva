@@ -1,7 +1,7 @@
 {
   "name": "@styled-cva/core",
   "description": "Shared utilities and CVA for styled-cva (React, Solid, etc.)",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "publishConfig": {
     "access": "public"
   },

@@ -1,5 +1,11 @@
 # @styled-cva/core
 
+## 0.6.1
+
+### Patch Changes
+
+- Publish under **The Unlicense**. Deprecate intrinsic `tw.*.cva(...)` in favor of `tw.*(...)` on React, Solid, and Vue. Narrow Vue `ElementKey` / intrinsic typing; refresh docs and examples.
+
 ## 0.6.0
 
 ### Minor Changes

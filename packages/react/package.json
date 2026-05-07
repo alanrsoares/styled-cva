@@ -1,7 +1,7 @@
 {
   "name": "@styled-cva/react",
   "description": "A typesafe, class-variance-authority-based, styled-components-like library for authoring React components",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "publishConfig": {
     "access": "public"
   },
@@ -63,6 +63,6 @@
     "typescript": ">=5.7.0"
   },
   "dependencies": {
-    "@styled-cva/core": "^0.6.0"
+    "@styled-cva/core": "^0.6.1"
   }
 }

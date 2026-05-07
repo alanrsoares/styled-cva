@@ -1,5 +1,12 @@
 # @styled-cva/examples-solid
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @styled-cva/solid@0.6.1
+
 ## 0.0.2
 
 ### Patch Changes

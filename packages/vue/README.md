@@ -239,7 +239,7 @@ Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-This project is licensed under the Apache-2.0 License.
+This project is dedicated to the public domain under [The Unlicense](https://unlicense.org/). See [`LICENSE`](LICENSE) in this package.
 
 ### Acknowledgements
 
@@ -250,7 +250,3 @@ This project is licensed under the Apache-2.0 License.
 - [CLSX](https://github.com/lukeed/clsx)
 
 - [tailwind-merge](https://github.com/dcastil/tailwind-merge)
-
-####
-
-License - [Apache-2.0](/LICENSE)

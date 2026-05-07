@@ -96,4 +96,4 @@ Versioning uses [Changesets](https://github.com/changesets/changesets). See [REL
 
 ## License
 
-Apache-2.0. See [packages/react/LICENSE](packages/react/LICENSE).
+[The Unlicense](https://unlicense.org/) — public domain. See the [`LICENSE`](LICENSE) file at the repository root.

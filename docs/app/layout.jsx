@@ -34,7 +34,7 @@ const navbar = (
   />
 );
 const footer = (
-  <Footer>Apache-2.0 {new Date().getFullYear()} © styled-cva.</Footer>
+  <Footer>The Unlicense {new Date().getFullYear()} © styled-cva.</Footer>
 );
 
 export default async function RootLayout({ children }) {

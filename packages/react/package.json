@@ -5,7 +5,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "license": "LicenseRef-LICENSE",
+  "license": "Unlicense",
   "keywords": [
     "styled-components",
     "class-variance-authority",

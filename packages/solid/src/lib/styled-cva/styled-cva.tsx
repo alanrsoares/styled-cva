@@ -5,6 +5,7 @@ import {
   cleanTemplate,
   cn,
   cva,
+  isTaggedTemplateArg,
   mergeArrays,
   removeTransientProps,
   type VariantProps,
@@ -233,6 +234,12 @@ type CVAWithPropsReturn<K extends ElementKey, T> = TailwindComponent<
     ) => Component<CVAProps<K, T>>;
   };
 
+/** Factory-call overload mirroring `.cva` (`tw.button("", {})` shorthand). */
+
+type IntrinsicCVAShorthand<K extends ElementKey> = <T>(
+  ...args: Parameters<CVA<T>>
+) => CVAWithPropsReturn<K, T>;
+
 export type StyledCVA = TailwindInterface & {
   /**
    * A factory function that creates a styled component with variant props
@@ -263,65 +270,73 @@ export type StyledCVA = TailwindInterface & {
      * ```
      */
     cva: <T>(...args: Parameters<CVA<T>>) => CVAWithPropsReturn<K, T>;
-  };
+  } & IntrinsicCVAShorthand<K>;
 };
 
 export function createStyledCVA(): StyledCVA {
   const twCVA = Object.fromEntries(
-    Object.entries(tw).map(([key, styledFn]) => [
-      key,
-      Object.assign(styledFn, {
-        cva: (...args: Parameters<CVA>) => {
-          const variance = cva(...args);
+    Object.entries(tw).map(([key, styledFn]) => {
+      const cvaImpl = (...args: Parameters<CVA>) => {
+        const variance = cva(...args);
 
-          type Props = VariantProps<typeof variance> & {
-            class?: string;
-            ref?: any;
-          } & StyledExtension;
+        type Props = VariantProps<typeof variance> & {
+          class?: string;
+          ref?: any;
+        } & StyledExtension;
 
-          const StyledComponent = styledFn`` as Component<Props>;
+        const StyledComponent = styledFn`` as Component<Props>;
 
-          const WithVariants: Component<Props> = (props) => {
-            // Use createMemo to compute class reactively
-            // Cast props to any to preserve Solid's reactivity proxy while satisfying CVA's type
-            const computedClass = createMemo(() =>
-              cn(variance(props as any), props.class),
-            );
+        const WithVariants: Component<Props> = (props) => {
+          // Use createMemo to compute class reactively
+          // Cast props to any to preserve Solid's reactivity proxy while satisfying CVA's type
+          const computedClass = createMemo(() =>
+            cn(variance(props as any), props.class),
+          );
 
-            return <StyledComponent {...props} class={computedClass()} />;
+          return <StyledComponent {...props} class={computedClass()} />;
+        };
+
+        (WithVariants as any).displayName = `Styled${capitalize(key)}`;
+
+        // Add withProps method to the component
+        type ValidPropsForImplementation = ValidElementProps<any> & {
+          [key: `data-${string}`]: string;
+        } & Partial<VariantProps<typeof variance>>;
+
+        const ComponentWithProps = WithVariants as typeof WithVariants & {
+          withProps: <DefaultProps extends ValidPropsForImplementation>(
+            defaultProps: DefaultProps,
+          ) => Component<Props>;
+        };
+
+        ComponentWithProps.withProps = ((defaultProps: any) => {
+          const ComponentWithDefaultProps: Component<Props> = (userProps) => {
+            // Merge default props with user props (user props take precedence)
+            const merged = mergeProps(defaultProps, userProps) as Props;
+            return <WithVariants {...merged} />;
           };
 
-          (WithVariants as any).displayName = `Styled${capitalize(key)}`;
+          (ComponentWithDefaultProps as any).displayName =
+            `${(WithVariants as any).displayName}.withProps`;
 
-          // Add withProps method to the component
-          type ValidPropsForImplementation = ValidElementProps<any> & {
-            [key: `data-${string}`]: string;
-          } & Partial<VariantProps<typeof variance>>;
+          return ComponentWithDefaultProps;
+        }) as typeof ComponentWithProps.withProps;
 
-          const ComponentWithProps = WithVariants as typeof WithVariants & {
-            withProps: <DefaultProps extends ValidPropsForImplementation>(
-              defaultProps: DefaultProps,
-            ) => Component<Props>;
-          };
+        return ComponentWithProps;
+      };
 
-          ComponentWithProps.withProps = ((defaultProps: any) => {
-            const ComponentWithDefaultProps: Component<Props> = (userProps) => {
-              // Merge default props with user props (user props take precedence)
-              const merged = mergeProps(defaultProps, userProps) as Props;
-              return <WithVariants {...merged} />;
-            };
+      const wrapped = function (this: unknown, ...args: unknown[]) {
+        if (isTaggedTemplateArg(args[0])) {
+          return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
+        }
+        return cvaImpl(...(args as Parameters<CVA>));
+      };
 
-            (ComponentWithDefaultProps as any).displayName =
-              `${(WithVariants as any).displayName}.withProps`;
+      Object.assign(wrapped, styledFn, { cva: cvaImpl });
 
-            return ComponentWithDefaultProps;
-          }) as typeof ComponentWithProps.withProps;
-
-          return ComponentWithProps;
-        },
-      }),
-    ]),
+      return [key, wrapped];
+    }),
   );
 
-  return Object.assign(tw, twCVA) as StyledCVA;
+  return Object.assign(tw, twCVA) as unknown as StyledCVA;
 }

@@ -7,6 +7,7 @@ import { expectType, type TypeEqual } from "ts-expect";
 import { vi } from "vitest";
 
 import { createStyledCVA } from "./styled-cva";
+import { isTaggedTemplateArg } from "../../index";
 
 const tw = createStyledCVA();
 
@@ -15,6 +16,12 @@ type ComponentProps<T extends Component<any>> =
   T extends Component<infer P> ? P : never;
 
 describe("styled-cva", () => {
+  it("re-exports isTaggedTemplateArg from the package entry", () => {
+    const tag = ((strings: TemplateStringsArray) => strings) `x`;
+    expect(isTaggedTemplateArg(tag)).toBe(true);
+    expect(isTaggedTemplateArg("x")).toBe(false);
+  });
+
   const StyledButton = tw.button.cva("btn-base", {
     variants: {
       // variant keys starting with $ will not be sent to the DOM,
@@ -32,6 +39,35 @@ describe("styled-cva", () => {
 
     expectType<TypeEqual<"primary" | "secondary", VariantProp>>(true);
     expectType<TypeEqual<string, VariantProp>>(false);
+  });
+
+  it("accepts intrinsic CVA shorthand tw.button(...args) as equivalent to tw.button.cva(...args)", () => {
+    const ShorthandButton = tw.button("btn-base", {
+      variants: {
+        $variant: {
+          primary: "btn-primary",
+          secondary: "btn-secondary",
+        },
+      },
+    });
+
+    expectType<
+      TypeEqual<
+        ComponentProps<typeof StyledButton>,
+        ComponentProps<typeof ShorthandButton>
+      >
+    >(true);
+
+    const { container } = render(() => (
+      <ShorthandButton $variant="secondary">Hi</ShorthandButton>
+    ));
+    expect(container.firstChild).toMatchInlineSnapshot(`
+      <button
+        class="btn-base btn-secondary"
+      >
+        Hi
+      </button>
+    `);
   });
 
   it("should preserve $variant union at the JSX call site (not widen to string)", () => {

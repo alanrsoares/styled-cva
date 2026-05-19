@@ -1,6 +1,6 @@
 # Releasing
 
-These packages are published to npm: **@styled-cva/core**, **@styled-cva/react**, **@styled-cva/solid**, **@styled-cva/vue**, and **@styled-cva/eslint-plugin**. **@styled-cva/docs** is private. This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and changelogs.
+These packages are published to npm: **@styled-cva/core**, **@styled-cva/react**, **@styled-cva/solid**, **@styled-cva/vue**, **@styled-cva/eslint-plugin**, **@styled-cva/prettier-plugin**, and **@styled-cva/biome-plugin**. **@styled-cva/docs** is private. This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and changelogs.
 
 ## One-time setup
 
@@ -29,20 +29,17 @@ bun run version    # Consume changesets, bump package versions, update CHANGELOG
 bun install        # Update lockfile after version bumps
 git add -A && git commit -m "chore(release): version packages"
 bun run release    # Build and publish all versioned packages to npm
-git push && git push --follow-tags   # If you tag in version step
+bunx changeset tag # Create per-package git tags (@scope/pkg@version) for what just shipped
+git push && git push --tags
 ```
 
 `bun run release` runs `bun run build` then `changeset publish`, which publishes only packages that had their version bumped.
 
-### 3. Optional: tag the release
+### 3. Tagging
 
-If you want a git tag per release, run after `bun run version`:
+The convention in this monorepo is **one git tag per published package per release**, formatted `@styled-cva/<pkg>@<version>` (e.g. `@styled-cva/core@0.7.0`). `bunx changeset tag` reads each `packages/*/package.json` after publish and creates exactly those tags — it is idempotent, so re-running on a release that's already tagged is a no-op.
 
-```bash
-git tag "v$(node -p "require('./packages/react/package.json').version")"
-```
-
-(Adjust the path if you prefer to tag from another package’s version.)
+Avoid single-version "release tags" (e.g. `v0.7.0`) — they lie about every package except one, and break the npm-version-to-git-SHA mapping for the others.
 
 ## Manual release (without changesets)
 
@@ -54,6 +51,10 @@ bun run release:react
 # or
 bun run bump:patch -- "@styled-cva/eslint-plugin"
 bun run release:eslint-plugin
+# or
+bun run release:prettier-plugin
+# or
+bun run release:biome-plugin
 ```
 
 Dry run: `bun publish --cwd packages/react --dry-run`

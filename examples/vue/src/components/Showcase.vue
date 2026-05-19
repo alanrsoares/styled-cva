@@ -74,7 +74,7 @@ const Link = tw.a`font-medium text-[#646cff] no-underline hover:text-[#535bf2] h
         Use <Code>tw.element`classes`</Code> for simple styled elements. Same API as styled-components.
       </SectionDesc>
       <Row>
-        <SectionTitle class="!text-base">This section is built with</SectionTitle>
+        <SectionTitle class="text-base!">This section is built with</SectionTitle>
         <Code>tw.section`...`</Code>
         <Code>tw.h2`...`</Code>
         <Code>tw.p`...`</Code>

@@ -49,6 +49,8 @@ export async function GET(request: NextRequest) {
     "- **Intrinsic CVA shorthand**: On HTML intrinsics, `tw.button(base, config)` is preferred; `tw.button.cva(base, config)` is deprecated but equivalent (React, Solid, Vue).",
     "- **Tailwind CSS**: Designed to work seamlessly with Tailwind CSS.",
     "- **Polymorphic**: Support for the `$as` prop to change the rendered element. Use the `PolymorphicComponentProps<Component, $As>` utility type to compose typed wrappers around custom-component targets (TanStack/Next/Remix Link, etc.) — automatically picks up every `$`-prefixed variant.",
+    "- **Lint and format tooling**: First-party `@styled-cva/eslint-plugin` (extract long classNames into styled components, fixable), `@styled-cva/prettier-plugin` (normalize whitespace + multiline long `tw\\`…\\`` and `cva` strings), and `@styled-cva/biome-plugin` (diagnostics-only GritQL rules for `tw\\`…\\`` templates in Biome 2.x).",
+    "- **Preact compatible**: Works under Preact via the standard `preact/compat` bundler alias — no styled-cva code changes needed.",
     "",
     "## Usage Examples",
     "",

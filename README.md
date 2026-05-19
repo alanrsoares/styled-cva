@@ -50,6 +50,10 @@ const Button = tw.button`bg-blue-500 text-white font-bold py-2 px-4 rounded`;
 
 [Full documentation →](https://github.com/alanrsoares/styled-cva/tree/main/docs)
 
+### Preact
+
+`@styled-cva/react` runs on [Preact](https://preactjs.com/) via the standard `preact/compat` bundler alias — no styled-cva code changes required. See [Getting Started → Preact](docs/app/getting-started/page.mdx#preact) for Vite, Webpack, and Next.js snippets.
+
 ## Monorepo
 
 | Package                                          | Description                                                                                     |

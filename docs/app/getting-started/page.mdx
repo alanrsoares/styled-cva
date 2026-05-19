@@ -166,3 +166,105 @@ For Tailwind CSS extension support, add this to your VSCode [settings.json](/.vs
   These settings enable Tailwind CSS IntelliSense for styled-cva template
   literals and CVA variant definitions.
 </Callout>
+
+## Preact
+
+`@styled-cva/react` works under [Preact](https://preactjs.com/) via the standard `preact/compat` alias. Preact provides drop-in replacements for `forwardRef` and the React type stack that styled-cva relies on, so no styled-cva code changes are required — set up the alias in your bundler and use the package exactly as you would in React.
+
+### Install
+
+<Tabs items={["npm", "pnpm", "bun"]}>
+  <Tabs.Tab>```bash npm i --save preact @styled-cva/react ```</Tabs.Tab>
+  <Tabs.Tab>```bash pnpm add preact @styled-cva/react ```</Tabs.Tab>
+  <Tabs.Tab>```bash bun add preact @styled-cva/react ```</Tabs.Tab>
+</Tabs>
+
+### Bundler alias
+
+<Tabs items={["Vite", "Webpack 5", "Next.js"]}>
+<Tabs.Tab>
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import preact from "@preact/preset-vite";
+
+export default defineConfig({
+  plugins: [preact()],
+  resolve: {
+    alias: {
+      react: "preact/compat",
+      "react-dom": "preact/compat",
+      "react/jsx-runtime": "preact/jsx-runtime",
+    },
+  },
+});
+```
+
+`@preact/preset-vite` wires the alias for you; the explicit `resolve.alias` block above is shown for projects that don't use the preset.
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```js
+// webpack.config.js
+module.exports = {
+  resolve: {
+    alias: {
+      react: "preact/compat",
+      "react-dom/test-utils": "preact/test-utils",
+      "react-dom": "preact/compat",
+      "react/jsx-runtime": "preact/jsx-runtime",
+    },
+  },
+};
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```js
+// next.config.js
+module.exports = {
+  webpack: (config) => {
+    Object.assign(config.resolve.alias, {
+      react: "preact/compat",
+      "react-dom": "preact/compat",
+      "react/jsx-runtime": "preact/jsx-runtime",
+    });
+    return config;
+  },
+};
+```
+
+</Tabs.Tab>
+</Tabs>
+
+### Usage
+
+No changes from the React workflow:
+
+```tsx
+import tw from "@styled-cva/react";
+
+const Button = tw.button("rounded bg-blue-500 px-4 py-2 text-white", {
+  variants: {
+    $variant: {
+      primary: "bg-blue-500",
+      ghost: "bg-transparent text-blue-500",
+    },
+  },
+});
+
+<Button $variant="primary">Click</Button>;
+```
+
+<Callout type="info" emoji="💡">
+  The lint/format plugins (`@styled-cva/eslint-plugin`, `@styled-cva/prettier-plugin`, `@styled-cva/biome-plugin`) key off the `tw` identifier in source code, not the runtime. They work identically under Preact.
+</Callout>
+
+### Caveats
+
+- **No dedicated `@styled-cva/preact` package.** The alias is the supported path. If you need to avoid bundler configuration, file an issue with the use case.
+- **`forwardRef` deprecation in React 19** does not affect Preact users — `preact/compat` still exports a working `forwardRef`.
+- **JSX namespace** must resolve to React types under the alias. `preact/compat` re-exports them, so polymorphic `$as` props and intrinsic element typings keep working.

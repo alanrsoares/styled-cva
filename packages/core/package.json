@@ -14,13 +14,20 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./formatting": {
+      "types": "./dist/formatting/index.d.ts",
+      "import": "./dist/formatting/index.mjs",
+      "require": "./dist/formatting/index.js"
     }
   },
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist",
+    "test": "bun test",
     "compile": "tsc --noEmit"
   },
   "dependencies": {

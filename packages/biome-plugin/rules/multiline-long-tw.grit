@@ -1,0 +1,26 @@
+// @styled-cva/biome-plugin: multiline-long-tw
+//
+// Flag inline `tw.tag` / `tw(...)` tagged templates whose quasi text exceeds
+// 80 characters and contains no newline. The fix is to break the class list
+// across multiple lines (handled automatically by `@styled-cva/prettier-plugin`).
+
+engine biome(1.0)
+language js
+
+or {
+  JsTemplateExpression(tag = `tw.$x`) as $t,
+  JsTemplateExpression(tag = `tw($_)`) as $t
+} where {
+  $t <: contains $chunk where {
+    $chunk <: JsTemplateChunkElement(),
+    $chunk <: r".{81,}"
+  },
+  $t <: not contains JsTemplateChunkElement() as $line where {
+    $line <: r".*\n.*"
+  },
+  register_diagnostic(
+    span = $t,
+    message = "Inline tw class string exceeds 80 chars. Break into multiple lines (run @styled-cva/prettier-plugin to auto-format).",
+    severity = "warn"
+  )
+}

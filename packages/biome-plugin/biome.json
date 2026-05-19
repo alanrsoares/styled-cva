@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
+  "plugins": [
+    "./rules/normalize-tw-classes.grit",
+    "./rules/multiline-long-tw.grit"
+  ],
+  "linter": { "enabled": true, "rules": { "recommended": false } },
+  "formatter": { "enabled": false },
+  "files": { "includes": ["fixtures/**"] }
+}

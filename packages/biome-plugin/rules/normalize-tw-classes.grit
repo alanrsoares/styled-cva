@@ -1,0 +1,35 @@
+// @styled-cva/biome-plugin: normalize-tw-classes
+//
+// Flag inline `tw.tag` / `tw(...)` tagged templates whose class string contains
+// a run of horizontal whitespace, leading horizontal whitespace, or trailing
+// horizontal whitespace.
+//
+// Multi-line templates (any chunk contains a newline) are exempt so that
+// prettier-formatted multi-line `tw.div\`\n  flex\n\`` is not flagged.
+//
+// Fix by running `@styled-cva/prettier-plugin` or editing by hand.
+
+engine biome(1.0)
+language js
+
+or {
+  JsTemplateExpression(tag = `tw.$x`) as $t,
+  JsTemplateExpression(tag = `tw($_)`) as $t
+} where {
+  $t <: contains $chunk where {
+    $chunk <: JsTemplateChunkElement(),
+    or {
+      $chunk <: r".*[ \t][ \t].*",
+      $chunk <: r"^[ \t].*",
+      $chunk <: r".*[ \t]$"
+    }
+  },
+  $t <: not contains JsTemplateChunkElement() as $line where {
+    $line <: r".*\n.*"
+  },
+  register_diagnostic(
+    span = $t,
+    message = "Tailwind class string has irregular whitespace. Run @styled-cva/prettier-plugin or normalize manually.",
+    severity = "warn"
+  )
+}

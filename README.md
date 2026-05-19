@@ -59,6 +59,8 @@ const Button = tw.button`bg-blue-500 text-white font-bold py-2 px-4 rounded`;
 | [packages/solid](packages/solid)                 | **@styled-cva/solid** – Solid adapter (published)                                               |
 | [packages/vue](packages/vue)                     | **@styled-cva/vue** – Vue adapter (published)                                                   |
 | [packages/eslint-plugin](packages/eslint-plugin) | **@styled-cva/eslint-plugin** – ESLint rule to extract classes to styled components (published) |
+| [packages/prettier-plugin](packages/prettier-plugin) | **@styled-cva/prettier-plugin** – Prettier plugin to normalize and multi-line `tw` templates (published) |
+| [packages/biome-plugin](packages/biome-plugin)   | **@styled-cva/biome-plugin** – Biome GritQL diagnostics for `tw` templates (published)          |
 | [docs](docs)                                     | **@styled-cva/docs** – documentation site (private)                                               |
 
 ## Development
@@ -77,7 +79,7 @@ bun run dev
 
 | Script                          | Description                                                          |
 | ------------------------------- | -------------------------------------------------------------------- |
-| `bun run build`                 | Build all packages (core, react, solid, vue, eslint-plugin) and docs |
+| `bun run build`                 | Build all packages (core, react, solid, vue, eslint-plugin, prettier-plugin, biome-plugin) and docs |
 | `bun run dev`                   | Start docs site (Next.js)                                            |
 | `bun run test`                  | Run tests in packages that have a test script                        |
 | `bun run lint`                  | Lint packages                                                        |
@@ -91,6 +93,8 @@ bun run dev
 | `bun run release:solid`         | Build and publish @styled-cva/solid                                  |
 | `bun run release:vue`           | Build and publish @styled-cva/vue                                    |
 | `bun run release:eslint-plugin` | Build and publish @styled-cva/eslint-plugin                          |
+| `bun run release:prettier-plugin` | Build and publish @styled-cva/prettier-plugin                      |
+| `bun run release:biome-plugin`  | Publish @styled-cva/biome-plugin (no build — ships `.grit` files)    |
 
 Versioning uses [Changesets](https://github.com/changesets/changesets). See [RELEASING.md](RELEASING.md) for the full workflow.
 

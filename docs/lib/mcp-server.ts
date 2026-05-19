@@ -53,6 +53,18 @@ export const DOCS_PAGES = [
     resource: "styled-cva://docs/eslint-plugin",
   },
   {
+    path: "prettier-plugin/page.mdx",
+    route: "/prettier-plugin",
+    title: "Prettier Plugin",
+    resource: "styled-cva://docs/prettier-plugin",
+  },
+  {
+    path: "biome-plugin/page.mdx",
+    route: "/biome-plugin",
+    title: "Biome Plugin",
+    resource: "styled-cva://docs/biome-plugin",
+  },
+  {
     path: "mcp/page.mdx",
     route: "/mcp",
     title: "MCP Docs Server",

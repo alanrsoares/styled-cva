@@ -1,0 +1,101 @@
+# Prettier Plugin
+
+The `@styled-cva/prettier-plugin` package normalizes class-string whitespace inside `tw.tag` / `tw(Component)` tagged templates and inside `tw.tag.cva({ base, variants })` calls, and rewrites long inline `tw\`…\`` templates into multi-line form when they overflow `printWidth`.
+
+Part of the styled-cva monorepo. Published to npm as `@styled-cva/prettier-plugin`.
+
+## What it does
+
+1. **Normalizes whitespace.** Collapses runs of whitespace inside recognized class strings to a single space and trims leading/trailing whitespace.
+2. **Rewrites long inline tagged templates to multi-line.** When `tw.tag\`…\`` would overflow `printWidth`, the plugin breaks the class list across multiple indented lines.
+
+For Tailwind-aware class ordering, pair this plugin with [`prettier-plugin-tailwindcss`](https://github.com/tailwindlabs/prettier-plugin-tailwindcss). Load it **after** `@styled-cva/prettier-plugin` in your Prettier config.
+
+### Targets
+
+- `` tw.div`…` `` / `` tw.button`…` `` — any `tw.<tag>` tagged template
+- `` tw(Component)`…` `` — `tw(Foo)` wrapper tagged template
+- `tw.div.cva({ base: "…", variants: { … } })` — `base` string + each variant option string
+
+`className="…"` attributes are intentionally **not** handled — that is `prettier-plugin-tailwindcss`'s job.
+
+### Example
+
+**Before:**
+
+```ts
+const Button = tw.button`  rounded   bg-blue-500   px-4 py-2 font-bold text-white   hover:bg-blue-600  `;
+
+const Card = tw.div.cva({
+  base: "  rounded-lg   bg-white   shadow ",
+  variants: {
+    $tone: {
+      info: "  bg-blue-50   text-blue-900 ",
+      danger: "bg-red-50  text-red-900",
+    },
+  },
+});
+```
+
+**After (`printWidth: 80`):**
+
+```ts
+const Button = tw.button`rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600`;
+
+const Card = tw.div.cva({
+  base: "rounded-lg bg-white shadow",
+  variants: {
+    $tone: {
+      info: "bg-blue-50 text-blue-900",
+      danger: "bg-red-50 text-red-900",
+    },
+  },
+});
+```
+
+**Multi-line rewrite** (when the single-line render exceeds `printWidth`):
+
+```ts
+const HeroCard = tw.div`
+  flex items-center justify-between gap-4 rounded-xl
+  border border-slate-200 bg-white p-6 shadow-md
+  hover:border-slate-300 hover:shadow-lg
+`;
+```
+
+Inner lines are indented by `tabWidth` (or one tab when `useTabs` is true) relative to the column where the tag starts; the closing backtick aligns back to that column.
+
+## Installation
+
+```bash
+bun add -D @styled-cva/prettier-plugin
+```
+
+**Peer dependency:** `prettier` (^3). Optional companion: `prettier-plugin-tailwindcss`.
+
+## Configuration
+
+In `.prettierrc` / `prettier.config.js`:
+
+```json
+{
+  "plugins": [
+    "@styled-cva/prettier-plugin",
+    "prettier-plugin-tailwindcss"
+  ]
+}
+```
+
+Order matters: load `@styled-cva/prettier-plugin` **before** `prettier-plugin-tailwindcss` so class sorting runs on the normalized, multi-lined output.
+
+This plugin reuses standard Prettier options (`printWidth`, `tabWidth`, `useTabs`). It introduces no new options.
+
+## Composition with the Biome plugin
+
+`@styled-cva/biome-plugin` reports diagnostics for the same constructs but cannot rewrite code (Biome GritQL plugins are diagnostics-only). The intended workflow is to run Prettier on save for auto-fix and use the Biome plugin in CI / `biome check` for verification.
+
+## Caveats
+
+- **Static templates only.** Tagged templates containing `${…}` interpolations are skipped.
+- **`cva` string literals stay strings.** They are whitespace-normalized but not converted to multi-line template literals.
+- **Recognition is conservative.** The `tw` identifier must be the root of the tag or `.cva()` member chain — renamed/aliased imports are not detected.

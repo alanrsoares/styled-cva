@@ -41,6 +41,17 @@ The convention in this monorepo is **one git tag per published package per relea
 
 Avoid single-version "release tags" (e.g. `v0.7.0`) — they lie about every package except one, and break the npm-version-to-git-SHA mapping for the others.
 
+### 4. Attach the agent skill to the GitHub release
+
+After publishing, build and attach the `.skill` artifact so downstream users can install via the release page:
+
+```bash
+bun run skill:build                       # writes dist/skill/styled-cva.skill
+gh release upload @styled-cva/react@<v> dist/skill/styled-cva.skill
+```
+
+The release is keyed off any one of the per-package tags (`@styled-cva/react@<v>` is a reasonable choice). Skill content is identical regardless of which package tag the release page tracks.
+
 ## Manual release (without changesets)
 
 To bump and publish a single package without using changesets:

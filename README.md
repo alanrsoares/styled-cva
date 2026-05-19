@@ -54,6 +54,23 @@ const Button = tw.button`bg-blue-500 text-white font-bold py-2 px-4 rounded`;
 
 `@styled-cva/react` runs on [Preact](https://preactjs.com/) via the standard `preact/compat` bundler alias — no styled-cva code changes required. See [Getting Started → Preact](docs/app/getting-started/page.mdx#preact) for Vite, Webpack, and Next.js snippets.
 
+### Agent skill (Claude Code + `.agents`-compatible)
+
+A consumer-facing skill ships with the repo at [.claude/skills/styled-cva/](.claude/skills/styled-cva/). It loads automatically when working inside this repo, and is published as a `.skill` artifact attached to each GitHub release.
+
+**Install for an end user:**
+
+1. Grab `styled-cva.skill` from the latest [GitHub release](https://github.com/alanrsoares/styled-cva/releases).
+2. Drop it into either `~/.agents/skills/` (multi-agent registry) or `~/.claude/skills/` (Claude Code only) — the file is a standard zip with `.skill` extension and most installers extract it in place.
+
+**Build locally:**
+
+```bash
+bun run skill:build   # writes dist/skill/styled-cva.skill
+```
+
+The same script is used by the release flow to produce the artifact attached to each tag.
+
 ## Monorepo
 
 | Package                                          | Description                                                                                     |

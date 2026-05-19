@@ -31,6 +31,15 @@ duplicate. `eslint-plugin` predates this hoist and still keeps its own
 `countClasses` / `normalizeClasses` helpers — fine, but new shared logic
 goes in `core/formatting`.
 
+A Claude Code skill lives at `.claude/skills/styled-cva/` — committed and
+versioned with the library. It loads automatically when working in this
+repo. To publish an updated artifact for downstream users, run
+`bun run skill:build`; the resulting `dist/skill/styled-cva.skill` can be
+distributed via Claude Code plugin marketplaces or attached to GitHub
+releases. Keep SKILL.md in sync when consumer-facing API changes — that
+includes the intrinsic CVA shorthand surface, plugin recipes, and Preact
+compat instructions.
+
 ## Commands
 
 From repo root:

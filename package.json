@@ -21,6 +21,8 @@
     "release:solid": "bun run build && bun publish --cwd packages/solid",
     "release:vue": "bun run build && bun publish --cwd packages/vue",
     "release:eslint-plugin": "bun run build && bun publish --cwd packages/eslint-plugin",
+    "release:prettier-plugin": "bun run build && bun publish --cwd packages/prettier-plugin",
+    "release:biome-plugin": "bun publish --cwd packages/biome-plugin",
     "bump:patch": "bun run scripts/bump-patch.ts",
     "changeset": "changeset",
     "version": "changeset version",

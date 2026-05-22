@@ -140,11 +140,10 @@ const StyledButton = tw(MyButton)`text-red-500`;
 
 ## VSCode IntelliSense
 
-For Tailwind CSS extension support, add this to your VSCode [settings.json](/.vscode/settings.json):
+Install the [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) extension and add this to your workspace `.vscode/settings.json`:
 
 ```json
 {
-  // tailwindcss intellisense settings
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
     "typescript": "javascript",
@@ -152,9 +151,13 @@ For Tailwind CSS extension support, add this to your VSCode [settings.json](/.vs
   },
   "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)",
-    "tw\\.[^`]+`([^`]*)`",
-    "tw\\(.*?\\).*?`([^`]*)",
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    "tw\\.\\w+`([^`]*)`",
+    "tw\\([^)]*\\)`([^`]*)`",
+    ["tw\\.\\w+\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\.\\w+\\.cva\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\([^)]+\\)\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cva\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cn\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]
   ],
   "editor.quickSuggestions": {
     "strings": true
@@ -163,8 +166,10 @@ For Tailwind CSS extension support, add this to your VSCode [settings.json](/.vs
 ```
 
 <Callout type="info" emoji="💡">
-  These settings enable Tailwind CSS IntelliSense for styled-cva template
-  literals and CVA variant definitions.
+  Tuple patterns (the `["…", "…"]` entries) need a **capturing group** around the
+  full call arguments — `([^;]*)` — so IntelliSense sees the base string and every
+  variant value inside `tw.span("base", { variants })`. Matching only `tw.span(`
+  will not work. Reload the window after editing settings.
 </Callout>
 
 ## Preact

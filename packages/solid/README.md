@@ -196,25 +196,29 @@ const StyledButton = tw(Button)`text-red-500`;
 
 ## VSCode intellisense
 
-For tailwindcss extension support, add this to your vscode [settings.json](/.vscode/settings.json)
+For Tailwind CSS IntelliSense, add to `.vscode/settings.json` (same patterns as React — see `@styled-cva/react` README or the getting-started docs):
 
 ```json
-  // tailwindcss intelisense settings
+{
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
     "typescript": "javascript",
     "typescriptreact": "javascript"
   },
-   "tailwindCSS.experimental.classRegex": [
+  "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)",
-    "tw\\.[^`]+`([^`]*)`",
-    "tw\\(.*?\\).*?`([^`]*)",
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    "tw\\.\\w+`([^`]*)`",
+    "tw\\([^)]*\\)`([^`]*)`",
+    ["tw\\.\\w+\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\.\\w+\\.cva\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\([^)]+\\)\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cva\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cn\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]
   ],
   "editor.quickSuggestions": {
     "strings": true
-  },
+  }
+}
 ```
 
 ## Contributing

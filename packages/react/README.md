@@ -205,28 +205,34 @@ const StyledButton = tw(MyButton)`text-red-500`;
 <StyledButton />;
 ```
 
-## VSCode intellisense
+## VSCode IntelliSense
 
-For tailwindcss extension support, add this to your vscode [settings.json](/.vscode/settings.json)
+Install the [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) extension and add to `.vscode/settings.json`:
 
 ```json
-  // tailwindcss intelisense settings
+{
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
-    "typescript": "javascript", // if you are using typescript
-    "typescriptreact": "javascript" // if you are using typescript with react
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
   },
-   "tailwindCSS.experimental.classRegex": [
-    "tw`([^`]*)", // tw`...`
-    "tw\\.[^`]+`([^`]*)`", // tw.xxx<xxx>`...`
-    "tw\\(.*?\\).*?`([^`]*)", // tw(Component)<xxx>`...`
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  "tailwindCSS.experimental.classRegex": [
+    "tw`([^`]*)",
+    "tw\\.\\w+`([^`]*)`",
+    "tw\\([^)]*\\)`([^`]*)`",
+    ["tw\\.\\w+\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\.\\w+\\.cva\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\([^)]+\\)\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cva\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cn\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]
   ],
   "editor.quickSuggestions": {
-    "strings": true // forces VS Code to trigger completions when editing "string" content
-  },
+    "strings": true
+  }
+}
 ```
+
+Covers tagged templates (`tw.div\`…\``), **0.7 shorthand** `tw.span("base", { variants })`, deprecated `tw.span.cva(…)`, `tw(Component)(…)`, standalone `cva()`, and `cn()`. Tuple patterns must use a capturing group `([^;]*)` for the full argument list (not just `tw.span(`). Reload the editor after saving.
 
 ## Contributing
 

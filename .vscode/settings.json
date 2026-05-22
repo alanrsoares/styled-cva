@@ -1,19 +1,22 @@
 {
-  // tailwindcss intelisense settings
+  // tailwindcss intellisense settings
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
-    "typescript": "javascript", // if you are using typescript
-    "typescriptreact": "javascript" // if you are using typescript with react
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
   },
   "tailwindCSS.experimental.classRegex": [
-    "tw`([^`]*)", // tw`...`
-    "tw\\.[^`]+`([^`]*)`", // tw.xxx<xxx>`...`
-    "tw\\(.*?\\).*?`([^`]*)", // tw(Component)<xxx>`...`
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    "tw`([^`]*)",
+    "tw\\.\\w+`([^`]*)`",
+    "tw\\([^)]*\\)`([^`]*)`",
+    ["tw\\.\\w+\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\.\\w+\\.cva\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\([^)]+\\)\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cva\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cn\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]
   ],
   "editor.quickSuggestions": {
-    "strings": true // forces VS Code to trigger completions when editing "string" content
+    "strings": true
   },
   // prettier settings
   "[json]": {

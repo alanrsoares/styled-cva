@@ -201,16 +201,21 @@ Three first-party plugins ship in the same monorepo. They are independent — in
 
 ## VSCode Tailwind IntelliSense
 
-Add to `.vscode/settings.json` to get class autocomplete inside `tw\`…\``, `tw.div\`…\``, `tw(Component)\`…\``, and `.cva(…)`:
+Add to `.vscode/settings.json` for autocomplete inside tagged templates, `tw.tag(base, { variants })`, standalone `cva()`, and `cn()`. Full patterns and caveats: [references/vscode-tailwind-intellisense.md](references/vscode-tailwind-intellisense.md).
 
 ```json
 {
   "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)",
-    "tw\\.[^`]+`([^`]*)`",
-    "tw\\(.*?\\).*?`([^`]*)",
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
-  ]
+    "tw\\.\\w+`([^`]*)`",
+    "tw\\([^)]*\\)`([^`]*)`",
+    ["tw\\.\\w+\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\.\\w+\\.cva\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["tw\\([^)]+\\)\\s*\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cva\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+    ["cn\\(([^;]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]
+  ],
+  "editor.quickSuggestions": { "strings": true }
 }
 ```
 

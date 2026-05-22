@@ -90,3 +90,7 @@ If your project uses both Prettier and Biome:
 - `@styled-cva/prettier-plugin` rewrites, `@styled-cva/biome-plugin` flags any remaining drift
 
 The pair gives you autofix in editors + a CI-safe gate that doesn't depend on a Prettier run having happened.
+
+## VSCode Tailwind IntelliSense
+
+See [vscode-tailwind-intellisense.md](./vscode-tailwind-intellisense.md) for the full `tailwindCSS.experimental.classRegex` block (tagged templates, `tw.tag(base, { variants })`, `cva()`, `cn()`). The container regex **must** use a capturing group such as `([^;]*)` around the full argument list — matching only `tw.span(` will not surface variant strings.

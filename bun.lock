@@ -159,11 +159,7 @@
       },
       "peerDependencies": {
         "prettier": "^3",
-        "prettier-plugin-tailwindcss": "*",
       },
-      "optionalPeers": [
-        "prettier-plugin-tailwindcss",
-      ],
     },
     "packages/react": {
       "name": "@styled-cva/react",

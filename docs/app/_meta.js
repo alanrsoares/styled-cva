@@ -1,6 +1,7 @@
 export default {
   index: "Introduction",
   "getting-started": "Getting Started",
+  rescript: "ReScript",
   examples: "Examples",
   testing: "Testing",
   api: "API Reference",

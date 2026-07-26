@@ -1,7 +1,7 @@
 {
   "name": "@styled-cva/rescript",
   "description": "ReScript v12 bindings for @styled-cva/react",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "publishConfig": {
     "access": "public"
   },
@@ -22,7 +22,8 @@
   },
   "files": [
     "rescript.json",
-    "src/**/*.res"
+    "src/**/*.res",
+    "!src/*Spec.res"
   ],
   "dependencies": {
     "@styled-cva/react": "workspace:*"

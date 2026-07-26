@@ -1,24 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { render, screen, waitFor } from "@testing-library/vue";
 import userEvent from "@testing-library/user-event";
-import { defineComponent, h, ref, type DefineComponent } from "vue";
+import { render, screen, waitFor } from "@testing-library/vue";
 import { expectType, type TypeEqual } from "ts-expect";
 import { vi } from "vitest";
+import { defineComponent, h, ref, type DefineComponent } from "vue";
 
-import { createStyledCVA } from "./styled-cva";
 import { isTaggedTemplateArg } from "../../index";
+import { createStyledCVA } from "./styled-cva";
 
 const tw = createStyledCVA();
 
 // Helper to get component props type
-type ComponentProps<T extends DefineComponent<any>> = T extends DefineComponent<infer P>
-  ? P
-  : never;
+type ComponentProps<T extends DefineComponent<any>> =
+  T extends DefineComponent<infer P> ? P : never;
 
 describe("styled-cva", () => {
   it("re-exports isTaggedTemplateArg from the package entry", () => {
-    const tag = ((strings: TemplateStringsArray) => strings) `x`;
+    const tag = ((strings: TemplateStringsArray) => strings)`x`;
     expect(isTaggedTemplateArg(tag)).toBe(true);
     expect(isTaggedTemplateArg("x")).toBe(false);
   });
@@ -886,10 +885,8 @@ describe("styled-cva", () => {
             return () =>
               h("div", [
                 h(Input, { $hasError: error.value, placeholder: "Email" }),
-                h(
-                  SubmitButton,
-                  { $isLoading: isLoading.value },
-                  () => (isLoading.value ? "Submitting..." : "Submit"),
+                h(SubmitButton, { $isLoading: isLoading.value }, () =>
+                  isLoading.value ? "Submitting..." : "Submit",
                 ),
                 h(
                   "button",
@@ -961,8 +958,7 @@ describe("styled-cva", () => {
                   $isHovered: isHovered.value,
                   $isDisabled: isDisabled.value,
                   onClick: () =>
-                    !isDisabled.value &&
-                    (isSelected.value = !isSelected.value),
+                    !isDisabled.value && (isSelected.value = !isSelected.value),
                   onMouseenter: () =>
                     !isDisabled.value && (isHovered.value = true),
                   onMouseleave: () => (isHovered.value = false),

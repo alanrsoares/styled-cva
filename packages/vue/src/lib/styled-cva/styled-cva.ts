@@ -42,7 +42,9 @@ const templateFunctionFactory: TailwindInterface = (<
     ...templateElements: ((props: any) => string | undefined | null)[]
   ) => {
     const TwComponentConstructor = (
-      styleArray: (Record<string, any> | ((p: any) => Record<string, any>))[] = [],
+      styleArray: (
+        Record<string, any> | ((p: any) => Record<string, any>)
+      )[] = [],
     ) => {
       const TwComponent = defineComponent({
         name:
@@ -64,15 +66,15 @@ const templateFunctionFactory: TailwindInterface = (<
           const withStyles = computed<Record<string, any>>(() =>
             styleArray
               ? styleArray.reduce<Record<string, any>>(
-                (acc, intStyle) =>
-                  Object.assign(
-                    acc,
-                    typeof intStyle === "function"
-                      ? intStyle(attrs)
-                      : intStyle,
-                  ),
-                {},
-              )
+                  (acc, intStyle) =>
+                    Object.assign(
+                      acc,
+                      typeof intStyle === "function"
+                        ? intStyle(attrs)
+                        : intStyle,
+                    ),
+                  {},
+                )
               : {},
           );
 
@@ -165,9 +167,9 @@ type StyledExtension = {
 
 // Type for valid withProps input: element props + data-* attributes + variant props
 type ValidElementProps<K extends ElementKey> = {
-  [P in keyof JSX.IntrinsicElements[K] as P extends `$${string}`
-    ? never
-    : P]?: JSX.IntrinsicElements[K][P];
+  [
+    P in keyof JSX.IntrinsicElements[K] as P extends `$${string}` ? never : P
+  ]?: JSX.IntrinsicElements[K][P];
 };
 
 // ValidWithProps includes element props, data-* attributes, and variant props
@@ -210,7 +212,9 @@ type CVAWithPropsReturn<K extends ElementKey, T> = DefineComponent<
       [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
     },
   ) => DefineComponent<
-    JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
+    JSX.IntrinsicElements[K] &
+      VariantProps<ReturnType<CVA<T>>> &
+      StyledExtension
   >;
 };
 

@@ -7,7 +7,7 @@ Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo.
 ## What it does
 
 1. **Normalizes whitespace.** Collapses runs of whitespace inside recognized class strings to a single space.
-2. **Rewrites long inline tagged templates to multi-line.** When `tw.tag\`…\`` (or `tw(Component)\`…\``) would overflow `printWidth`, the plugin wraps the class list across multiple indented lines.
+2. **Rewrites long inline tagged templates to multi-line.** When `tw.tag\`…\``(or`tw(Component)\`…\``) would overflow `printWidth`, the plugin wraps the class list across multiple indented lines.
 
 For Tailwind-aware class ordering, pair this plugin with [`prettier-plugin-tailwindcss`](https://github.com/tailwindlabs/prettier-plugin-tailwindcss). Load it **after** this plugin in your Prettier config.
 
@@ -79,10 +79,7 @@ In `.prettierrc` / `prettier.config.js`:
 
 ```json
 {
-  "plugins": [
-    "@styled-cva/prettier-plugin",
-    "prettier-plugin-tailwindcss"
-  ]
+  "plugins": ["@styled-cva/prettier-plugin", "prettier-plugin-tailwindcss"]
 }
 ```
 

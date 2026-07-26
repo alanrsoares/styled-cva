@@ -189,11 +189,9 @@ const rule: Rule.RuleModule = {
 
             const attrIndex = openingElement.attributes.indexOf(attr as never);
             const prevAttr = openingElement.attributes[attrIndex - 1] as
-              | ASTNode
-              | undefined;
+              ASTNode | undefined;
             const nextAttr = openingElement.attributes[attrIndex + 1] as
-              | ASTNode
-              | undefined;
+              ASTNode | undefined;
 
             if (attrIndex > 0 && prevAttr?.range && attr.range) {
               fixes.push(fixer.removeRange([prevAttr.range[1], attr.range[1]]));

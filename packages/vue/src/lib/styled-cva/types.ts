@@ -23,15 +23,10 @@ export type IsTwElement = { [isTwElement]: true };
 
 export type FlattenInterpolation<P> = ReadonlyArray<Interpolation<P>>;
 export type InterpolationValue =
-  | string
-  | number
-  | FalseyValue
-  | TailwindComponentInterpolation;
+  string | number | FalseyValue | TailwindComponentInterpolation;
 
 export type Interpolation<P> =
-  | InterpolationValue
-  | InterpolationFunction<P>
-  | FlattenInterpolation<P>;
+  InterpolationValue | InterpolationFunction<P> | FlattenInterpolation<P>;
 
 export type InterpolationFunction<P> = (props: P) => Interpolation<P>;
 
@@ -50,11 +45,9 @@ type IsAny<T, True, False = never> = True | False extends (
   : False;
 
 export type RemoveIndex<T> = {
-  [K in keyof T as string extends K
-    ? never
-    : number extends K
-      ? never
-      : K]: T[K];
+  [
+    K in keyof T as string extends K ? never : number extends K ? never : K
+  ]: T[K];
 };
 
 /**
@@ -181,8 +174,7 @@ export type IntrinsicElementsTemplateFunctionsMap = {
   [RTag in ElementKey]: TemplateFunction<JSX.IntrinsicElements[RTag]>;
 };
 
-export interface TailwindInterface
-  extends IntrinsicElementsTemplateFunctionsMap {
+export interface TailwindInterface extends IntrinsicElementsTemplateFunctionsMap {
   /**
    * A factory function that creates a styled component from a wrapped component
    * @example

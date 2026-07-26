@@ -1,6 +1,6 @@
-import { describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
+import { describe, expect, test } from "bun:test";
 
 const PKG_DIR = resolve(import.meta.dirname, "..");
 
@@ -12,7 +12,7 @@ function runBiome(target: string) {
   );
   return {
     stdout: stdout ?? "",
-    exitCode: status ?? -1
+    exitCode: status ?? -1,
   };
 }
 

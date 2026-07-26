@@ -143,9 +143,9 @@ type StyledExtension = {
 // Type for valid withProps input: element props + data-* attributes + variant props
 // This type uses a mapped type to only allow valid keys
 type ValidElementProps<K extends ElementKey> = {
-  [P in keyof JSX.IntrinsicElements[K] as P extends `$${string}`
-    ? never
-    : P]?: JSX.IntrinsicElements[K][P];
+  [
+    P in keyof JSX.IntrinsicElements[K] as P extends `$${string}` ? never : P
+  ]?: JSX.IntrinsicElements[K][P];
 };
 
 // ValidWithProps includes element props, data attributes, and variant props

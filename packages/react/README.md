@@ -168,8 +168,8 @@ const Button = tw.button.cva("font-bold py-2 px-4 rounded", {
 When `$as` is a custom React component (TanStack Router `Link`, Next.js `Link`, etc.) and you want a typed wrapper, compose the props with `PolymorphicComponentProps`. It automatically picks up every `$`-prefixed variant on the source component.
 
 ```tsx
-import Link, { type LinkProps } from "next/link";
 import tw, { type PolymorphicComponentProps } from "@styled-cva/react";
+import Link, { type LinkProps } from "next/link";
 
 const Button = tw.button.cva("btn", {
   variants: {
@@ -232,7 +232,7 @@ Install the [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/ite
 }
 ```
 
-Covers tagged templates (`tw.div\`…\``), **0.7 shorthand** `tw.span("base", { variants })`, deprecated `tw.span.cva(…)`, `tw(Component)(…)`, standalone `cva()`, and `cn()`. Tuple patterns must use a capturing group `([^;]*)` for the full argument list (not just `tw.span(`). Reload the editor after saving.
+Covers tagged templates (`tw.div\`…\``), **0.7 shorthand** `tw.span("base", { variants })`, deprecated `tw.span.cva(…)`, `tw(Component)(…)`, standalone `cva()`, and `cn()`. Tuple patterns must use a capturing group `([^;]*)`for the full argument list (not just`tw.span(`). Reload the editor after saving.
 
 ## Contributing
 

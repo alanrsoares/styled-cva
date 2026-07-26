@@ -11,15 +11,10 @@ export type IsTwElement = { [isTwElement]: true };
 
 export type FlattenInterpolation<P> = ReadonlyArray<Interpolation<P>>;
 export type InterpolationValue =
-  | string
-  | number
-  | FalseyValue
-  | TailwindComponentInterpolation;
+  string | number | FalseyValue | TailwindComponentInterpolation;
 
 export type Interpolation<P> =
-  | InterpolationValue
-  | InterpolationFunction<P>
-  | FlattenInterpolation<P>;
+  InterpolationValue | InterpolationFunction<P> | FlattenInterpolation<P>;
 
 export type InterpolationFunction<P> = (props: P) => Interpolation<P>;
 
@@ -37,11 +32,9 @@ type IsAny<T, True, False = never> = True | False extends (
   : False;
 
 export type RemoveIndex<T> = {
-  [K in keyof T as string extends K
-  ? never
-  : number extends K
-  ? never
-  : K]: T[K];
+  [
+    K in keyof T as string extends K ? never : number extends K ? never : K
+  ]: T[K];
 };
 
 /**
@@ -70,10 +63,10 @@ type TailwindComponentPropsWith$As<
   O extends object,
   $As extends string | React.ComponentType<any> = React.ComponentType<P>,
   P2 extends {} = $As extends AnyTailwindComponent
-  ? TailwindComponentAllInnerProps<$As>
-  : $As extends IntrinsicElementsKeys | React.ComponentType<any>
-  ? React.ComponentPropsWithRef<$As>
-  : never,
+    ? TailwindComponentAllInnerProps<$As>
+    : $As extends IntrinsicElementsKeys | React.ComponentType<any>
+      ? React.ComponentPropsWithRef<$As>
+      : never,
 > = P & O & TailwindPropHelper<P2> & { $as?: $As };
 
 /**
@@ -205,12 +198,12 @@ export interface TailwindInterface extends IntrinsicElementsTemplateFunctionsMap
   ): TemplateFunction<
     // Prevent functional components without props infering props as `unknown`
     C extends (P?: never) => any
-    ? {}
-    : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
-    ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
-      className?: string;
-    }
-    : React.ComponentPropsWithoutRef<C>
+      ? {}
+      : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
+        ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
+            className?: string;
+          }
+        : React.ComponentPropsWithoutRef<C>
   >;
   /**
    * @example

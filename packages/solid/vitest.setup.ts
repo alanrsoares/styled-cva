@@ -8,8 +8,7 @@ import { expect } from "vitest";
 declare global {
   namespace Vi {
     interface JestAssertion<T = unknown>
-      extends jest.Matchers<void, T>,
-        TestingLibraryMatchers<T, void> {}
+      extends jest.Matchers<void, T>, TestingLibraryMatchers<T, void> {}
   }
 }
 

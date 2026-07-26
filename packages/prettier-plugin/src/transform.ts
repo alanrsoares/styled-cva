@@ -1,8 +1,8 @@
 import {
-  type FormatOptions,
   formatClassQuasi,
   getIndentBefore,
   normalizeClasses,
+  type FormatOptions,
 } from "./utils.js";
 
 interface AnyNode {

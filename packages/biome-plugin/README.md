@@ -1,6 +1,6 @@
 # @styled-cva/biome-plugin
 
-Biome GritQL plugin for [@styled-cva/react](https://www.npmjs.com/package/@styled-cva/react). Provides **lint diagnostics** for `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates that have abnormal whitespace or are too long on a single line.
+Biome GritQL plugin for [@styled-cva/react](https://www.npmjs.com/package/@styled-cva/react). Provides **lint diagnostics** for `tw.tag\`…\``/`tw(Component)\`…\`` tagged templates that have abnormal whitespace or are too long on a single line.
 
 Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo.
 
@@ -17,17 +17,17 @@ A migration to a code-modifying Biome plugin will become possible once Biome's J
 
 ### `normalize-tw-classes`
 
-Flags inline `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates whose class string contains:
+Flags inline `tw.tag\`…\``/`tw(Component)\`…\`` tagged templates whose class string contains:
 
 - a run of 2+ horizontal whitespace characters
 - leading horizontal whitespace
 - trailing horizontal whitespace
 
-Multi-line templates (whose chunk contains a `\n`) are **exempt** so that prettier-formatted multi-line `tw.div\`\n  flex\n\`` does not trigger the rule.
+Multi-line templates (whose chunk contains a `\n`) are **exempt** so that prettier-formatted multi-line `tw.div\`\n flex\n\`` does not trigger the rule.
 
 ### `multiline-long-tw`
 
-Flags inline `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates whose quasi text exceeds 80 characters on a single line. Multi-line templates are exempt.
+Flags inline `tw.tag\`…\``/`tw(Component)\`…\`` tagged templates whose quasi text exceeds 80 characters on a single line. Multi-line templates are exempt.
 
 ## Installation
 

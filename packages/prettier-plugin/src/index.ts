@@ -51,7 +51,10 @@ const wrapParser = (
 const plugin: Plugin = {
   parsers: {
     babel: wrapParser(prettierParserBabel.parsers.babel!, "babel"),
-    "babel-ts": wrapParser(prettierParserBabel.parsers["babel-ts"]!, "babel-ts"),
+    "babel-ts": wrapParser(
+      prettierParserBabel.parsers["babel-ts"]!,
+      "babel-ts",
+    ),
     typescript: wrapParser(
       prettierParserTypescript.parsers.typescript!,
       "babel-ts",

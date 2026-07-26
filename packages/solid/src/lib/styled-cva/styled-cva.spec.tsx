@@ -6,8 +6,8 @@ import { createSignal, type Component } from "solid-js";
 import { expectType, type TypeEqual } from "ts-expect";
 import { vi } from "vitest";
 
-import { createStyledCVA } from "./styled-cva";
 import { isTaggedTemplateArg } from "../../index";
+import { createStyledCVA } from "./styled-cva";
 
 const tw = createStyledCVA();
 
@@ -17,7 +17,7 @@ type ComponentProps<T extends Component<any>> =
 
 describe("styled-cva", () => {
   it("re-exports isTaggedTemplateArg from the package entry", () => {
-    const tag = ((strings: TemplateStringsArray) => strings) `x`;
+    const tag = ((strings: TemplateStringsArray) => strings)`x`;
     expect(isTaggedTemplateArg(tag)).toBe(true);
     expect(isTaggedTemplateArg("x")).toBe(false);
   });

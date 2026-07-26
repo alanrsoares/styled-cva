@@ -1,0 +1,37 @@
+{
+  "name": "@styled-cva/rescript",
+  "description": "ReScript v12 bindings for @styled-cva/react",
+  "version": "0.7.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Unlicense",
+  "keywords": [
+    "styled-components",
+    "class-variance-authority",
+    "rescript",
+    "react",
+    "tailwindcss",
+    "variants"
+  ],
+  "scripts": {
+    "build": "bun run scripts/generate.ts && rescript build",
+    "clean": "rescript clean",
+    "test": "rescript build && bun test ./src/StyledCvaSpec.res.js"
+  },
+  "files": [
+    "rescript.json",
+    "src/**/*.res"
+  ],
+  "dependencies": {
+    "@styled-cva/react": "workspace:*"
+  },
+  "peerDependencies": {
+    "@rescript/react": "^0.15.0",
+    "rescript": "^12.0.0-alpha.9"
+  },
+  "devDependencies": {
+    "@rescript/react": "^0.15.0",
+    "rescript": "^12.0.0-alpha.9"
+  }
+}

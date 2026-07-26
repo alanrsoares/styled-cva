@@ -1,16 +1,17 @@
 ---
 name: styled-cva
-description: Type-safe styled components with CVA variants for React, Solid, and Vue. Use when authoring components with Tailwind CSS, implementing variant-based styling, using `tw` template literals or the intrinsic CVA shorthand (`tw.tag(base, config)`), refactoring `className`/`cn()` logic into named components, or configuring the companion lint/format tooling. Triggers on `@styled-cva/react`, `@styled-cva/solid`, `@styled-cva/vue`, `@styled-cva/eslint-plugin`, `@styled-cva/prettier-plugin`, `@styled-cva/biome-plugin`, `tw.div`, `tw.button`, `tw(Component)`, `.cva(`, `.withProps(`, `$variant`, `$size`, `$as` props, `PolymorphicComponentProps`, and `VariantProps`. Also applies under Preact via the `preact/compat` alias.
+description: Type-safe styled components with CVA variants for React, Solid, Vue, and ReScript. Use when authoring components with Tailwind CSS, implementing variant-based styling, using `tw` template literals or the intrinsic CVA shorthand (`tw.tag(base, config)`), refactoring `className`/`cn()` logic into named components, or configuring the companion lint/format tooling. Triggers on `@styled-cva/react`, `@styled-cva/solid`, `@styled-cva/vue`, `@styled-cva/rescript`, `@styled-cva/eslint-plugin`, `@styled-cva/prettier-plugin`, `@styled-cva/biome-plugin`, `tw.div`, `tw.button`, `tw(Component)`, `.cva(`, `.withProps(`, `$variant`, `$size`, `$as` props, `PolymorphicComponentProps`, and `VariantProps`. Also applies under Preact via the `preact/compat` alias.
 ---
 
 # styled-cva
 
-A TypeScript-first library combining class-variance-authority (CVA) with a styled-components-like API. Same surface across React, Solid, and Vue.
+A TypeScript-first library combining class-variance-authority (CVA) with a styled-components-like API. Same surface across React, Solid, Vue, and ReScript.
 
 Adapters and current major:
 - **React** — `@styled-cva/react` (React 19+; for React 18 use 0.3.x)
 - **Solid** — `@styled-cva/solid`
 - **Vue** — `@styled-cva/vue`
+- **ReScript** — `@styled-cva/rescript` (ReScript v12+)
 - **Preact** — use `@styled-cva/react` with the `preact/compat` bundler alias. See [references/preact.md](references/preact.md).
 
 Everything below uses the React import path; the API and triggers are identical across all adapters unless called out.
@@ -241,7 +242,7 @@ Solid uses `@solidjs/testing-library`; Vue uses `@vue/test-utils`. Variant asser
 
 ## Cross-framework gotchas
 
-- **Solid / Vue** — same `tw` API surface; the `$as` prop and `.withProps()` chaining behave identically. Vue templates use `:class` rather than `className` inside SFCs, but inside `<script setup>` you still write `tw.div(…)` calls the same way.
+- **Solid / Vue / ReScript** — same `tw` API surface; the `$as` prop and `.withProps()` chaining behave identically. Vue templates use `:class` rather than `className` inside SFCs, but inside `<script setup>` you still write `tw.div(…)` calls the same way.
 - **Don't replace `{}` with `Record<string, …>` in this codebase's types** — it widens variant unions to `string`. If you contribute to the styled-cva monorepo, read `AGENTS.md` first.
 
 ## Resources

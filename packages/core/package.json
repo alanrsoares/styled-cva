@@ -27,6 +27,7 @@
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist",
+    "lint": "tsc --noEmit",
     "test": "bun test",
     "compile": "tsc --noEmit"
   },

@@ -26,11 +26,11 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Lint Codebase
-        run: bun run lint
-
       - name: Build All Monorepo Packages
         run: bun run build
+
+      - name: Lint Codebase
+        run: bun run lint
 
       - name: Run Test Suites
         run: bun run test

@@ -1,0 +1,14 @@
+pre-commit:
+  parallel: true
+  commands:
+    build:
+      run: bun run build
+    lint:
+      run: bun run lint
+    test:
+      run: bun run test
+
+commit-msg:
+  commands:
+    commitlint:
+      run: bunx commitlint --edit {1}

@@ -1,7 +1,7 @@
 {
   "name": "@styled-cva/rescript",
   "description": "ReScript v12 bindings for @styled-cva/react",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "publishConfig": {
     "access": "public"
   },
@@ -30,10 +30,12 @@
   },
   "peerDependencies": {
     "@rescript/react": "^0.15.0",
+    "react": "^^19.0.0",
     "rescript": "^^12.0.0-alpha.9"
   },
   "devDependencies": {
     "@rescript/react": "^0.15.0",
+    "react": "^19.2.8",
     "rescript": "^12.0.0-alpha.9"
   }
 }

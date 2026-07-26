@@ -125,4 +125,42 @@ describe("@styled-cva/rescript Package Spec", () => {
       expect(Tw.h2)->toBeDefined
     })
   })
+
+  describe("JSX usage", () => {
+    module Card = {
+      let make = Tw.div("rounded-md p-4 shadow-xs")
+    }
+
+    module Link = {
+      let make = Tw.a("underline")
+    }
+
+    module Badge = {
+      type props = {...styledProps, @as("$tone") tone?: string}
+
+      let make: React.component<props> = Tw.spanWithConfig(
+        "badge-base",
+        {
+          "variants": {
+            "$tone": {
+              "brand": "bg-brand",
+              "muted": "bg-muted",
+            },
+          },
+        },
+      )
+    }
+
+    test("factory results are usable directly as JSX components", () => {
+      let element =
+        <Card className="mt-2" id="card">
+          <Link href="https://rescript-lang.org" target="_blank" rel="noopener noreferrer">
+            {React.string("ReScript")}
+          </Link>
+          <Badge tone="muted"> {React.string("new")} </Badge>
+        </Card>
+
+      expect(element)->toBeDefined
+    })
+  })
 })

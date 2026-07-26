@@ -1,5 +1,11 @@
 # @styled-cva/rescript
 
+## 0.8.1
+
+### Patch Changes
+
+- improve component authoring in res
+
 ## 0.8.0
 
 ### Minor Changes

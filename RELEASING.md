@@ -1,6 +1,6 @@
 # Releasing
 
-These packages are published to npm: **@styled-cva/core**, **@styled-cva/react**, **@styled-cva/solid**, **@styled-cva/vue**, **@styled-cva/eslint-plugin**, **@styled-cva/prettier-plugin**, and **@styled-cva/biome-plugin**. **@styled-cva/docs** is private. This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and changelogs.
+These packages are published to npm: **@styled-cva/core**, **@styled-cva/react**, **@styled-cva/solid**, **@styled-cva/vue**, **@styled-cva/rescript**, **@styled-cva/eslint-plugin**, **@styled-cva/prettier-plugin**, and **@styled-cva/biome-plugin**. **@styled-cva/docs** is private. This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and changelogs.
 
 ## One-time setup
 
@@ -59,6 +59,12 @@ To bump and publish a single package without using changesets:
 ```bash
 bun run bump:patch -- "@styled-cva/react"
 bun run release:react
+# or
+bun run release:solid
+# or
+bun run release:vue
+# or
+bun run release:rescript
 # or
 bun run bump:patch -- "@styled-cva/eslint-plugin"
 bun run release:eslint-plugin

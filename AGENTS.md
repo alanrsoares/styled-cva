@@ -14,6 +14,7 @@ Bun workspace. Each package is independently published except where noted.
 | `packages/react`           | `@styled-cva/react`           | Primary published package               |
 | `packages/solid`           | `@styled-cva/solid`           | Solid port                              |
 | `packages/vue`             | `@styled-cva/vue`             | Vue port                                |
+| `packages/rescript`        | `@styled-cva/rescript`        | ReScript v12 bindings                   |
 | `packages/eslint-plugin`   | `@styled-cva/eslint-plugin`   | Rule that extracts classes to `tw…`     |
 | `packages/prettier-plugin` | `@styled-cva/prettier-plugin` | Prettier preprocess that normalizes / multilines `tw\`…\`` and `cva()` strings |
 | `packages/biome-plugin`    | `@styled-cva/biome-plugin`    | Biome GritQL diagnostics for `tw\`…\`` (lint-only; no fix) |
@@ -160,7 +161,7 @@ bunx changeset tag     # create per-package @scope/pkg@version git tags
 git push && git push --tags
 ```
 
-`release:react`, `release:solid`, `release:vue`, `release:eslint-plugin`,
+`release:react`, `release:solid`, `release:vue`, `release:rescript`, `release:eslint-plugin`,
 `release:prettier-plugin`, `release:biome-plugin`
 are also available for single-package publishes (manual flow).
 

@@ -17,6 +17,7 @@
   "scripts": {
     "build": "bun run scripts/generate.ts && rescript build",
     "clean": "rescript clean",
+    "lint": "rescript build",
     "test": "rescript build && bun test ./src/StyledCvaSpec.res.js"
   },
   "files": [

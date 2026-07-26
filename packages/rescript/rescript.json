@@ -1,0 +1,19 @@
+{
+  "name": "@styled-cva/rescript",
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    }
+  ],
+  "package-specs": {
+    "module": "esmodule"
+  },
+  "suffix": ".res.js",
+  "jsx": {
+    "version": 4
+  },
+  "dependencies": [
+    "@rescript/react"
+  ]
+}

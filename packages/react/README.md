@@ -189,20 +189,36 @@ export const ButtonLink = (props: ButtonLinkProps) => (
 
 ### Styling Custom Components
 
-Create a styled component from a custom component that accepts a `className` prop.
+Create a styled component from a custom component that accepts a `className` prop. You can use template literals or declare CVA variants directly:
 
 ```tsx
 import tw from "@styled-cva/react";
 
-const MyButton = ({ className }: { className: string }) => {
-  return <button className={className}>Hello</button>;
+const MyButton = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+}) => {
+  return <button className={className}>{children}</button>;
 };
 
+// Tagged template syntax
 const StyledButton = tw(MyButton)`text-red-500`;
 
-// ...
-
-<StyledButton />;
+// Or with CVA variants (transient $-props are stripped before forwarding)
+const VariantButton = tw(MyButton)("px-4 py-2 rounded", {
+  variants: {
+    $variant: {
+      primary: "bg-blue-500 text-white",
+      secondary: "bg-gray-500 text-white",
+    },
+  },
+  defaultVariants: {
+    $variant: "primary",
+  },
+});
 ```
 
 ## VSCode IntelliSense

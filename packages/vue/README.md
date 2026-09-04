@@ -165,24 +165,39 @@ const Button = tw.button.cva("font-bold py-2 px-4 rounded", {
 
 ### Styling Custom Components
 
-Create a styled component from a custom component that accepts a `class` prop.
+Create a styled component from a custom component that accepts a `class` prop. You can use template literals or declare CVA variants directly:
 
 ```vue
 <script setup lang="ts">
 import tw from "@styled-cva/vue";
+import { defineComponent, h } from "vue";
 
 const MyButton = defineComponent({
   props: { class: { type: String, default: "" } },
-  setup(props) {
-    return () => h("button", { class: props.class }, "Hello");
+  setup(props, { slots }) {
+    return () => h("button", { class: props.class }, slots.default?.());
   },
 });
 
+// Tagged template syntax
 const StyledButton = tw(MyButton)`text-red-500`;
+
+// Or with CVA variants (transient $-props are stripped before forwarding)
+const VariantButton = tw(MyButton)("px-4 py-2 rounded", {
+  variants: {
+    $variant: {
+      primary: "bg-blue-500 text-white",
+      secondary: "bg-gray-500 text-white",
+    },
+  },
+  defaultVariants: {
+    $variant: "primary",
+  },
+});
 </script>
 
 <template>
-  <StyledButton />
+  <VariantButton :$variant="'primary'">Click Me</VariantButton>
 </template>
 ```
 

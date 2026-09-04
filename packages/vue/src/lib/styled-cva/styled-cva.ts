@@ -25,9 +25,14 @@ import {
   isTwElement,
   type AnyTailwindComponent,
   type ElementKey,
-  type IntrinsicElementsTemplateFunctionsMap,
   type JSX,
+  type TailwindComponent,
+  type TailwindComponentAllInnerProps,
+  type TailwindComponentInnerOtherProps,
+  type TailwindComponentInnerProps,
   type TailwindInterface,
+  type TailwindPropHelper,
+  type TemplateFunction,
 } from "./types";
 
 const isTw = (c: any): c is AnyTailwindComponent => c?.[isTwElement] === true;
@@ -54,12 +59,12 @@ const templateFunctionFactory: TailwindInterface = (<
         inheritAttrs: false,
         setup(_, { slots, attrs }: SetupContext) {
           // Extract $as, class, and style from attrs (Vue doesn't like $ prefixed props)
-          const $as = computed(() => (attrs as any).$as ?? Element);
+          const $as = computed(() => (attrs as any).$as);
           const classAttr = computed(() => (attrs as any).class ?? "");
           const styleAttr = computed(() => (attrs as any).style);
 
           const FinalElement = computed(() =>
-            isTw(Element) ? Element : $as.value,
+            isTw(Element) ? Element : ($as.value ?? Element),
           );
 
           // Compute accumulated styles - reactive
@@ -81,9 +86,9 @@ const templateFunctionFactory: TailwindInterface = (<
           // Filter out transient props (starting with "$") and class/style unless styling another Tw component
           const filteredAttrs = computed(() => {
             const entries = Object.entries(attrs).filter(
-              ([key]) => key !== "class" && key !== "style",
+              ([key]) => key !== "class" && key !== "style" && key !== "$as",
             );
-            if (isTw(FinalElement.value) || typeof Element !== "string") {
+            if (isTw(FinalElement.value)) {
               return Object.fromEntries(entries);
             }
             return Object.fromEntries(entries.filter(removeTransientProps));
@@ -120,7 +125,7 @@ const templateFunctionFactory: TailwindInterface = (<
                 ...filteredAttrs.value,
                 style: mergedStyle.value,
                 class: computedClass.value,
-                ...(isTw(Element) ? { $as: $as.value } : {}),
+                ...(isTw(Element) && $as.value ? { $as: $as.value } : {}),
               },
               children,
             );
@@ -143,22 +148,6 @@ const templateFunctionFactory: TailwindInterface = (<
   };
 }) as any;
 
-const intrinsicElementsMap: IntrinsicElementsTemplateFunctionsMap =
-  domElements.reduce(
-    (acc, DomElement) => ({
-      ...acc,
-      [DomElement]: templateFunctionFactory(DomElement),
-    }),
-    {} as IntrinsicElementsTemplateFunctionsMap,
-  );
-
-const tw: TailwindInterface = Object.assign(
-  templateFunctionFactory,
-  intrinsicElementsMap,
-);
-
-export default tw;
-
 type CVA<T = unknown> = typeof cva<T>;
 
 type StyledExtension = {
@@ -166,19 +155,17 @@ type StyledExtension = {
 };
 
 // Type for valid withProps input: element props + data-* attributes + variant props
-type ValidElementProps<K extends ElementKey> = {
-  [
-    P in keyof JSX.IntrinsicElements[K] as P extends `$${string}` ? never : P
-  ]?: JSX.IntrinsicElements[K][P];
+type ValidElementProps<P> = {
+  [K in keyof P as K extends `$${string}` ? never : K]?: P[K];
 };
 
 // ValidWithProps includes element props, data-* attributes, and variant props
-type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
+type ValidWithProps<P, T> = ValidElementProps<P> & {
   [key: `data-${string}`]: string;
 } & Partial<VariantProps<ReturnType<CVA<T>>>>;
 
-type CVAWithPropsReturn<K extends ElementKey, T> = DefineComponent<
-  JSX.IntrinsicElements[K] & VariantProps<ReturnType<CVA<T>>> & StyledExtension
+export type ComponentCVAWithPropsReturn<P, T> = DefineComponent<
+  P & VariantProps<ReturnType<CVA<T>>> & StyledExtension
 > & {
   /**
    * Sets default props for the component. User-provided props will override these defaults.
@@ -207,26 +194,37 @@ type CVAWithPropsReturn<K extends ElementKey, T> = DefineComponent<
    * <StyledButton>Click me</StyledButton>
    * ```
    */
-  withProps: <DefaultProps extends ValidWithProps<K, T>>(
+  withProps: <DefaultProps extends ValidWithProps<P, T>>(
     defaultProps: DefaultProps & {
-      [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
+      [K in Exclude<keyof DefaultProps, keyof ValidWithProps<P, T>>]?: never;
     },
-  ) => DefineComponent<
-    JSX.IntrinsicElements[K] &
-      VariantProps<ReturnType<CVA<T>>> &
-      StyledExtension
-  >;
+  ) => DefineComponent<P & VariantProps<ReturnType<CVA<T>>> & StyledExtension>;
 };
 
-/** Intrinsic CVA: `tw.button(base, config)` — preferred over `.cva(base, config)`. */
+export type CVAWithPropsReturn<
+  K extends ElementKey,
+  T,
+> = ComponentCVAWithPropsReturn<JSX.IntrinsicElements[K], T>;
 
+export interface ComponentTemplateFunction<
+  in out P extends object,
+  in out O extends object = object,
+> extends TemplateFunction<P, O> {
+  <T>(
+    ...args: Parameters<CVA<T>>
+  ): ComponentCVAWithPropsReturn<TailwindPropHelper<P, O>, T>;
+  cva: <T>(
+    ...args: Parameters<CVA<T>>
+  ) => ComponentCVAWithPropsReturn<TailwindPropHelper<P, O>, T>;
+}
+
+/** Intrinsic CVA: `tw.button(base, config)` — preferred over `.cva(base, config)`. */
 type IntrinsicCVAShorthand<K extends ElementKey> = <T>(
   ...args: Parameters<CVA<T>>
 ) => CVAWithPropsReturn<K, T>;
 
-/** `TailwindInterface` + per-tag CVA (prefer shorthand; `.cva` deprecated). Indexed `StyledCVA["tag"]` unreliable — use `tw.tag`. */
-export type StyledCVA = TailwindInterface & {
-  [K in ElementKey]: {
+type StyledCVAElements = {
+  [K in ElementKey]: TailwindInterface[K] & {
     /**
      * @deprecated Prefer intrinsic CVA shorthand — call `tw.button(base, config)` instead of
      * `tw.button.cva(base, config)` (same types and runtime).
@@ -247,84 +245,162 @@ export type StyledCVA = TailwindInterface & {
   } & IntrinsicCVAShorthand<K>;
 };
 
-export function createStyledCVA(): StyledCVA {
-  const twCVA = Object.fromEntries(
-    Object.entries(tw).map(([key, styledFn]) => {
-      const cvaImpl = (...args: Parameters<CVA>) => {
-        const variance = cva(...args);
+export type StyledCVA = TailwindInterface &
+  StyledCVAElements & {
+    <C extends TailwindComponent<any, any>>(
+      component: C,
+    ): ComponentTemplateFunction<
+      TailwindComponentInnerProps<C>,
+      TailwindComponentInnerOtherProps<C>
+    >;
 
-        type Props = VariantProps<typeof variance> & {
-          class?: string;
-        } & StyledExtension;
+    <C extends TailwindComponent<any, any>, T>(
+      component: C,
+      ...args: Parameters<CVA<T>>
+    ): ComponentCVAWithPropsReturn<TailwindComponentAllInnerProps<C>, T>;
 
-        const StyledComponent = (styledFn as any)``;
+    <C extends Component>(
+      component: C,
+    ): ComponentTemplateFunction<Record<string, any>>;
 
-        const WithVariants = defineComponent({
-          name: `Styled${capitalize(key)}`,
-          inheritAttrs: false,
-          setup(_, { slots, attrs }) {
-            // Extract class from attrs
-            const classAttr = computed(() => (attrs as any).class ?? "");
+    <C extends Component, T>(
+      component: C,
+      ...args: Parameters<CVA<T>>
+    ): ComponentCVAWithPropsReturn<Record<string, any>, T>;
 
-            // Use computed to compute class reactively
-            const computedClass = computed(() =>
-              cn(variance(attrs as any), classAttr.value),
-            );
+    <C extends keyof JSX.IntrinsicElements>(
+      component: C,
+    ): ComponentTemplateFunction<JSX.IntrinsicElements[C]>;
 
-            return () =>
-              h(
-                StyledComponent,
-                { ...attrs, class: computedClass.value },
-                slots.default ? { default: slots.default } : undefined,
-              );
-          },
+    <C extends keyof JSX.IntrinsicElements, T>(
+      component: C,
+      ...args: Parameters<CVA<T>>
+    ): ComponentCVAWithPropsReturn<JSX.IntrinsicElements[C], T>;
+  };
+
+const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
+  return (...args: Parameters<CVA>) => {
+    const variance = cva(...args);
+
+    type Props = VariantProps<typeof variance> & {
+      class?: string;
+    } & StyledExtension;
+
+    const StyledComponent = styledFn``;
+
+    const displayName =
+      key != null
+        ? `Styled${capitalize(key)}`
+        : typeof Element === "string"
+          ? `Styled${capitalize(Element)}`
+          : `Styled${(Element as any).displayName || (Element as any).name || "Component"}`;
+
+    const WithVariants = defineComponent({
+      name: displayName,
+      inheritAttrs: false,
+      setup(_, { slots, attrs }) {
+        const classAttr = computed(() => (attrs as any).class ?? "");
+        const $as = computed(() => (attrs as any).$as);
+
+        const computedClass = computed(() =>
+          cn(variance(attrs as any), classAttr.value),
+        );
+
+        const forwardedAttrs = computed(() => {
+          const entries = Object.entries(attrs).filter(
+            ([k]) => k !== "class" && k !== "$as",
+          );
+          if (isTw(Element)) {
+            return Object.fromEntries(entries);
+          }
+          return Object.fromEntries(entries.filter(removeTransientProps));
         });
 
-        // Add withProps method to the component
-        type ValidPropsForImplementation = ValidElementProps<any> & {
-          [key: `data-${string}`]: string;
-        } & Partial<VariantProps<typeof variance>>;
-
-        const ComponentWithProps = WithVariants as typeof WithVariants & {
-          withProps: <DefaultProps extends ValidPropsForImplementation>(
-            defaultProps: DefaultProps,
-          ) => DefineComponent<Props>;
-        };
-
-        ComponentWithProps.withProps = ((defaultProps: any) => {
-          const ComponentWithDefaultProps = defineComponent({
-            name: `${WithVariants.name}.withProps`,
-            inheritAttrs: false,
-            setup(_, { slots, attrs }) {
-              // Merge default props with user attrs (user attrs take precedence)
-              const merged = computed(() => mergeProps(defaultProps, attrs));
-              return () =>
-                h(
-                  WithVariants,
-                  merged.value,
-                  slots.default ? { default: slots.default } : undefined,
-                );
+        return () =>
+          h(
+            StyledComponent,
+            {
+              ...forwardedAttrs.value,
+              class: computedClass.value,
+              ...($as.value !== undefined ? { $as: $as.value } : {}),
             },
-          });
+            slots.default ? { default: slots.default } : undefined,
+          );
+      },
+    });
 
-          return ComponentWithDefaultProps;
-        }) as typeof ComponentWithProps.withProps;
+    (WithVariants as any)[isTwElement] = true;
 
-        return ComponentWithProps;
-      };
+    // Add withProps method to the component
+    type ValidPropsForImplementation = ValidWithProps<any, any>;
 
-      const wrapped = function (this: unknown, ...args: unknown[]) {
-        if (isTaggedTemplateArg(args[0])) {
-          return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
-        }
-        return cvaImpl(...(args as Parameters<CVA>));
-      };
+    const ComponentWithProps = WithVariants as typeof WithVariants & {
+      withProps: <DefaultProps extends ValidPropsForImplementation>(
+        defaultProps: DefaultProps,
+      ) => DefineComponent<Props>;
+    };
 
-      Object.assign(wrapped, styledFn, { cva: cvaImpl });
+    ComponentWithProps.withProps = ((defaultProps: any) => {
+      const ComponentWithDefaultProps = defineComponent({
+        name: `${WithVariants.name}.withProps`,
+        inheritAttrs: false,
+        setup(_, { slots, attrs }) {
+          // Merge default props with user attrs (user attrs take precedence)
+          const merged = computed(() => mergeProps(defaultProps, attrs));
+          return () =>
+            h(
+              WithVariants,
+              merged.value,
+              slots.default ? { default: slots.default } : undefined,
+            );
+        },
+      });
 
-      return [key, wrapped];
-    }),
+      (ComponentWithDefaultProps as any)[isTwElement] = true;
+
+      return ComponentWithDefaultProps;
+    }) as typeof ComponentWithProps.withProps;
+
+    return ComponentWithProps;
+  };
+};
+
+const wrapTemplateFunction = (styledFn: any, Element: any, key?: string) => {
+  const cvaImpl = createCvaImpl(styledFn, Element, key);
+
+  const wrapped = function (this: unknown, ...args: unknown[]) {
+    if (isTaggedTemplateArg(args[0])) {
+      return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
+    }
+    return cvaImpl(...(args as Parameters<CVA>));
+  };
+
+  Object.assign(wrapped, styledFn, { cva: cvaImpl });
+
+  return wrapped;
+};
+
+export function createStyledCVA(): StyledCVA {
+  const styledFnFactory = ((element: any, ...callArgs: any[]) => {
+    const styledFn = templateFunctionFactory(element);
+    const wrapped = wrapTemplateFunction(
+      styledFn,
+      element,
+      typeof element === "string" ? element : undefined,
+    );
+    if (callArgs.length > 0) {
+      return (wrapped as any)(...callArgs);
+    }
+    return wrapped;
+  }) as any;
+
+  const twCVA = Object.fromEntries(
+    domElements.map((key) => [key, styledFnFactory(key)]),
   );
 
-  return Object.assign(tw, twCVA) as unknown as StyledCVA;
+  return Object.assign(styledFnFactory, twCVA) as unknown as StyledCVA;
 }
+
+const tw: StyledCVA = createStyledCVA();
+
+export default tw;

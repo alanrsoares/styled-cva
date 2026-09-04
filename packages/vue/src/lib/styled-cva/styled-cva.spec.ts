@@ -1084,4 +1084,113 @@ describe("styled-cva", () => {
       });
     });
   });
+
+  describe("wrapped components (issue #5)", () => {
+    const Alert = defineComponent({
+      inheritAttrs: true,
+      props: {
+        class: { type: String, default: "" },
+        title: { type: String, default: "" },
+      },
+      setup(props, { slots, attrs }) {
+        return () =>
+          h(
+            "div",
+            {
+              ...attrs,
+              class: props.class,
+              "data-testid": "alert",
+            },
+            slots.default ? slots.default() : props.title,
+          );
+      },
+    });
+
+    it("should strip transient $-props when styling a foreign component with template literal", () => {
+      const StyledAlert = tw(Alert)<{
+        $tone?: "info" | "warning";
+        $size?: "sm" | "lg";
+      }>`p-4 border`;
+
+      const { container } = render(StyledAlert, {
+        props: {
+          $tone: "warning",
+          $size: "lg",
+        } as any,
+      });
+
+      const el = container.querySelector('[data-testid="alert"]')!;
+      expect(el).toHaveClass("p-4", "border");
+      expect(el.getAttribute("$tone")).toBeNull();
+      expect(el.getAttribute("$size")).toBeNull();
+    });
+
+    it("should support (base, config) variant shorthand on wrapped foreign components", async () => {
+      const VariantAlert = tw(Alert)("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100 text-green-800",
+            danger: "bg-red-100 text-red-800",
+          },
+        },
+        defaultVariants: {
+          $tone: "tip",
+        },
+      });
+
+      const { container, rerender } = render(VariantAlert, {
+        props: {
+          $tone: "danger",
+        },
+        slots: { default: "Alert message" },
+      });
+
+      const el = container.querySelector('[data-testid="alert"]')!;
+      expect(el).toHaveClass("p-4", "bg-red-100", "text-red-800");
+      expect(el.getAttribute("$tone")).toBeNull();
+
+      await rerender({ $tone: "tip" });
+      expect(el).toHaveClass("p-4", "bg-green-100", "text-green-800");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+
+    it("should support .cva() on wrapped foreign components", () => {
+      const AlertCva = tw(Alert).cva("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100",
+          },
+        },
+      });
+
+      const { container } = render(AlertCva, {
+        props: { $tone: "tip" },
+        slots: { default: "CVA alert" },
+      });
+      const el = container.querySelector('[data-testid="alert"]')!;
+      expect(el).toHaveClass("p-4", "bg-green-100");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+
+    it("should support withProps on wrapped foreign components with variants", () => {
+      const DefaultAlert = tw(Alert)("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100",
+            warn: "bg-yellow-100",
+          },
+        },
+      }).withProps({
+        $tone: "warn",
+        title: "Warning Alert",
+      });
+
+      const { container } = render(DefaultAlert, {
+        slots: { default: "Warning text" },
+      });
+      const el = container.querySelector('[data-testid="alert"]')!;
+      expect(el).toHaveClass("p-4", "bg-yellow-100");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+  });
 });

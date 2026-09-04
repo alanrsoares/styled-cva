@@ -44,11 +44,11 @@ export type TailwindSolidComponent<P extends object> = Component<P> & {
   (props: P): JSX.Element;
 };
 
-type MergeProps<O extends object, P extends {} = {}> =
+export type MergeProps<O extends object, P extends {} = {}> =
   // Distribute unions early to avoid quadratic expansion
   P extends any ? IsAny<P, RemoveIndex<P> & O, P & O> : never;
 
-type TailwindPropHelper<
+export type TailwindPropHelper<
   P extends {},
   O extends object = {},
   // M caches MergeProps<O, P> so the keyof and lookup share one instantiation.

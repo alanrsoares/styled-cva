@@ -1102,4 +1102,87 @@ describe("styled-cva", () => {
       });
     });
   });
+
+  describe("wrapped components (issue #5)", () => {
+    const Alert: Component<JSX.HTMLAttributes<HTMLDivElement>> = (props) => (
+      <div data-testid="alert" {...props} />
+    );
+
+    it("should strip transient $-prefixed props when wrapping a foreign component with tagged template", () => {
+      const WrappedAlert = tw(Alert)`p-4 border`;
+      render(() => (
+        <WrappedAlert {...({ $tone: "tip", $size: "lg" } as any)}>
+          Alert text
+        </WrappedAlert>
+      ));
+
+      const el = screen.getByTestId("alert");
+      expect(el).toHaveClass("p-4", "border");
+      expect(el.getAttribute("$tone")).toBeNull();
+      expect(el.getAttribute("$size")).toBeNull();
+    });
+
+    it("should support (base, config) variant shorthand on wrapped foreign components", () => {
+      const VariantAlert = tw(Alert)("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100 text-green-800",
+            danger: "bg-red-100 text-red-800",
+          },
+        },
+        defaultVariants: {
+          $tone: "tip",
+        },
+      });
+
+      type Props = ComponentProps<typeof VariantAlert>;
+      expectType<TypeEqual<"tip" | "danger" | undefined, Props["$tone"]>>(true);
+
+      const [tone, setTone] = createSignal<"tip" | "danger">("danger");
+      render(() => <VariantAlert $tone={tone()}>Alert message</VariantAlert>);
+
+      const el = screen.getByTestId("alert");
+      expect(el).toHaveClass("p-4", "bg-red-100", "text-red-800");
+      expect(el.getAttribute("$tone")).toBeNull();
+
+      setTone("tip");
+      expect(el).toHaveClass("p-4", "bg-green-100", "text-green-800");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+
+    it("should support .cva() on wrapped foreign components", () => {
+      const AlertCva = tw(Alert).cva("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100",
+          },
+        },
+      });
+
+      render(() => <AlertCva $tone="tip">CVA alert</AlertCva>);
+      const el = screen.getByTestId("alert");
+      expect(el).toHaveClass("p-4", "bg-green-100");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+
+    it("should support withProps on wrapped foreign components with variants", () => {
+      const DefaultAlert = tw(Alert)("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100",
+            warn: "bg-yellow-100",
+          },
+        },
+      }).withProps({
+        $tone: "warn",
+        title: "Warning Alert",
+      });
+
+      render(() => <DefaultAlert>Warning text</DefaultAlert>);
+      const el = screen.getByTestId("alert");
+      expect(el).toHaveClass("p-4", "bg-yellow-100");
+      expect(el).toHaveAttribute("title", "Warning Alert");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+  });
 });

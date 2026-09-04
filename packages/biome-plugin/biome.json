@@ -2,6 +2,7 @@
   "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
   "plugins": [
     "./rules/normalize-tw-classes.grit",
+    "./rules/normalize-cva-classes.grit",
     "./rules/multiline-long-tw.grit",
     "./rules/prefer-size-class.grit"
   ],

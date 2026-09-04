@@ -1,26 +1,72 @@
 // @styled-cva/biome-plugin: multiline-long-tw
 //
-// Flag inline `tw.tag` / `tw(...)` tagged templates whose quasi text exceeds
-// 80 characters and contains no newline. The fix is to break the class list
-// across multiple lines (handled automatically by `@styled-cva/prettier-plugin`).
+// Flag inline `tw.tag`/`tw(Component)` tagged templates with a physical line
+// over 80 characters, and wrap the class list across lines.
+//
+// The fix packs each line greedily up to 74 characters (74 + the 2-space
+// indent stays inside an 80-column budget) using bounded repetition — GritQL
+// has no arithmetic, but a greedy `{1,74}` followed by a required space is the
+// same decision a width-aware wrapper makes. One line is split per pass and
+// Biome re-applies safe plugin fixes until no rule rewrites, so arbitrarily
+// long class lists converge in one `biome check --write`.
+//
+// Both the 74-char budget and the 2-space indent are fixed: GritQL cannot read
+// plugin options, and the node carries no column information, so a deeply
+// nested declaration is wrapped to the same indent as a top-level one. Use
+// `@styled-cva/prettier-plugin` when the indent must follow the source column.
 
 engine biome(1.0)
 language js
 
-or {
-  JsTemplateExpression(tag = `tw.$x`) as $t,
-  JsTemplateExpression(tag = `tw($_)`) as $t
-} where {
-  $t <: contains $chunk where {
-    $chunk <: JsTemplateChunkElement(),
-    $chunk <: r".{81,}"
-  },
-  $t <: not contains JsTemplateChunkElement() as $line where {
-    $line <: r".*\n.*"
-  },
-  register_diagnostic(
-    span = $t,
-    message = "Inline tw class string exceeds 80 chars. Break into multiple lines (run @styled-cva/prettier-plugin to auto-format).",
-    severity = "warn"
-  )
+// Resolve the local styled-cva binding: an aliased default import from any
+// `@styled-cva/*` adapter, else the conventional bare `tw` — but only when the
+// file does not import `tw` from somewhere else.
+pattern styled_cva_binding($sc) {
+  or {
+    contains `import $sc from $src` where { $src <: r"\"@styled-cva/[a-z]+\"" },
+    and {
+      not contains `import tw from $other` where {
+        $other <: not r"\"@styled-cva/[a-z]+\""
+      },
+      $sc = `tw`
+    }
+  }
+}
+
+// Static, single-chunk `tw.tag\`…\`` / `tw(Component)\`…\`` templates.
+pattern tw_template($sc, $chunk) {
+  or {
+    JsTemplateExpression(tag = `$sc.$_`, elements = [$chunk]),
+    JsTemplateExpression(tag = `$sc($_)`, elements = [$chunk])
+  } where { $chunk <: JsTemplateChunkElement() }
+}
+
+file($body) where {
+  $body <: styled_cva_binding($sc),
+  $body <: contains bubble($sc) tw_template($sc, $chunk) as $t where {
+    // Some physical line still busts the budget. Anchored match, so the
+    // `[\s\S]*` bookends are what let this see past a newline.
+    $chunk <: r"[\s\S]*[^\n]{81,}[\s\S]*",
+    or {
+      // Still on one line — open a wrapped block.
+      $chunk <: r"([^\n]{1,74}) ([^\n]+)"($head, $rest) where {
+        $chunk => `
+  $head
+  $rest
+`
+      },
+      // Already wrapped, but the last line is still too long — split it.
+      $chunk <: r"([\s\S]*\n)  ([^\n]{1,74}) ([^\n]+)\n"($done, $head, $rest) where {
+        $chunk => `$done  $head
+  $rest
+`
+      }
+    },
+    register_diagnostic(
+      span = $t,
+      message = "Inline tw class string exceeds 80 chars. Wrapped across lines.",
+      severity = "warn",
+      fix_kind = "safe"
+    )
+  }
 }

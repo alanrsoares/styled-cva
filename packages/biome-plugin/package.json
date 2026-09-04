@@ -6,12 +6,13 @@
     "access": "public"
   },
   "license": "Unlicense",
-  "description": "Biome GritQL plugin: diagnostics for styled-cva tw`...` tagged templates.",
+  "description": "Biome GritQL plugin: safe auto-fixes and diagnostics for styled-cva tw`...` templates and cva() class strings.",
   "files": [
     "rules"
   ],
   "exports": {
     "./rules/normalize-tw-classes.grit": "./rules/normalize-tw-classes.grit",
+    "./rules/normalize-cva-classes.grit": "./rules/normalize-cva-classes.grit",
     "./rules/multiline-long-tw.grit": "./rules/multiline-long-tw.grit",
     "./rules/prefer-size-class.grit": "./rules/prefer-size-class.grit"
   },

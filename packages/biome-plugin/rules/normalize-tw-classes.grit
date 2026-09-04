@@ -1,59 +1,56 @@
-
 // @styled-cva/biome-plugin: normalize-tw-classes
 //
-// Flag inline `tw.tag` / `tw(...)` tagged templates whose class string contains
+// Flag inline `tw.tag`/`tw(Component)` tagged templates whose class string has
 // a run of horizontal whitespace, leading horizontal whitespace, or trailing
-// horizontal whitespace.
+// horizontal whitespace, and rewrite it to single-spaced, trimmed classes.
 //
-// Multi-line templates (any chunk contains a newline) are exempt so that
-// prettier-formatted multi-line `tw.div\`\n  flex\n\`` is not flagged.
+// The fix collapses one run per pass; Biome re-applies safe plugin fixes until
+// no rule rewrites, so `biome check --write` converges on any input length.
 //
-// Safe fix rewrites the template string to normalize whitespace.
+// Multi-line templates are left alone: every arm is anchored and `.` does not
+// match a newline, so a wrapped template (see multiline-long-tw) never matches.
 
 engine biome(1.0)
 language js
 
-function normalize_classes($x) {
-
-  $p1 = split(string = $x, separator = "	"),
-  $s1 = join(list = $p1, separator = " "),
-  $p2 = split(string = $s1, separator = "                "),
-  $s2 = join(list = $p2, separator = " "),
-  $p3 = split(string = $s2, separator = "        "),
-  $s3 = join(list = $p3, separator = " "),
-  $p4 = split(string = $s3, separator = "        "),
-  $s4 = join(list = $p4, separator = " "),
-  $p5 = split(string = $s4, separator = "    "),
-  $s5 = join(list = $p5, separator = " "),
-  $p6 = split(string = $s5, separator = "    "),
-  $s6 = join(list = $p6, separator = " "),
-  $p7 = split(string = $s6, separator = "  "),
-  $s7 = join(list = $p7, separator = " "),
-  $p8 = split(string = $s7, separator = "  "),
-  $s8 = join(list = $p8, separator = " "),
-  $p9 = split(string = $s8, separator = "  "),
-  $s9 = join(list = $p9, separator = " "),
-  return trim(string = $s9, trim_chars = " ")
-
+// Resolve the local styled-cva binding: an aliased default import from any
+// `@styled-cva/*` adapter, else the conventional bare `tw` — but only when the
+// file does not import `tw` from somewhere else.
+pattern styled_cva_binding($sc) {
+  or {
+    contains `import $sc from $src` where { $src <: r"\"@styled-cva/[a-z]+\"" },
+    and {
+      not contains `import tw from $other` where {
+        $other <: not r"\"@styled-cva/[a-z]+\""
+      },
+      $sc = `tw`
+    }
+  }
 }
 
-or {
-  JsTemplateExpression(tag = `tw.$x`, elements = [$chunk]) as $t,
-  JsTemplateExpression(tag = `tw($_)`, elements = [$chunk]) as $t
-} where {
-  $chunk <: JsTemplateChunkElement(),
+// Static, single-chunk `tw.tag\`…\`` / `tw(Component)\`…\`` templates.
+pattern tw_template($sc, $chunk) {
   or {
-    $chunk <: r".*[ \t][ \t].*",
-    $chunk <: r"^[ \t].*",
-    $chunk <: r".*[ \t]$"
-  },
-  $chunk <: not r".*\n.*",
-  $res = normalize_classes($chunk),
-  register_diagnostic(
-    span = $t,
-    message = "Tailwind class string has irregular whitespace. Run @styled-cva/prettier-plugin or normalize manually.",
-    severity = "warn",
-    fix_kind = "safe"
-  ),
-  $chunk => $res
+    JsTemplateExpression(tag = `$sc.$_`, elements = [$chunk]),
+    JsTemplateExpression(tag = `$sc($_)`, elements = [$chunk])
+  } where { $chunk <: JsTemplateChunkElement() }
+}
+
+file($body) where {
+  $body <: styled_cva_binding($sc),
+  $body <: contains bubble($sc) tw_template($sc, $chunk) as $t where {
+    or {
+      $chunk <: r"(.*?)[ \t][ \t]+(.*)"($head, $rest) where {
+        $chunk => `$head $rest`
+      },
+      $chunk <: r"[ \t]+(.*)"($rest) where { $chunk => `$rest` },
+      $chunk <: r"(.*?)[ \t]+"($head) where { $chunk => `$head` }
+    },
+    register_diagnostic(
+      span = $t,
+      message = "Tailwind class string has irregular whitespace.",
+      severity = "warn",
+      fix_kind = "safe"
+    )
+  }
 }

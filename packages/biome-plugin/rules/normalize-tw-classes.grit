@@ -1,3 +1,4 @@
+
 // @styled-cva/biome-plugin: normalize-tw-classes
 //
 // Flag inline `tw.tag` / `tw(...)` tagged templates whose class string contains
@@ -7,29 +8,52 @@
 // Multi-line templates (any chunk contains a newline) are exempt so that
 // prettier-formatted multi-line `tw.div\`\n  flex\n\`` is not flagged.
 //
-// Fix by running `@styled-cva/prettier-plugin` or editing by hand.
+// Safe fix rewrites the template string to normalize whitespace.
 
 engine biome(1.0)
 language js
 
+function normalize_classes($x) {
+
+  $p1 = split(string = $x, separator = "	"),
+  $s1 = join(list = $p1, separator = " "),
+  $p2 = split(string = $s1, separator = "                "),
+  $s2 = join(list = $p2, separator = " "),
+  $p3 = split(string = $s2, separator = "        "),
+  $s3 = join(list = $p3, separator = " "),
+  $p4 = split(string = $s3, separator = "        "),
+  $s4 = join(list = $p4, separator = " "),
+  $p5 = split(string = $s4, separator = "    "),
+  $s5 = join(list = $p5, separator = " "),
+  $p6 = split(string = $s5, separator = "    "),
+  $s6 = join(list = $p6, separator = " "),
+  $p7 = split(string = $s6, separator = "  "),
+  $s7 = join(list = $p7, separator = " "),
+  $p8 = split(string = $s7, separator = "  "),
+  $s8 = join(list = $p8, separator = " "),
+  $p9 = split(string = $s8, separator = "  "),
+  $s9 = join(list = $p9, separator = " "),
+  return trim(string = $s9, trim_chars = " ")
+
+}
+
 or {
-  JsTemplateExpression(tag = `tw.$x`) as $t,
-  JsTemplateExpression(tag = `tw($_)`) as $t
+  JsTemplateExpression(tag = `tw.$x`, elements = [$chunk]) as $t,
+  JsTemplateExpression(tag = `tw($_)`, elements = [$chunk]) as $t
 } where {
-  $t <: contains $chunk where {
-    $chunk <: JsTemplateChunkElement(),
-    or {
-      $chunk <: r".*[ \t][ \t].*",
-      $chunk <: r"^[ \t].*",
-      $chunk <: r".*[ \t]$"
-    }
+  $chunk <: JsTemplateChunkElement(),
+  or {
+    $chunk <: r".*[ \t][ \t].*",
+    $chunk <: r"^[ \t].*",
+    $chunk <: r".*[ \t]$"
   },
-  $t <: not contains JsTemplateChunkElement() as $line where {
-    $line <: r".*\n.*"
-  },
+  $chunk <: not r".*\n.*",
+  $res = normalize_classes($chunk),
   register_diagnostic(
     span = $t,
     message = "Tailwind class string has irregular whitespace. Run @styled-cva/prettier-plugin or normalize manually.",
-    severity = "warn"
-  )
+    severity = "warn",
+    fix_kind = "safe"
+  ),
+  $chunk => $res
 }

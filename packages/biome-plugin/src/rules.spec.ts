@@ -51,6 +51,35 @@ describe("normalize-tw-classes", () => {
       diags.some((d) => messageOf(d).includes("irregular whitespace")),
     ).toBe(true);
   });
+
+  test("autofixes irregular whitespace with --write", () => {
+    const { writeFileSync, readFileSync, unlinkSync } = require("node:fs");
+    const testFile = resolve(PKG_DIR, "fixtures/invalid/temp-autofix.ts");
+    try {
+      writeFileSync(
+        testFile,
+        "const A = tw.div`  flex   items-center  gap-2  `;\nconst B = tw(Button)`   px-4 \t py-2   `;\n",
+      );
+      const { status } = spawnSync(
+        "bunx",
+        [
+          "@biomejs/biome",
+          "lint",
+          "--write",
+          "fixtures/invalid/temp-autofix.ts",
+        ],
+        { cwd: PKG_DIR, encoding: "utf8" },
+      );
+      expect(status).toBe(0);
+      expect(readFileSync(testFile, "utf8")).toBe(
+        "const A = tw.div`flex items-center gap-2`;\nconst B = tw(Button)`px-4 py-2`;\n",
+      );
+    } finally {
+      try {
+        unlinkSync(testFile);
+      } catch {}
+    }
+  });
 });
 
 describe("multiline-long-tw", () => {

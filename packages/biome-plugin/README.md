@@ -4,14 +4,17 @@ Biome GritQL plugin for [@styled-cva/react](https://www.npmjs.com/package/@style
 
 Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo.
 
-## Diagnostics, not auto-fix
+## Safe auto-fix for whitespace normalization
 
-As of Biome 2.x, GritQL plugins can **only register diagnostics** — they cannot rewrite code. To auto-fix the issues this plugin reports, run [`@styled-cva/prettier-plugin`](../prettier-plugin) on the same files. The two plugins are designed to complement each other:
+Biome 2.x supports GritQL rewrites with safe fixes. `@styled-cva/biome-plugin` provides:
 
-- `@styled-cva/biome-plugin` — flags issues in `biome check` / `biome lint`
-- `@styled-cva/prettier-plugin` — rewrites the offending templates on save
+- **`normalize-tw-classes`**: registers a **safe auto-fix** (`fix_kind = "safe"`). Running `biome lint --write` (or `biome check --write`) automatically normalizes irregular horizontal whitespace inside single-line `tw` templates.
+- **`multiline-long-tw`**: provides **diagnostics only**. Multi-line template formatting (indentation, line wrapping) is handled by [`@styled-cva/prettier-plugin`](../prettier-plugin).
 
-A migration to a code-modifying Biome plugin will become possible once Biome's JS plugin API ships.
+The two plugins complement each other:
+
+- `@styled-cva/biome-plugin` — flags issues and auto-fixes whitespace in `biome check --write` / `biome lint --write`
+- `@styled-cva/prettier-plugin` — formats and wraps long templates across multiple lines on save
 
 ## Rules
 
@@ -23,11 +26,13 @@ Flags inline `tw.tag\`…\``/`tw(Component)\`…\`` tagged templates whose class
 - leading horizontal whitespace
 - trailing horizontal whitespace
 
+**Auto-fix:** Rewrites the template chunk to collapse multiple spaces/tabs to a single space and trim leading/trailing whitespace (`biome lint --write`).
+
 Multi-line templates (whose chunk contains a `\n`) are **exempt** so that prettier-formatted multi-line `tw.div\`\n flex\n\`` does not trigger the rule.
 
 ### `multiline-long-tw`
 
-Flags inline `tw.tag\`…\``/`tw(Component)\`…\`` tagged templates whose quasi text exceeds 80 characters on a single line. Multi-line templates are exempt.
+Flags inline `tw.tag\`…\``/`tw(Component)\`…\``tagged templates whose quasi text exceeds 80 characters on a single line. Multi-line templates are exempt. Break long templates into multiple lines manually or via`@styled-cva/prettier-plugin`.
 
 ## Installation
 
@@ -55,7 +60,7 @@ Biome plugins are referenced by relative path; there is no package-name shorthan
 
 ## Caveats
 
-- **Diagnostics only.** No auto-fix. Pair with `@styled-cva/prettier-plugin` for rewrites.
+- **Auto-fix is supported for `normalize-tw-classes` only.** `multiline-long-tw` remains diagnostic-only; use `@styled-cva/prettier-plugin` for multi-line wrapping and indenting.
 - **`tw` import name is hard-coded.** The rules only recognize the `tw` identifier; renamed imports (`import sc as tw from …`) are not supported.
 - **`.cva({ base, variants })` strings are not analyzed.** Object-literal traversal with conditional regex predicates is not expressible in the current Biome GritQL dialect. Use `@styled-cva/prettier-plugin` to normalize those.
 - **80-char threshold is fixed.** GritQL has no numeric comparison or plugin options; the rule uses `r".{81,}"`. To raise/lower the threshold today, fork the `.grit` file.

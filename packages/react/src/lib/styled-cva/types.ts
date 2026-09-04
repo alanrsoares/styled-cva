@@ -45,12 +45,12 @@ export type TailwindExoticComponent<P> = Pick<
   keyof React.ForwardRefExoticComponent<any>
 >;
 
-type MergeProps<O extends object, P extends {} = {}> =
+export type MergeProps<O extends object, P extends {} = {}> =
   // Distribute unions early to avoid quadratic expansion
   P extends any ? IsAny<P, RemoveIndex<P> & O, P & O> : never;
 // RemoveIndex<P> is used to make React.ComponentPropsWithRef typesafe on Tailwind components, delete if causing issues
 
-type TailwindPropHelper<
+export type TailwindPropHelper<
   P extends {},
   O extends object = {},
   // M caches MergeProps<O, P> so the keyof and lookup share one instantiation.

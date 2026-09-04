@@ -1319,4 +1319,124 @@ describe("styled-cva", () => {
       expectType<{ to: string }>(linkProps);
     });
   });
+
+  describe("wrapped components (issue #5)", () => {
+    // Foreign component that spreads props onto DOM (shadcn / TanStack pattern)
+    const Alert = ({ className, ...props }: React.ComponentProps<"div">) => (
+      <div data-testid="alert" className={className} {...props} />
+    );
+
+    it("should strip transient $-prefixed props when wrapping a foreign component with tagged template", () => {
+      const WrappedAlert = tw(Alert)`p-4 border`;
+      const { getByTestId } = render(
+        <WrappedAlert {...({ $tone: "tip", $size: "lg" } as any)}>
+          Alert text
+        </WrappedAlert>,
+      );
+
+      const el = getByTestId("alert");
+      expect(el).toHaveClass("p-4", "border");
+      expect(el.getAttribute("$tone")).toBeNull();
+      expect(el.getAttribute("$size")).toBeNull();
+    });
+
+    it("should support (base, config) variant shorthand on wrapped foreign components", () => {
+      const VariantAlert = tw(Alert)("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100 text-green-800",
+            danger: "bg-red-100 text-red-800",
+          },
+        },
+        defaultVariants: {
+          $tone: "tip",
+        },
+      });
+
+      type Props = ComponentProps<typeof VariantAlert>;
+      expectType<TypeEqual<"tip" | "danger" | undefined, Props["$tone"]>>(true);
+
+      const { getByTestId, rerender } = render(
+        <VariantAlert $tone="danger">Danger alert</VariantAlert>,
+      );
+
+      const el = getByTestId("alert");
+      expect(el).toHaveClass("p-4", "bg-red-100", "text-red-800");
+      expect(el.getAttribute("$tone")).toBeNull();
+
+      rerender(<VariantAlert>Default alert</VariantAlert>);
+      expect(el).toHaveClass("p-4", "bg-green-100", "text-green-800");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+
+    it("should support .cva() on wrapped foreign components", () => {
+      const AlertCva = tw(Alert).cva("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100",
+          },
+        },
+      });
+
+      const { getByTestId } = render(
+        <AlertCva $tone="tip">CVA alert</AlertCva>,
+      );
+      const el = getByTestId("alert");
+      expect(el).toHaveClass("p-4", "bg-green-100");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+
+    it("should support withProps on wrapped foreign components with variants", () => {
+      const DefaultAlert = tw(Alert)("p-4", {
+        variants: {
+          $tone: {
+            tip: "bg-green-100",
+            warn: "bg-yellow-100",
+          },
+        },
+      }).withProps({
+        $tone: "warn",
+        title: "Warning Alert",
+      });
+
+      const { getByTestId } = render(<DefaultAlert>Warning text</DefaultAlert>);
+      const el = getByTestId("alert");
+      expect(el).toHaveClass("p-4", "bg-yellow-100");
+      expect(el).toHaveAttribute("title", "Warning Alert");
+      expect(el.getAttribute("$tone")).toBeNull();
+    });
+
+    const Link = ({
+      to,
+      children,
+      className,
+    }: {
+      to: string;
+      children: React.ReactNode;
+      className?: string;
+    }) => (
+      <a href={to} className={className}>
+        {children}
+      </a>
+    );
+
+    it("should allow type-safe polymorphic $as with custom React components without type errors", () => {
+      const Button = tw.button("btn-base", {
+        variants: {
+          $variant: { primary: "btn-primary" },
+        },
+      });
+
+      const { container } = render(
+        <Button $as={Link} to="/profile" $variant="primary">
+          Profile
+        </Button>,
+      );
+      const link = container.firstChild as HTMLAnchorElement;
+      expect(link.tagName).toBe("A");
+      expect(link).toHaveAttribute("href", "/profile");
+      expect(link).toHaveClass("btn-base", "btn-primary");
+      expect(link.getAttribute("$variant")).toBeNull();
+    });
+  });
 });

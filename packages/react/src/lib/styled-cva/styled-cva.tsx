@@ -29,9 +29,13 @@ import {
   isTwElement,
   type AnyTailwindComponent,
   type ElementKey,
-  type IntrinsicElementsKeys,
-  type IntrinsicElementsTemplateFunctionsMap,
+  type TailwindComponent,
+  type TailwindComponentAllInnerProps,
+  type TailwindComponentInnerOtherProps,
+  type TailwindComponentInnerProps,
   type TailwindInterface,
+  type TailwindPropHelper,
+  type TemplateFunction,
 } from "./types";
 
 const isTw = (c: any): c is AnyTailwindComponent => c[isTwElement] === true;
@@ -48,10 +52,10 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
     ) => {
       const TwComponent = forwardRef(
         (baseProps: any, ref: any): JSX.Element => {
-          const { $as = Element, style = {}, ...props } = baseProps;
+          const { $as, style = {}, ...props } = baseProps;
 
           // set FinalElement based on if Element is a TailwindComponent, $as defaults to Element if undefined
-          const FinalElement = isTw(Element) ? Element : $as;
+          const FinalElement = isTw(Element) ? Element : ($as ?? Element);
 
           const withStyles: CSSProperties = styleArray
             ? styleArray.reduce<CSSProperties>(
@@ -67,12 +71,11 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
             : {};
 
           // filter out props that starts with "$" props except when styling a tailwind-styled-component
-          const filteredProps =
-            isTw(FinalElement) || typeof Element !== "string"
-              ? props
-              : (Object.fromEntries(
-                  Object.entries(props).filter(removeTransientProps),
-                ) as any);
+          const filteredProps = isTw(FinalElement)
+            ? props
+            : (Object.fromEntries(
+                Object.entries(props).filter(removeTransientProps),
+              ) as any);
 
           return (
             <FinalElement
@@ -90,7 +93,7 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
                 props.className,
               )}
               // forward $as prop when styling a tailwind-styled-component
-              {...(isTw(Element) ? { $as } : {})}
+              {...(isTw(Element) && $as ? { $as } : {})}
             />
           );
         },
@@ -116,24 +119,6 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
   };
 }) as any;
 
-const intrinsicElementsMap = domElements.reduce(
-  <K extends IntrinsicElementsKeys>(
-    acc: IntrinsicElementsTemplateFunctionsMap,
-    DomElement: K,
-  ) => ({
-    ...acc,
-    [DomElement]: templateFunctionFactory(DomElement),
-  }),
-  {} as IntrinsicElementsTemplateFunctionsMap,
-);
-
-const tw: TailwindInterface = Object.assign(
-  templateFunctionFactory,
-  intrinsicElementsMap,
-);
-
-export default tw;
-
 type CVA<T = unknown> = typeof cva<T>;
 
 type StyledExtension = {
@@ -142,30 +127,39 @@ type StyledExtension = {
 
 // Type for valid withProps input: element props + data-* attributes + variant props
 // This type uses a mapped type to only allow valid keys
-type ValidElementProps<K extends ElementKey> = {
-  [
-    P in keyof JSX.IntrinsicElements[K] as P extends `$${string}` ? never : P
-  ]?: JSX.IntrinsicElements[K][P];
+type ValidElementProps<P> = {
+  [K in keyof P as K extends `$${string}` ? never : K]?: P[K];
 };
 
 // ValidWithProps includes element props, data attributes, and variant props
-type ValidWithProps<K extends ElementKey, T> = ValidElementProps<K> & {
+type ValidWithProps<P, T> = ValidElementProps<P> & {
   [key: `data-${string}`]: string;
 } & Partial<VariantProps<ReturnType<CVA<T>>>>;
 
 // Shared CVA component prop shape (element + variants + $as)
-type CVAComponentProps<K extends ElementKey, T> = JSX.IntrinsicElements[K] &
+type CVAComponentProps<P, T> = P &
   VariantProps<ReturnType<CVA<T>>> &
   StyledExtension;
 
 // Cached forward-ref shape so base + withProps return type share one instantiation
-type CVAComponent<K extends ElementKey, T> = ForwardRefExoticComponent<
-  PropsWithoutRef<CVAComponentProps<K, T>> & RefAttributes<HTMLElement>
+type CVAComponent<P, T> = ForwardRefExoticComponent<
+  PropsWithoutRef<CVAComponentProps<P, T>> & RefAttributes<HTMLElement>
 >;
 
 // Polymorphic props when $as is used with an intrinsic element (e.g. $as="a")
 type PolymorphicCVAProps<T, $As extends ElementKey> = PropsWithoutRef<
   JSX.IntrinsicElements[$As] &
+    VariantProps<ReturnType<CVA<T>>> &
+    StyledExtension & { $as?: $As }
+> &
+  RefAttributes<HTMLElement>;
+
+// Polymorphic props when $as is used with a custom React component (e.g. $as={Link})
+type PolymorphicCustomCVAProps<
+  T,
+  $As extends ComponentType<any>,
+> = PropsWithoutRef<
+  ($As extends ComponentType<infer P> ? P : never) &
     VariantProps<ReturnType<CVA<T>>> &
     StyledExtension & { $as?: $As }
 > &
@@ -220,9 +214,13 @@ export type PolymorphicComponentProps<
 > &
   RefAttributes<HTMLElement>;
 
-type CVAWithPropsReturn<K extends ElementKey, T> = CVAComponent<K, T> & {
+export type ComponentCVAWithPropsReturn<P, T> = CVAComponent<P, T> & {
   // Polymorphic overload for intrinsic HTML elements (e.g., $as="a", $as="button")
   <$As extends ElementKey>(props: PolymorphicCVAProps<T, $As>): ReactElement;
+  // Polymorphic overload for custom React components (e.g., $as={Link})
+  <$As extends ComponentType<any>>(
+    props: PolymorphicCustomCVAProps<T, $As>,
+  ): ReactElement;
   /**
    * Sets default props for the component. User-provided props will override these defaults.
    *
@@ -250,20 +248,36 @@ type CVAWithPropsReturn<K extends ElementKey, T> = CVAComponent<K, T> & {
    * <StyledButton>Click me</StyledButton>
    * ```
    */
-  withProps: <DefaultProps extends ValidWithProps<K, T>>(
+  withProps: <DefaultProps extends ValidWithProps<P, T>>(
     defaultProps: DefaultProps & {
-      [P in Exclude<keyof DefaultProps, keyof ValidWithProps<K, T>>]?: never;
+      [K in Exclude<keyof DefaultProps, keyof ValidWithProps<P, T>>]?: never;
     },
-  ) => CVAComponent<K, T>;
+  ) => CVAComponent<P, T>;
 };
 
-/** Intrinsic CVA: `tw.button(base, config)` — preferred over `.cva(base, config)`. */
+export type CVAWithPropsReturn<
+  K extends ElementKey,
+  T,
+> = ComponentCVAWithPropsReturn<JSX.IntrinsicElements[K], T>;
 
+export interface ComponentTemplateFunction<
+  in out P extends object,
+  in out O extends object = object,
+> extends TemplateFunction<P, O> {
+  <T>(
+    ...args: Parameters<CVA<T>>
+  ): ComponentCVAWithPropsReturn<TailwindPropHelper<P, O>, T>;
+  cva: <T>(
+    ...args: Parameters<CVA<T>>
+  ) => ComponentCVAWithPropsReturn<TailwindPropHelper<P, O>, T>;
+}
+
+/** Intrinsic CVA: `tw.button(base, config)` — preferred over `.cva(base, config)`. */
 type IntrinsicCVAShorthand<K extends ElementKey> = <T>(
   ...args: Parameters<CVA<T>>
 ) => CVAWithPropsReturn<K, T>;
 
-export type StyledCVA = TailwindInterface & {
+type StyledCVAElements = {
   [K in ElementKey]: TailwindInterface[K] & {
     /**
      * @deprecated Prefer intrinsic CVA shorthand — call `tw.button(base, config)` instead of
@@ -285,78 +299,157 @@ export type StyledCVA = TailwindInterface & {
   } & IntrinsicCVAShorthand<K>;
 };
 
-export function createStyledCVA(): StyledCVA {
-  const twCVA = Object.fromEntries(
-    Object.entries(tw).map(([key, styledFn]) => {
-      const cvaImpl = (...args: Parameters<CVA>) => {
-        const variance = cva(...args);
+export type StyledCVA = TailwindInterface &
+  StyledCVAElements & {
+    <C extends TailwindComponent<any, any>>(
+      component: C,
+    ): ComponentTemplateFunction<
+      TailwindComponentInnerProps<C>,
+      TailwindComponentInnerOtherProps<C>
+    >;
 
-        type Props = VariantProps<typeof variance> & {
-          className?: string;
-          ref?: Ref<HTMLElement>;
-        } & StyledExtension;
+    <C extends TailwindComponent<any, any>, T>(
+      component: C,
+      ...args: Parameters<CVA<T>>
+    ): ComponentCVAWithPropsReturn<TailwindComponentAllInnerProps<C>, T>;
 
-        const StyledComponent = styledFn`` as FC<Props>;
+    <C extends React.ComponentType<any>>(
+      component: C,
+    ): ComponentTemplateFunction<
+      C extends (P?: never) => any
+        ? object
+        : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
+          ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
+              className?: string;
+            }
+          : React.ComponentPropsWithoutRef<C>
+    >;
 
-        const WithRef = forwardRef<HTMLElement, Props>(
-          ({ className, ...props }, ref) => (
-            <StyledComponent
-              className={cn(variance({ ...props, className }), className)}
-              {...props}
-              ref={ref}
-            />
-          ),
+    <C extends React.ComponentType<any>, T>(
+      component: C,
+      ...args: Parameters<CVA<T>>
+    ): ComponentCVAWithPropsReturn<
+      C extends (P?: never) => any
+        ? object
+        : React.ComponentPropsWithoutRef<C> extends { className?: unknown }
+          ? Omit<React.ComponentPropsWithoutRef<C>, "className"> & {
+              className?: string;
+            }
+          : React.ComponentPropsWithoutRef<C>,
+      T
+    >;
+
+    <C extends keyof JSX.IntrinsicElements>(
+      component: C,
+    ): ComponentTemplateFunction<JSX.IntrinsicElements[C]>;
+
+    <C extends keyof JSX.IntrinsicElements, T>(
+      component: C,
+      ...args: Parameters<CVA<T>>
+    ): ComponentCVAWithPropsReturn<JSX.IntrinsicElements[C], T>;
+  };
+
+const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
+  return (...args: Parameters<CVA>) => {
+    const variance = cva(...args);
+
+    type Props = VariantProps<typeof variance> & {
+      className?: string;
+      ref?: Ref<HTMLElement>;
+    } & StyledExtension;
+
+    const StyledComponent = styledFn`` as FC<Props>;
+
+    const WithRef = forwardRef<HTMLElement, Props>(
+      ({ className, $as, ...props }: any, ref) => {
+        const classNames = cn(variance({ ...props, className }), className);
+        const forwardedProps = isTw(Element)
+          ? props
+          : (Object.fromEntries(
+              Object.entries(props).filter(removeTransientProps),
+            ) as any);
+
+        return (
+          <StyledComponent
+            className={classNames}
+            {...forwardedProps}
+            {...($as !== undefined ? { $as } : {})}
+            ref={ref}
+          />
         );
+      },
+    );
 
-        WithRef.displayName = `Styled${capitalize(key)}`;
+    const displayName =
+      key != null
+        ? `Styled${capitalize(key)}`
+        : typeof Element === "string"
+          ? `Styled${capitalize(Element)}`
+          : `Styled${(Element as any).displayName || (Element as any).name || "Component"}`;
 
-        // Add withProps method to the component
-        // Type constraint is enforced by the type definition (ValidWithProps<K, T>)
-        // Implementation uses 'as any' to match the type signature while allowing runtime flexibility
-        // We use the variance type to get the correct variant props
-        type ValidPropsForImplementation = ValidElementProps<
-          typeof key & ElementKey
-        > & {
-          [key: `data-${string}`]: string;
-        } & Partial<VariantProps<typeof variance>>;
+    WithRef.displayName = displayName;
+    (WithRef as any)[isTwElement] = true;
 
-        const ComponentWithProps = WithRef as typeof WithRef & {
-          withProps: <DefaultProps extends ValidPropsForImplementation>(
-            defaultProps: DefaultProps,
-          ) => ForwardRefExoticComponent<
-            PropsWithoutRef<Props> & RefAttributes<HTMLElement>
-          >;
-        };
+    // Add withProps method to the component
+    const ComponentWithProps = WithRef as typeof WithRef & {
+      withProps: (defaultProps: any) => any;
+    };
 
-        ComponentWithProps.withProps = ((defaultProps: any) => {
-          const ComponentWithDefaultProps = forwardRef<HTMLElement, Props>(
-            (userProps, ref) => {
-              // Merge default props with user props (user props take precedence)
-              const mergedProps = { ...defaultProps, ...userProps } as Props;
-              return <WithRef {...mergedProps} ref={ref} />;
-            },
-          );
+    ComponentWithProps.withProps = ((defaultProps: any) => {
+      const ComponentWithDefaultProps = forwardRef<HTMLElement, Props>(
+        (userProps, ref) => {
+          // Merge default props with user props (user props take precedence)
+          const mergedProps = { ...defaultProps, ...userProps } as Props;
+          return <WithRef {...mergedProps} ref={ref} />;
+        },
+      );
 
-          ComponentWithDefaultProps.displayName = `${WithRef.displayName}.withProps`;
+      ComponentWithDefaultProps.displayName = `${displayName}.withProps`;
+      (ComponentWithDefaultProps as any)[isTwElement] = true;
 
-          return ComponentWithDefaultProps;
-        }) as typeof ComponentWithProps.withProps;
+      return ComponentWithDefaultProps;
+    }) as typeof ComponentWithProps.withProps;
 
-        return ComponentWithProps;
-      };
+    return ComponentWithProps;
+  };
+};
 
-      const wrapped = function (this: unknown, ...args: unknown[]) {
-        if (isTaggedTemplateArg(args[0])) {
-          return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
-        }
-        return cvaImpl(...(args as Parameters<CVA>));
-      };
+const wrapTemplateFunction = (styledFn: any, Element: any, key?: string) => {
+  const cvaImpl = createCvaImpl(styledFn, Element, key);
 
-      Object.assign(wrapped, styledFn, { cva: cvaImpl });
+  const wrapped = function (this: unknown, ...args: unknown[]) {
+    if (isTaggedTemplateArg(args[0])) {
+      return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
+    }
+    return cvaImpl(...(args as Parameters<CVA>));
+  };
 
-      return [key, wrapped];
-    }),
+  Object.assign(wrapped, styledFn, { cva: cvaImpl });
+
+  return wrapped;
+};
+
+export function createStyledCVA(): StyledCVA {
+  const styledFnFactory = ((element: any, ...callArgs: any[]) => {
+    const styledFn = templateFunctionFactory(element);
+    const wrapped = wrapTemplateFunction(
+      styledFn,
+      element,
+      typeof element === "string" ? element : undefined,
+    );
+    if (callArgs.length > 0) {
+      return (wrapped as any)(...callArgs);
+    }
+    return wrapped;
+  }) as any;
+
+  const twCVA = Object.fromEntries(
+    domElements.map((key) => [key, styledFnFactory(key)]),
   );
 
-  return Object.assign(tw, twCVA) as unknown as StyledCVA;
+  return Object.assign(styledFnFactory, twCVA) as unknown as StyledCVA;
 }
+
+const tw: StyledCVA = createStyledCVA();
+
+export default tw;

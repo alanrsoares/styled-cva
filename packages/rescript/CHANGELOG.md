@@ -1,5 +1,11 @@
 # @styled-cva/rescript
 
+## 0.8.3
+
+### Patch Changes
+
+- @styled-cva/react@0.7.3
+
 ## 0.8.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @styled-cva/examples-react
 
+## 0.0.5
+
+### Patch Changes
+
+- @styled-cva/react@0.7.3
+
 ## 0.0.4
 
 ### Patch Changes

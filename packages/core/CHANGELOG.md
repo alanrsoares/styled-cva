@@ -1,5 +1,11 @@
 # @styled-cva/core
 
+## 0.7.0
+
+### Minor Changes
+
+- 871a5c8: Replace `clsx` and `tailwind-merge` with `cn` to target Tailwind CSS v4 class merging and conflict resolution with argument-identity caching.
+
 ## 0.6.1
 
 ### Patch Changes

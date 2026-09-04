@@ -1,5 +1,11 @@
 # @styled-cva/examples-vue
 
+## 0.0.5
+
+### Patch Changes
+
+- @styled-cva/vue@0.6.3
+
 ## 0.0.4
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @styled-cva/vue
 
+## 0.6.3
+
+### Patch Changes
+
+- Updated dependencies [871a5c8]
+  - @styled-cva/core@0.7.0
+
 ## 0.6.2
 
 ### Patch Changes

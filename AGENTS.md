@@ -17,7 +17,7 @@ Bun workspace. Each package is independently published except where noted.
 | `packages/rescript`        | `@styled-cva/rescript`        | ReScript v12 bindings                   |
 | `packages/eslint-plugin`   | `@styled-cva/eslint-plugin`   | Rule that extracts classes to `tw…`     |
 | `packages/prettier-plugin` | `@styled-cva/prettier-plugin` | Prettier preprocess that normalizes / multilines `tw\`…\`` and `cva()` strings |
-| `packages/biome-plugin`    | `@styled-cva/biome-plugin`    | Biome GritQL diagnostics for `tw\`…\`` (lint-only; no fix) |
+| `packages/biome-plugin`    | `@styled-cva/biome-plugin`    | Biome GritQL plugin for `tw\`…\`` (whitespace normalization safe auto-fix + long line diagnostics) |
 | `examples/{react,solid,vue}` | `@styled-cva/examples-*`    | Private; consumer smoke tests           |
 | `docs`                     | `@styled-cva/docs`            | Private; Nextra site                    |
 

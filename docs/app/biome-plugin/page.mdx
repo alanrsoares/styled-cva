@@ -1,33 +1,43 @@
 # Biome Plugin
 
-The `@styled-cva/biome-plugin` package ships Biome GritQL rules that **flag** `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates with abnormal whitespace or excessive single-line length. It is a lint plugin, not a fixer.
+The `@styled-cva/biome-plugin` package ships Biome GritQL rules that lint `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates for abnormal whitespace and excessive single-line length, including safe auto-fixes for whitespace normalization.
 
 Part of the styled-cva monorepo. Published to npm as `@styled-cva/biome-plugin`.
 
-## Diagnostics, not auto-fix
+## Safe auto-fix for whitespace normalization
 
-As of Biome 2.x, GritQL plugins can **only register diagnostics** — they cannot rewrite code. To auto-fix the issues this plugin reports, run [`@styled-cva/prettier-plugin`](/prettier-plugin) on the same files. The two plugins are designed to compose:
+Biome 2.x supports GritQL rewrites with safe fixes. `@styled-cva/biome-plugin` provides:
 
-- `@styled-cva/biome-plugin` — surfaces issues in `biome check` / `biome lint`
-- `@styled-cva/prettier-plugin` — rewrites the offending templates on save
+- **`normalize-tw-classes`**: registers a **safe auto-fix** (`fix_kind = "safe"`). Running `biome lint --write` (or `biome check --write`) automatically normalizes irregular horizontal whitespace inside single-line `tw` templates.
+- **`prefer-size-class`**: registers a **safe auto-fix** (`fix_kind = "safe"`). Automatically converts identical width and height utilities (e.g. `w-4 h-4`, `h-8 w-8`, or `md:w-12 md:h-12`) into shorthand `size-n` (`size-4`, `size-8`, `md:size-12`).
+- **`multiline-long-tw`**: provides **diagnostics only**. Multi-line template formatting (indentation, line wrapping) is handled by [`@styled-cva/prettier-plugin`](/prettier-plugin).
 
-A migration to a code-modifying Biome plugin will become possible once Biome's JS plugin API ships.
+The two plugins complement each other:
+
+- `@styled-cva/biome-plugin` — flags issues and auto-fixes whitespace and size shorthands in `biome check --write` / `biome lint --write`
+- `@styled-cva/prettier-plugin` — formats and wraps long templates across multiple lines on save
 
 ## Rules
 
 ### `normalize-tw-classes`
 
-Flags inline `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates whose class string contains:
+Flags inline `tw.tag` / `tw(Component)` tagged templates whose class string contains:
 
 - a run of 2+ horizontal whitespace characters,
 - leading horizontal whitespace,
 - or trailing horizontal whitespace.
 
-Multi-line templates (whose chunk contains a `\n`) are **exempt** so that prettier-formatted multi-line `tw.div\`\n  flex\n\`` does not trigger the rule.
+Multi-line templates (whose chunk contains a `\n`) are **exempt** so that prettier-formatted multi-line `tw.div` templates do not trigger the rule.
+
+### `prefer-size-class`
+
+Flags inline `tw.tag` / `tw(Component)` tagged templates containing identical width and height classes (e.g. `w-4 h-4`, `h-4 w-4`, `md:w-8 md:h-8`).
+
+**Auto-fix:** Rewrites pairs of identical width and height classes to `size-n` (`md:size-8`, etc.) preserving any variant modifiers.
 
 ### `multiline-long-tw`
 
-Flags inline `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates whose quasi text exceeds 80 characters on a single line. Multi-line templates are exempt.
+Flags inline `tw.tag` / `tw(Component)` tagged templates whose quasi text exceeds 80 characters on a single line. Multi-line templates are exempt.
 
 ## Installation
 
@@ -46,6 +56,7 @@ In `biome.json` reference the `.grit` files by path:
   "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "plugins": [
     "./node_modules/@styled-cva/biome-plugin/rules/normalize-tw-classes.grit",
+    "./node_modules/@styled-cva/biome-plugin/rules/prefer-size-class.grit",
     "./node_modules/@styled-cva/biome-plugin/rules/multiline-long-tw.grit"
   ]
 }
@@ -54,8 +65,8 @@ In `biome.json` reference the `.grit` files by path:
 Biome plugins are referenced by relative path; there is no package-name shorthand in Biome 2.x.
 
 ## Caveats
-
-- **Diagnostics only.** Pair with `@styled-cva/prettier-plugin` for rewrites.
+ 
+- **Auto-fix is supported for `normalize-tw-classes` and `prefer-size-class`.** `multiline-long-tw` remains diagnostic-only; use `@styled-cva/prettier-plugin` for multi-line wrapping and indenting.
 - **`tw` import name is hard-coded.** Renamed imports (`import sc as tw from …`) are not recognized.
 - **`.cva({ base, variants })` strings are not analyzed.** Object-literal traversal with conditional regex predicates is not expressible in the current Biome GritQL dialect. Use `@styled-cva/prettier-plugin` to normalize those.
 - **80-char threshold is fixed.** GritQL has no numeric comparison or plugin options; the rule uses `r".{81,}"`. To change the threshold, fork the `.grit` file.

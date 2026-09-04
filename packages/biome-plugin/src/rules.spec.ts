@@ -51,6 +51,35 @@ describe("normalize-tw-classes", () => {
       diags.some((d) => messageOf(d).includes("irregular whitespace")),
     ).toBe(true);
   });
+
+  test("autofixes irregular whitespace with --write", () => {
+    const { writeFileSync, readFileSync, unlinkSync } = require("node:fs");
+    const testFile = resolve(PKG_DIR, "fixtures/invalid/temp-autofix.ts");
+    try {
+      writeFileSync(
+        testFile,
+        "const A = tw.div`  flex   items-center  gap-2  `;\nconst B = tw(Button)`   px-4 \t py-2   `;\n",
+      );
+      const { status } = spawnSync(
+        "bunx",
+        [
+          "@biomejs/biome",
+          "lint",
+          "--write",
+          "fixtures/invalid/temp-autofix.ts",
+        ],
+        { cwd: PKG_DIR, encoding: "utf8" },
+      );
+      expect(status).toBe(0);
+      expect(readFileSync(testFile, "utf8")).toBe(
+        "const A = tw.div`flex items-center gap-2`;\nconst B = tw(Button)`px-4 py-2`;\n",
+      );
+    } finally {
+      try {
+        unlinkSync(testFile);
+      } catch {}
+    }
+  });
 });
 
 describe("multiline-long-tw", () => {
@@ -59,6 +88,44 @@ describe("multiline-long-tw", () => {
     expect(diags.some((d) => messageOf(d).includes("exceeds 80 chars"))).toBe(
       true,
     );
+  });
+});
+
+describe("prefer-size-class", () => {
+  test("flags identical w-n and h-n classes", () => {
+    const diags = diagnosticsFor("fixtures/invalid/size-class.ts");
+    expect(
+      diags.filter((d) => messageOf(d).includes("Use size-n instead")).length,
+    ).toBe(3);
+  });
+
+  test("autofixes w-n h-n classes into size-n with --write", () => {
+    const { writeFileSync, readFileSync, unlinkSync } = require("node:fs");
+    const testFile = resolve(PKG_DIR, "fixtures/invalid/temp-size-autofix.ts");
+    try {
+      writeFileSync(
+        testFile,
+        "const A = tw.div`flex w-4 h-4 text-red-500`;\nconst B = tw(Button)`h-8 w-8`;\nconst C = tw.div`md:w-12 md:h-12`;\n",
+      );
+      const { status } = spawnSync(
+        "bunx",
+        [
+          "@biomejs/biome",
+          "lint",
+          "--write",
+          "fixtures/invalid/temp-size-autofix.ts",
+        ],
+        { cwd: PKG_DIR, encoding: "utf8" },
+      );
+      expect(status).toBe(0);
+      expect(readFileSync(testFile, "utf8")).toBe(
+        "const A = tw.div`flex size-4 text-red-500`;\nconst B = tw(Button)`size-8`;\nconst C = tw.div`md:size-12`;\n",
+      );
+    } finally {
+      try {
+        unlinkSync(testFile);
+      } catch {}
+    }
   });
 });
 

@@ -268,6 +268,8 @@ This project is dedicated to the public domain under [The Unlicense](https://unl
 
 - [CVA](https://github.com/joe-bell/cva)
 
+- [cn](https://github.com/shadcn-ui/cn)
+
 - [CLSX](https://github.com/lukeed/clsx)
 
 - [tailwind-merge](https://github.com/dcastil/tailwind-merge)

@@ -1,5 +1,4 @@
-import clsx, { type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn as baseCn } from "cn";
 
 /**
  * Tailwind CSS classnames combiner
@@ -14,4 +13,5 @@ import { twMerge } from "tailwind-merge";
  * // className = "text-red-500 bg-blue-500"
  * ```
  */
-export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+export const cn = baseCn;
+

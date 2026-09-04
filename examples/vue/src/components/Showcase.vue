@@ -168,7 +168,7 @@ const Link = tw.a`font-medium text-[#646cff] no-underline hover:text-[#535bf2] h
       </SectionDesc>
       <Row>
         <label class="text-sm text-[#888]">cn():</label>
-        <span :class="cn('rounded px-2 py-1 text-xs', 'bg-[#333] text-[#a5d6ff]')">clsx + tailwind-merge</span>
+        <span :class="cn('rounded px-2 py-1 text-xs', 'bg-[#333] text-[#a5d6ff]')">cn (Tailwind v4)</span>
       </Row>
     </Section>
 

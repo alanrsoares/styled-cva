@@ -84,7 +84,7 @@ let make = (~isActive: bool) => {
 
 ## Class Name Merging with `cn`
 
-`cn` wraps `clsx` and `tailwind-merge` to combine arrays of class names:
+`cn` uses the `cn` engine to combine arrays of class names and resolve conflicts:
 
 ```rescript
 open StyledCva

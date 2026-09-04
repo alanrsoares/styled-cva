@@ -1,8 +1,8 @@
-import type { ClassValue as CLSXClassValue } from "clsx";
+import type { ClassValue as CNClassValue } from "cn";
 
 export type ClassPropKey = "class" | "className";
 
-export type ClassValue = CLSXClassValue;
+export type ClassValue = CNClassValue;
 
 export type ClassProp =
   | {

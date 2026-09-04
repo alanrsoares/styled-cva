@@ -222,7 +222,7 @@ export default function Showcase() {
               "bg-[#333] text-[#a5d6ff]",
             )}
           >
-            clsx + tailwind-merge
+            cn (Tailwind v4)
           </span>
         </Row>
       </Section>

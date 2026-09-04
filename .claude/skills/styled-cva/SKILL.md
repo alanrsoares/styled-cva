@@ -145,7 +145,7 @@ const Btn = tw.button("px-4 py-2", {
 ```tsx
 import { cn, cva, type VariantProps } from "@styled-cva/react";
 
-// cn — clsx + tailwind-merge
+// cn — Tailwind class merging + conflict resolution
 cn("text-red-500", condition && "bg-blue-500", "text-blue-500"); // last text-* wins
 
 // cva — raw class-variance-authority, no $ prefix needed

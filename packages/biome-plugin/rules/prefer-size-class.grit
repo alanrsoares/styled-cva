@@ -1,121 +1,64 @@
 // @styled-cva/biome-plugin: prefer-size-class
 //
-// Flag inline `tw.tag` / `tw(...)` tagged templates that have identical width
-// and height classes (e.g. `w-4 h-4`, `h-4 w-4`, or `md:w-8 md:h-8`) and safely
-// rewrite them to `size-n` (e.g. `size-4`, `md:size-8`).
+// Flag inline `tw.tag`/`tw(Component)` tagged templates that set identical
+// width and height (`w-4 h-4`, `h-8 w-8`, `md:w-12 md:h-12`) and rewrite the
+// pair to the `size-n` shorthand, preserving the variant modifier.
+//
+// One pair is rewritten per pass; Biome re-applies safe plugin fixes until no
+// rule rewrites, so a template with several pairs converges in one
+// `biome check --write`. Both arms are newline-tolerant, so pairs inside a
+// wrapped multi-line template are still collapsed.
 
 engine biome(1.0)
 language js
 
-or {
-  JsTemplateExpression(tag = `tw.$x`, elements = [$chunk]) as $t,
-  JsTemplateExpression(tag = `tw($_)`, elements = [$chunk]) as $t
-} where {
-  $chunk <: JsTemplateChunkElement(),
+// Resolve the local styled-cva binding: an aliased default import from any
+// `@styled-cva/*` adapter, else the conventional bare `tw` — but only when the
+// file does not import `tw` from somewhere else.
+pattern styled_cva_binding($sc) {
   or {
-    // Both with matching modifiers (e.g. md:w-4 md:h-4)
-    $chunk <: r"^([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+)$"($w_mod, $w, $h_mod, $h) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$size_cls`
-    },
-    $chunk <: r"^(.* )([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+)$"($prefix, $w_mod, $w, $h_mod, $h) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$prefix$size_cls`
-    },
-    $chunk <: r"^([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+)( .*)$"($w_mod, $w, $h_mod, $h, $suffix) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$size_cls$suffix`
-    },
-    $chunk <: r"^(.* )([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+)( .*)$"($prefix, $w_mod, $w, $h_mod, $h, $suffix) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$prefix$size_cls$suffix`
-    },
-    $chunk <: r"^([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+)$"($h_mod, $h, $w_mod, $w) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$size_cls`
-    },
-    $chunk <: r"^(.* )([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+)$"($prefix, $h_mod, $h, $w_mod, $w) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$prefix$size_cls`
-    },
-    $chunk <: r"^([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+)( .*)$"($h_mod, $h, $w_mod, $w, $suffix) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$size_cls$suffix`
-    },
-    $chunk <: r"^(.* )([a-z0-9_:\\[\\]\\-]+:)h-([^ ]+) ([a-z0-9_:\\[\\]\\-]+:)w-([^ ]+)( .*)$"($prefix, $h_mod, $h, $w_mod, $w, $suffix) where {
-      $w_mod == $h_mod,
-      $w == $h,
-      $size_name = `size-$w`,
-      $size_cls = `$w_mod$size_name`,
-      $chunk => `$prefix$size_cls$suffix`
-    },
-    // Bare classes (no modifier, e.g. w-4 h-4)
-    $chunk <: r"^w-([^ ]+) h-([^ ]+)$"($w, $h) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$size_cls`
-    },
-    $chunk <: r"^(.* )w-([^ ]+) h-([^ ]+)$"($prefix, $w, $h) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$prefix$size_cls`
-    },
-    $chunk <: r"^w-([^ ]+) h-([^ ]+)( .*)$"($w, $h, $suffix) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$size_cls$suffix`
-    },
-    $chunk <: r"^(.* )w-([^ ]+) h-([^ ]+)( .*)$"($prefix, $w, $h, $suffix) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$prefix$size_cls$suffix`
-    },
-    $chunk <: r"^h-([^ ]+) w-([^ ]+)$"($h, $w) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$size_cls`
-    },
-    $chunk <: r"^(.* )h-([^ ]+) w-([^ ]+)$"($prefix, $h, $w) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$prefix$size_cls`
-    },
-    $chunk <: r"^h-([^ ]+) w-([^ ]+)( .*)$"($h, $w, $suffix) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$size_cls$suffix`
-    },
-    $chunk <: r"^(.* )h-([^ ]+) w-([^ ]+)( .*)$"($prefix, $h, $w, $suffix) where {
-      $w == $h,
-      $size_cls = `size-$w`,
-      $chunk => `$prefix$size_cls$suffix`
+    contains `import $sc from $src` where { $src <: r"\"@styled-cva/[a-z]+\"" },
+    and {
+      not contains `import tw from $other` where {
+        $other <: not r"\"@styled-cva/[a-z]+\""
+      },
+      $sc = `tw`
     }
-  },
-  register_diagnostic(
-    span = $t,
-    message = "Use size-n instead of identical width and height classes.",
-    severity = "warn",
-    fix_kind = "safe"
-  )
+  }
+}
+
+// Static, single-chunk `tw.tag\`…\`` / `tw(Component)\`…\`` templates.
+pattern tw_template($sc, $chunk) {
+  or {
+    JsTemplateExpression(tag = `$sc.$_`, elements = [$chunk]),
+    JsTemplateExpression(tag = `$sc($_)`, elements = [$chunk])
+  } where { $chunk <: JsTemplateChunkElement() }
+}
+
+file($body) where {
+  $body <: styled_cva_binding($sc),
+  $body <: contains bubble($sc) tw_template($sc, $chunk) as $t where {
+    or {
+      $chunk <: r"(|[\s\S]* )([a-z0-9_:\[\]\-]*:|)w-([^ \n]+) ([a-z0-9_:\[\]\-]*:|)h-([^ \n]+)( [\s\S]*|)"($pre, $w_mod, $w, $h_mod, $h, $post) where {
+        $w_mod <: $h_mod,
+        $w <: $h,
+        $size_name = `size-$w`,
+        $size_cls = `$w_mod$size_name`,
+        $chunk => `$pre$size_cls$post`
+      },
+      $chunk <: r"(|[\s\S]* )([a-z0-9_:\[\]\-]*:|)h-([^ \n]+) ([a-z0-9_:\[\]\-]*:|)w-([^ \n]+)( [\s\S]*|)"($pre, $h_mod, $h, $w_mod, $w, $post) where {
+        $w_mod <: $h_mod,
+        $w <: $h,
+        $size_name = `size-$w`,
+        $size_cls = `$w_mod$size_name`,
+        $chunk => `$pre$size_cls$post`
+      }
+    },
+    register_diagnostic(
+      span = $t,
+      message = "Use size-n instead of identical width and height classes.",
+      severity = "warn",
+      fix_kind = "safe"
+    )
+  }
 }

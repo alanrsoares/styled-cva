@@ -1,0 +1,68 @@
+// @styled-cva/biome-plugin: normalize-cva-classes
+//
+// Normalize whitespace in the class strings of a `tw.tag.cva({ … })` /
+// `tw(Component).cva({ … })` call: `base`, every `variants.*.*` option, and
+// the `class` / `className` of a `compoundVariants` entry.
+//
+// Only string *values* are visited. Object keys are a different node
+// (`JsLiteralMemberName`), so a quoted variant key such as `"2xl"` is never
+// rewritten, and non-class strings like `defaultVariants` values are out of
+// scope by construction.
+//
+// One run is collapsed per pass; Biome re-applies safe plugin fixes until no
+// rule rewrites, so `biome check --write` converges.
+
+engine biome(1.0)
+language js
+
+// Resolve the local styled-cva binding: an aliased default import from any
+// `@styled-cva/*` adapter, else the conventional bare `tw` — but only when the
+// file does not import `tw` from somewhere else.
+pattern styled_cva_binding($sc) {
+  or {
+    contains `import $sc from $src` where { $src <: r"\"@styled-cva/[a-z]+\"" },
+    and {
+      not contains `import tw from $other` where {
+        $other <: not r"\"@styled-cva/[a-z]+\""
+      },
+      $sc = `tw`
+    }
+  }
+}
+
+// Whitespace-normalize one class string literal.
+pattern normalize_class_literal() {
+  JsStringLiteralExpression() as $s where {
+    or {
+      $s <: r"(.)(.*?)[ \t][ \t]+(.*)(.)"($q, $head, $rest, $q2) where {
+        $s => `$q$head $rest$q2`
+      },
+      $s <: r"(.)[ \t]+(.*)(.)"($q, $rest, $q2) where { $s => `$q$rest$q2` },
+      $s <: r"(.)(.*?)[ \t]+(.)"($q, $head, $q2) where { $s => `$q$head$q2` }
+    },
+    register_diagnostic(
+      span = $s,
+      message = "Tailwind class string has irregular whitespace.",
+      severity = "warn",
+      fix_kind = "safe"
+    )
+  }
+}
+
+file($body) where {
+  $body <: styled_cva_binding($sc),
+  $body <: contains bubble($sc) `$sc.$_.cva($config)` where {
+    $config <: or {
+      contains `base: $b` where { $b <: normalize_class_literal() },
+      contains `variants: $v` where {
+        $v <: contains bubble normalize_class_literal()
+      },
+      contains `compoundVariants: $cv` where {
+        $cv <: contains bubble or {
+          `class: $c` where { $c <: normalize_class_literal() },
+          `className: $c` where { $c <: normalize_class_literal() }
+        }
+      }
+    }
+  }
+}

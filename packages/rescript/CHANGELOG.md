@@ -1,5 +1,12 @@
 # @styled-cva/rescript
 
+## 0.8.2
+
+### Patch Changes
+
+- Updated dependencies [a2537a1]
+  - @styled-cva/react@0.7.2
+
 ## 0.8.1
 
 ### Patch Changes

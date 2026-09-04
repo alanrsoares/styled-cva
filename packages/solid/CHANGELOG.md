@@ -1,5 +1,11 @@
 # @styled-cva/solid
 
+## 0.6.2
+
+### Patch Changes
+
+- a2537a1: Strip transient `$`-prefixed props when wrapping custom components with `tw(Component)` and enable variant declaration via the `(base, config)` shorthand and `.cva()` method.
+
 ## 0.6.1
 
 ### Patch Changes

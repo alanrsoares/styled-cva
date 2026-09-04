@@ -8,18 +8,18 @@ too if you need user-context.
 
 Bun workspace. Each package is independently published except where noted.
 
-| Path                       | Package                       | Notes                                   |
-| -------------------------- | ----------------------------- | --------------------------------------- |
-| `packages/core`            | `@styled-cva/core`            | Shared `cva`, `cn`, helpers; no UI deps. Subpath `@styled-cva/core/formatting` exports pure class-string utilities for tooling. |
-| `packages/react`           | `@styled-cva/react`           | Primary published package               |
-| `packages/solid`           | `@styled-cva/solid`           | Solid port                              |
-| `packages/vue`             | `@styled-cva/vue`             | Vue port                                |
-| `packages/rescript`        | `@styled-cva/rescript`        | ReScript v12 bindings                   |
-| `packages/eslint-plugin`   | `@styled-cva/eslint-plugin`   | Rule that extracts classes to `tw…`     |
-| `packages/prettier-plugin` | `@styled-cva/prettier-plugin` | Prettier preprocess that normalizes / multilines `tw\`…\`` and `cva()` strings |
-| `packages/biome-plugin`    | `@styled-cva/biome-plugin`    | Biome GritQL plugin for `tw\`…\`` (whitespace normalization safe auto-fix + long line diagnostics) |
-| `examples/{react,solid,vue}` | `@styled-cva/examples-*`    | Private; consumer smoke tests           |
-| `docs`                     | `@styled-cva/docs`            | Private; Nextra site                    |
+| Path                         | Package                       | Notes                                                                                                                           |
+| ---------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/core`              | `@styled-cva/core`            | Shared `cva`, `cn`, helpers; no UI deps. Subpath `@styled-cva/core/formatting` exports pure class-string utilities for tooling. |
+| `packages/react`             | `@styled-cva/react`           | Primary published package                                                                                                       |
+| `packages/solid`             | `@styled-cva/solid`           | Solid port                                                                                                                      |
+| `packages/vue`               | `@styled-cva/vue`             | Vue port                                                                                                                        |
+| `packages/rescript`          | `@styled-cva/rescript`        | ReScript v12 bindings                                                                                                           |
+| `packages/eslint-plugin`     | `@styled-cva/eslint-plugin`   | Rule that extracts classes to `tw…`                                                                                             |
+| `packages/prettier-plugin`   | `@styled-cva/prettier-plugin` | Prettier preprocess that normalizes / multilines `tw\`…\``and`cva()` strings                                                    |
+| `packages/biome-plugin`      | `@styled-cva/biome-plugin`    | Biome GritQL plugin for `tw\`…\`` (whitespace normalization safe auto-fix + long line diagnostics)                              |
+| `examples/{react,solid,vue}` | `@styled-cva/examples-*`      | Private; consumer smoke tests                                                                                                   |
+| `docs`                       | `@styled-cva/docs`            | Private; Nextra site                                                                                                            |
 
 The three framework packages share a near-identical type architecture
 (`types.ts` + `styled-cva.{ts,tsx}`). When you change one, mirror to the
@@ -45,23 +45,23 @@ compat instructions.
 
 From repo root:
 
-| Command         | What it does                                          |
-| --------------- | ----------------------------------------------------- |
-| `bun install`   | Install workspace deps                                |
-| `bun run build` | Build all publishable packages + docs                 |
-| `bun run test`  | All packages' test suites (vitest for framework adapters, `bun:test` for core / eslint-plugin / prettier-plugin / biome-plugin) |
-| `bun run lint`  | All packages' eslint                                  |
-| `bun run format`| Prettier across the repo                              |
+| Command          | What it does                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `bun install`    | Install workspace deps                                                                                                          |
+| `bun run build`  | Build all publishable packages + docs                                                                                           |
+| `bun run test`   | All packages' test suites (vitest for framework adapters, `bun:test` for core / eslint-plugin / prettier-plugin / biome-plugin) |
+| `bun run lint`   | All packages' eslint                                                                                                            |
+| `bun run format` | Prettier across the repo                                                                                                        |
 
 Per-package (run from the package directory):
 
-| Command           | What it does                                       |
-| ----------------- | -------------------------------------------------- |
+| Command           | What it does                                                 |
+| ----------------- | ------------------------------------------------------------ |
 | `bun run compile` | Typecheck only — uses `tsconfig.build.json` (excludes specs) |
-| `bun run test`    | Vitest                                             |
-| `bun run lint`    | ESLint                                             |
-| `bun run bundle`  | tsup → `dist/`                                     |
-| `bun run build`   | `compile && bundle`                                |
+| `bun run test`    | Vitest                                                       |
+| `bun run lint`    | ESLint                                                       |
+| `bun run bundle`  | tsup → `dist/`                                               |
+| `bun run build`   | `compile && bundle`                                          |
 
 `compile` is the fast path used by CI/build. Specs are typechecked by
 vitest at test time and by the IDE via `tsconfig.json`.
@@ -123,7 +123,7 @@ the wrapper.
   separate `__tests__` directory.
 - **Type tests** use `ts-expect`'s `expectType<TypeEqual<…>>(true)`
   pattern. When fixing an inference bug, add a test that exercises the
-  *exact* path that broke (e.g. `Parameters<typeof X>[0]` for the JSX
+  _exact_ path that broke (e.g. `Parameters<typeof X>[0]` for the JSX
   call-site path, distinct from `ComponentProps<typeof X>` which routes
   through a different overload).
 - **Don't commit** `docs/next-env.d.ts` — autogenerated by Next.js,

@@ -12,7 +12,8 @@
   ],
   "exports": {
     "./rules/normalize-tw-classes.grit": "./rules/normalize-tw-classes.grit",
-    "./rules/multiline-long-tw.grit": "./rules/multiline-long-tw.grit"
+    "./rules/multiline-long-tw.grit": "./rules/multiline-long-tw.grit",
+    "./rules/prefer-size-class.grit": "./rules/prefer-size-class.grit"
   },
   "scripts": {
     "test": "bun test",

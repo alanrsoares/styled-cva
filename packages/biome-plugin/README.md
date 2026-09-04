@@ -9,11 +9,12 @@ Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo.
 Biome 2.x supports GritQL rewrites with safe fixes. `@styled-cva/biome-plugin` provides:
 
 - **`normalize-tw-classes`**: registers a **safe auto-fix** (`fix_kind = "safe"`). Running `biome lint --write` (or `biome check --write`) automatically normalizes irregular horizontal whitespace inside single-line `tw` templates.
+- **`prefer-size-class`**: registers a **safe auto-fix** (`fix_kind = "safe"`). Automatically converts identical width and height utilities (e.g. `w-4 h-4`, `h-8 w-8`, or `md:w-12 md:h-12`) into shorthand `size-n` (`size-4`, `size-8`, `md:size-12`).
 - **`multiline-long-tw`**: provides **diagnostics only**. Multi-line template formatting (indentation, line wrapping) is handled by [`@styled-cva/prettier-plugin`](../prettier-plugin).
 
 The two plugins complement each other:
 
-- `@styled-cva/biome-plugin` — flags issues and auto-fixes whitespace in `biome check --write` / `biome lint --write`
+- `@styled-cva/biome-plugin` — flags issues and auto-fixes whitespace and size shorthands in `biome check --write` / `biome lint --write`
 - `@styled-cva/prettier-plugin` — formats and wraps long templates across multiple lines on save
 
 ## Rules
@@ -29,6 +30,12 @@ Flags inline `tw.tag\`…\``/`tw(Component)\`…\`` tagged templates whose class
 **Auto-fix:** Rewrites the template chunk to collapse multiple spaces/tabs to a single space and trim leading/trailing whitespace (`biome lint --write`).
 
 Multi-line templates (whose chunk contains a `\n`) are **exempt** so that prettier-formatted multi-line `tw.div\`\n flex\n\`` does not trigger the rule.
+
+### `prefer-size-class`
+
+Flags inline `tw.tag\`…\``/`tw(Component)\`…\``tagged templates containing identical width and height classes (e.g.`w-4 h-4`, `h-4 w-4`, `md:w-8 md:h-8`).
+
+**Auto-fix:** Rewrites pairs of identical width and height classes to `size-n` (`md:size-8`, etc.) preserving any variant modifiers.
 
 ### `multiline-long-tw`
 
@@ -51,6 +58,7 @@ In `biome.json` reference the `.grit` files directly by path:
   "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "plugins": [
     "./node_modules/@styled-cva/biome-plugin/rules/normalize-tw-classes.grit",
+    "./node_modules/@styled-cva/biome-plugin/rules/prefer-size-class.grit",
     "./node_modules/@styled-cva/biome-plugin/rules/multiline-long-tw.grit"
   ]
 }

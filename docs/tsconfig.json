@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -19,7 +20,9 @@
       }
     ],
     "paths": {
-      "~/*": ["./*"]
+      "@/*": ["./*"],
+      "~/*": ["./*"],
+      "collections/*": ["./.source/*"]
     }
   },
   "include": [

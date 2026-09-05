@@ -5,22 +5,29 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "typecheck": "fumadocs-mdx && next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.2",
-    "@tailwindcss/postcss": "^4.1.18",
+    "@orama/orama": "^3.1.18",
+    "@tailwindcss/postcss": "^4.3.3",
+    "fumadocs-core": "16.14.4",
+    "fumadocs-mdx": "15.2.3",
+    "fumadocs-twoslash": "3.3.0",
+    "fumadocs-ui": "16.14.4",
     "lucide-react": "^0.562.0",
-    "next": "^16.1.1",
-    "nextra": "^4.6.1",
-    "nextra-theme-docs": "^4.6.1",
+    "next": "16.3.1",
     "postcss": "^8.5.6",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "tailwindcss": "^4.1.18",
-    "zod": "^3.25.76"
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.3",
+    "twoslash": "0.3.9",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/mdx": "^2.0.14",
     "@types/node": "^20.19.28",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",

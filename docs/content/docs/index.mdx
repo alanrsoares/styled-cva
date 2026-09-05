@@ -1,0 +1,69 @@
+---
+title: Introduction
+description: A typesafe, class-variance-authority-based, styled-components-like library for authoring React, Solid, Vue, and ReScript components.
+---
+
+import {
+  Brackets,
+  Code,
+  Layers,
+  Palette,
+  Rocket,
+  Shapes,
+  Shield,
+} from "lucide-react";
+
+Welcome to **styled-cva** documentation.
+
+A typesafe, [class-variance-authority-based](https://github.com/joe-bell/cva), styled-components-like library for authoring UI components with Tailwind CSS.
+
+<Callout type="warning">
+  styled-cva only supports React 19.x (or Solid, Vue, ReScript via their respective adapters). If you're on React 18, use the legacy 0.3.x releases.
+</Callout>
+
+## Quick Example
+
+```tsx
+import tw from "@styled-cva/react";
+
+// Basic styled component
+const Button = tw.button`bg-blue-500 text-white px-4 py-2 rounded`;
+
+// With variants (prefer shorthand — `.cva()` on intrinsics is deprecated)
+const VariantButton = tw.button("px-4 py-2 rounded", {
+  variants: {
+    $variant: {
+      primary: "bg-blue-500 text-white",
+      secondary: "bg-gray-500 text-white",
+    },
+  },
+});
+
+// Usage
+<Button>Click me</Button>
+<VariantButton $variant="primary">Primary</VariantButton>
+```
+
+<Callout type="info">
+  For detailed installation instructions and comprehensive examples, check out
+  the [Getting Started guide](/docs/getting-started).
+</Callout>
+
+## Features
+
+<Cards>
+  <Card icon={<Shield />} title="Type-safe" href="/docs/api" description="Full TypeScript inference across variants, default variants, and compound variants." />
+  <Card icon={<Layers />} title="CVA-based" href="/docs/api" description="Built directly on top of class-variance-authority with zero friction." />
+  <Card icon={<Code />} title="Styled Syntax" href="/docs/getting-started" description="Familiar styled-components template literal and factory API." />
+  <Card icon={<Palette />} title="Tailwind CSS" href="/docs/getting-started" description="Designed ground-up to complement Tailwind CSS utility classes." />
+  <Card icon={<Brackets />} title="Intrinsic CVA Shorthand" href="/docs/getting-started" description="tw.button(base, config) shorthand on all 72+ HTML intrinsics." />
+  <Card icon={<Shapes />} title="Polymorphic Components" href="/docs/getting-started" description="Full $as prop support preserving variant typing on custom elements." />
+</Cards>
+
+## Next Steps
+
+<Callout type="info">
+  Ready to get started? Check out the [Getting Started guide](/docs/getting-started)
+  to learn the basics, or dive into the [API Reference](/docs/api) for complete
+  documentation.
+</Callout>

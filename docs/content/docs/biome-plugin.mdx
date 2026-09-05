@@ -1,0 +1,64 @@
+---
+title: Biome Plugin
+description: Biome GritQL rules and safe auto-fixes for styled-cva class strings.
+---
+
+The `@styled-cva/biome-plugin` package ships Biome GritQL rules that lint `tw.tag\`…\`` / `tw(Component)\`…\`` tagged templates for abnormal whitespace and excessive single-line length, including safe auto-fixes for whitespace normalization.
+
+Part of the styled-cva monorepo. Published to npm as `@styled-cva/biome-plugin`.
+
+## Safe auto-fix for whitespace normalization
+
+Biome 2.x supports GritQL rewrites with safe fixes. `@styled-cva/biome-plugin` provides:
+
+- **`normalize-tw-classes`**: registers a **safe auto-fix** (`fix_kind = "safe"`). Running `biome lint --write` (or `biome check --write`) automatically normalizes irregular horizontal whitespace inside single-line `tw` templates.
+- **`prefer-size-class`**: registers a **safe auto-fix** (`fix_kind = "safe"`). Automatically converts identical width and height utilities (e.g. `w-4 h-4`, `h-8 w-8`, or `md:w-12 md:h-12`) into shorthand `size-n` (`size-4`, `size-8`, `md:size-12`).
+- **`multiline-long-tw`**: provides **diagnostics only**. Multi-line template formatting (indentation, line wrapping) is handled by [`@styled-cva/prettier-plugin`](/docs/prettier-plugin).
+
+The two plugins complement each other:
+
+- `@styled-cva/biome-plugin` — flags issues and auto-fixes whitespace and size shorthands in `biome check --write` / `biome lint --write`
+- `@styled-cva/prettier-plugin` — formats and wraps long templates across multiple lines on save
+
+## Rules
+
+### `normalize-tw-classes`
+
+Flags inline `tw.tag` / `tw(Component)` tagged templates whose class string contains:
+
+- a run of 2+ horizontal whitespace characters,
+- leading horizontal whitespace,
+- or trailing horizontal whitespace.
+
+Multi-line templates (whose chunk contains a `\n`) are **exempt** so that prettier-formatted multi-line `tw.div` templates do not trigger the rule.
+
+### `prefer-size-class`
+
+Flags inline `tw.tag` / `tw(Component)` tagged templates containing identical width and height classes (e.g. `w-4 h-4`, `h-4 w-4`, `md:w-8 md:h-8`).
+
+**Auto-fix:** Rewrites pairs of identical width and height classes to `size-n` (`md:size-8`, etc.) preserving any variant modifiers.
+
+### `multiline-long-tw`
+
+Flags inline `tw.tag` / `tw(Component)` tagged templates whose quasi text exceeds 80 characters on a single line. Multi-line templates are exempt.
+
+## Installation
+
+```bash
+bun add -D @styled-cva/biome-plugin
+```
+
+**Peer dependency:** `@biomejs/biome` (^2).
+
+## Configuration
+
+In `biome.json`:
+
+```json
+{
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "plugins": ["@styled-cva/biome-plugin"]
+}
+```
+
+Biome automatically resolves the plugin from `node_modules` and runs the rules during `biome lint` and `biome check`.

@@ -9,7 +9,7 @@ type PackageJson = {
 
 function readPackageVersion(pathSegments: string[]): string | null {
   try {
-    const pkgPath = join(process.cwd(), ...pathSegments);
+    const pkgPath = join(/*turbopackIgnore: true*/ process.cwd(), ...pathSegments);
     const raw = readFileSync(pkgPath, "utf8");
     const pkg = JSON.parse(raw) as PackageJson;
     return pkg.version ?? null;
@@ -28,4 +28,3 @@ export function getReactVersion(): string {
 export function getDocsVersion(): string {
   return readPackageVersion(["package.json"]) ?? "0.0.0";
 }
-

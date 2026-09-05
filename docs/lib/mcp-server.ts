@@ -17,56 +17,62 @@ import { getReactVersion } from "./versions";
 // Documentation pages mapping
 export const DOCS_PAGES = [
   {
-    path: "page.mdx",
-    route: "/",
+    path: "index.mdx",
+    route: "/docs",
     title: "Introduction",
     resource: "styled-cva://docs/introduction",
   },
   {
-    path: "getting-started/page.mdx",
-    route: "/getting-started",
+    path: "getting-started.mdx",
+    route: "/docs/getting-started",
     title: "Getting Started",
     resource: "styled-cva://docs/getting-started",
   },
   {
-    path: "examples/page.mdx",
-    route: "/examples",
+    path: "examples.mdx",
+    route: "/docs/examples",
     title: "Examples",
     resource: "styled-cva://docs/examples",
   },
   {
-    path: "testing/page.mdx",
-    route: "/testing",
+    path: "testing.mdx",
+    route: "/docs/testing",
     title: "Testing",
     resource: "styled-cva://docs/testing",
   },
   {
-    path: "api/page.mdx",
-    route: "/api",
+    path: "api.mdx",
+    route: "/docs/api",
     title: "API Reference",
     resource: "styled-cva://docs/api",
   },
   {
-    path: "eslint-plugin/page.mdx",
-    route: "/eslint-plugin",
+    path: "eslint-plugin.mdx",
+    route: "/docs/eslint-plugin",
     title: "ESLint Plugin",
     resource: "styled-cva://docs/eslint-plugin",
   },
   {
-    path: "prettier-plugin/page.mdx",
-    route: "/prettier-plugin",
+    path: "prettier-plugin.mdx",
+    route: "/docs/prettier-plugin",
     title: "Prettier Plugin",
     resource: "styled-cva://docs/prettier-plugin",
   },
   {
-    path: "biome-plugin/page.mdx",
-    route: "/biome-plugin",
+    path: "biome-plugin.mdx",
+    route: "/docs/biome-plugin",
     title: "Biome Plugin",
     resource: "styled-cva://docs/biome-plugin",
   },
   {
-    path: "mcp/page.mdx",
-    route: "/mcp",
+    path: "rescript.mdx",
+    route: "/docs/rescript",
+    title: "ReScript Bindings",
+    resource: "styled-cva://docs/rescript",
+  },
+  {
+    path: "mcp.mdx",
+    route: "/docs/mcp",
     title: "MCP Docs Server",
     resource: "styled-cva://docs/mcp",
   },
@@ -109,7 +115,7 @@ export async function readResource(uri: string): Promise<ReadResourceResult> {
   }
 
   try {
-    const filePath = join(process.cwd(), "app", page.path);
+    const filePath = join(process.cwd(), "content/docs", page.path);
     const content = await readFile(filePath, "utf-8");
 
     // Remove frontmatter if present

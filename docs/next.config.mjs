@@ -1,17 +1,24 @@
-import nextra from "nextra";
+import { createMDX } from 'fumadocs-mdx/next';
 
-// Set up Nextra with its configuration
-const withNextra = nextra({
-  // Nextra-specific options can be added here
-});
+const withMDX = createMDX();
 
-// Export the final Next.js config with Nextra included
-export default withNextra({
-  // Add regular Next.js options here if needed
-  // Turbopack requires this alias to resolve next-mdx-import-source-file
-  turbopack: {
-    resolveAlias: {
-      "next-mdx-import-source-file": "./mdx-components.js",
-    },
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
+/** @type {import('next').NextConfig} */
+const config = {
+  reactStrictMode: true,
+  basePath: basePath || undefined,
+  images: {
+    unoptimized: true,
   },
-});
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
+  transpilePackages: [
+    "@styled-cva/core",
+    "@styled-cva/react",
+  ],
+  serverExternalPackages: ["twoslash", "typescript", "@typescript/vfs"],
+};
+
+export default withMDX(config);

@@ -1,0 +1,101 @@
+---
+title: MCP Docs Server
+description: Access styled-cva documentation via the Model Context Protocol (MCP).
+---
+
+<Callout type="info">
+  This documentation site functions as an HTTP MCP (Model Context Protocol)
+  server, making styled-cva documentation accessible to AI assistants and other
+  MCP clients.
+</Callout>
+
+## Endpoint
+
+**Production URL**: `https://styled-cva.vercel.app/api/mcp`
+
+## Integration
+
+<Tabs items={["Cursor", "Claude Desktop", "Windsurf", "Gemini"]}>
+
+<Tab value="Cursor">
+
+Add to your Cursor MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "styled-cva-docs": {
+      "url": "https://styled-cva.vercel.app/api/mcp"
+    }
+  }
+}
+```
+
+</Tab>
+
+<Tab value="Claude Desktop">
+
+Add to your Claude Desktop MCP configuration file (typically `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "styled-cva-docs": {
+      "url": "https://styled-cva.vercel.app/api/mcp"
+    }
+  }
+}
+```
+
+</Tab>
+
+<Tab value="Windsurf">
+
+Configure in Windsurf's MCP settings:
+
+```
+Server URL: https://styled-cva.vercel.app/api/mcp
+```
+
+</Tab>
+
+<Tab value="Gemini">
+
+Add to your Gemini MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "styled-cva-docs": {
+      "url": "https://styled-cva.vercel.app/api/mcp"
+    }
+  }
+}
+```
+
+</Tab>
+
+</Tabs>
+
+## Available Resources
+
+The server exposes all documentation pages as MCP resources:
+
+- **[Introduction](/docs)** - `styled-cva://docs/introduction`
+- **[Getting Started](/docs/getting-started)** - `styled-cva://docs/getting-started`
+- **[API Reference](/docs/api)** - `styled-cva://docs/api`
+- **[MCP Docs Server](/docs/mcp)** - `styled-cva://docs/mcp`
+
+## Available Tools
+
+- **`list_docs`** - List all available documentation pages
+- **`search_docs`** - Search documentation by keyword (requires `query` parameter)
+
+## `llms.txt`
+
+In addition to the MCP server, we also provide a standard [`llms.txt`](/llms.txt) and [`llms-full.txt`](/llms-full.txt). This is a markdown document that provides a concise summary of the project and its documentation, specifically designed for Large Language Models to consume.
+
+<Callout type="info">
+  Once configured, your AI assistant can query styled-cva documentation directly
+  through the MCP protocol.
+</Callout>

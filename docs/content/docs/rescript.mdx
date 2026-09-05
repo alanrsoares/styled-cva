@@ -1,0 +1,119 @@
+---
+title: ReScript Bindings
+description: Zero-cost, type-safe ReScript v12 bindings for @styled-cva/react.
+---
+
+`@styled-cva/rescript` provides zero-cost, type-safe [ReScript v12](https://rescript-lang.org) bindings for `@styled-cva/react`.
+
+It includes code-generated element factories for all 72+ HTML elements (`Tw.div`, `Tw.button`, `Tw.a`, `Tw.span`, etc.), `cva()` variant generator, and `cn()` class merge utility.
+
+## Installation
+
+<Tabs items={["bun", "npm", "pnpm"]}>
+
+<Tab value="bun">
+
+```bash
+bun add @styled-cva/rescript @styled-cva/react
+```
+
+</Tab>
+
+<Tab value="npm">
+
+```bash
+npm i --save @styled-cva/rescript @styled-cva/react
+```
+
+</Tab>
+
+<Tab value="pnpm">
+
+```bash
+pnpm add @styled-cva/rescript @styled-cva/react
+```
+
+</Tab>
+
+</Tabs>
+
+Add `@styled-cva/rescript` to your `rescript.json` (or `bsconfig.json`):
+
+```json
+{
+  "dependencies": [
+    "@rescript/react",
+    "@styled-cva/rescript"
+  ]
+}
+```
+
+## Basic Usage
+
+Open `StyledCva` to access element components and utilities:
+
+```ocaml
+open StyledCva
+
+/* Basic Styled Element */
+let card = Tw.div("bg-white p-4 rounded-xl shadow-md")
+
+@react.component
+let make = () => {
+  React.createElement(
+    card,
+    {
+      children: <p>{React.string("Hello ReScript!")}</p>,
+    },
+  )
+}
+```
+
+## Variants with `cva`
+
+Use `cva` to define multi-axis variants:
+
+```ocaml
+open StyledCva
+
+type buttonVariantProps = {
+  "$state": string,
+}
+
+let buttonVariants: buttonVariantProps => string = cva(
+  "px-4 py-2 rounded-md font-bold transition-all active:scale-95",
+  {
+    "variants": {
+      "$state": {
+        "active": "bg-orange-500 text-white animate-pulse",
+        "idle": "bg-stone-600 text-stone-100 hover:bg-stone-700",
+      },
+    },
+    "defaultVariants": {
+      "$state": "idle",
+    },
+  },
+)
+
+@react.component
+let make = (~isActive: bool) => {
+  <button
+    className={buttonVariants({
+      "$state": isActive ? "active" : "idle",
+    })}
+  >
+    {React.string("Click Me")}
+  </button>
+}
+```
+
+## Class Name Merging with `cn`
+
+`cn` uses the `cn` engine to combine arrays of class names and resolve conflicts:
+
+```ocaml
+open StyledCva
+
+let baseClass = cn(["text-red-500", "p-4", "text-blue-500"])
+/* Resolves to: "p-4 text-blue-500" */
+```

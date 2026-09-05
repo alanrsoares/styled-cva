@@ -1,0 +1,335 @@
+---
+title: API Reference
+description: Complete API reference for styled-cva exports, methods, and TypeScript utilities.
+---
+
+## `tw`
+
+The main export from `@styled-cva/react`. It's a function that can be used to create styled components.
+
+### Basic Usage
+
+```tsx
+import tw from "@styled-cva/react";
+
+const Button = tw.button`bg-blue-500 text-white`;
+```
+
+### With Element Types
+
+You can use `tw` with any HTML element:
+
+```tsx
+const Div = tw.div`container mx-auto`;
+const Input = tw.input`border rounded`;
+const A = tw.a`text-blue-500 hover:underline`;
+```
+
+### With Custom Components
+
+You can also wrap custom components:
+
+```tsx
+import MyComponent from "./MyComponent";
+
+const StyledComponent = tw(MyComponent)`bg-gray-100 p-4`;
+```
+
+### Extending Styled Components
+
+You can extend existing styled components to add additional styles:
+
+```tsx
+const BaseButton = tw.button`btn-base`;
+
+// Extend with additional classes
+const ExtendedButton = tw(BaseButton)`bg-green-500 hover:bg-green-600`;
+
+// This works with CVA components too
+const VariantButton = tw.button("btn-base", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+const ExtendedVariantButton = tw(VariantButton)`rounded-lg`;
+```
+
+## `.cva()`
+
+<Callout type="warning">
+  **Deprecated on intrinsic elements** (`tw.button`, `tw.div`, …): prefer **`tw.element(base, config)`** — same types and runtime as **`tw.element.cva(base, config)`**. The `.cva()` member remains available but may be removed in a future major version.
+</Callout>
+
+Creates a styled component with variant support using class-variance-authority.
+
+### Signature
+
+Preferred for intrinsics (see above):
+
+```tsx
+tw.element(baseClasses, config);
+```
+
+Equivalent legacy form:
+
+```tsx
+tw.element.cva(baseClasses, config);
+```
+
+### Parameters
+
+- `baseClasses` (string): Base CSS classes that are always applied
+- `config` (object): CVA configuration object
+  - `variants` (object): Variant definitions
+  - `defaultVariants` (object, optional): Default variant values
+  - `compoundVariants` (array, optional): Compound variant definitions
+
+### Example
+
+```tsx
+const Button = tw.button("btn-base", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+    $size: {
+      sm: "btn-sm",
+      md: "btn-md",
+      lg: "btn-lg",
+    },
+  },
+  defaultVariants: {
+    $variant: "primary",
+    $size: "md",
+  },
+  compoundVariants: [
+    {
+      $variant: "primary",
+      $size: "lg",
+      className: "btn-primary-lg",
+    },
+  ],
+});
+
+// Using default variants - they're applied automatically
+<Button>Click me</Button>; // Uses primary variant and md size
+
+// Override defaults
+<Button $variant="secondary" $size="sm">
+  Small Secondary
+</Button>;
+```
+
+### Transient Props
+
+<Callout type="info">
+  Variant keys starting with `$` are transient props that won't be passed to the
+  DOM element. This prevents React warnings about unknown props.
+</Callout>
+
+## Intrinsic shorthand (`tw.element(base, config)`)
+
+For **intrinsic** factories (`tw.button`, `tw.a`, `tw.div`, …), omit `.cva` and pass the same arguments (**preferred**; `.cva()` on intrinsics is deprecated — see above):
+
+```tsx
+tw.element(baseClasses, cvaConfig);
+// equivalent to:
+tw.element.cva(baseClasses, cvaConfig);
+```
+
+Tagged templates (``tw.div`classes` ``) are unchanged. Dispatch treats the first argument as CVA config when it is not a tagged-template receiver. See **`isTaggedTemplateArg`** under [Utilities](#utilities).
+
+## `.withProps()`
+
+Sets default props for a component. User-provided props will override these defaults.
+
+### Signature
+
+```tsx
+Component.withProps(defaultProps);
+```
+
+### Parameters
+
+- `defaultProps` (object): An object containing default props to apply
+
+### Example
+
+```tsx
+const Button = tw.button("btn", {
+    variants: {
+      $variant: {
+        primary: "btn-primary",
+        secondary: "btn-secondary",
+      },
+    },
+  })
+  .withProps({
+    type: "button",
+    "data-testid": "button",
+    $variant: "primary",
+  });
+```
+
+## `$as` Prop
+
+The `$as` prop allows you to render a component as a different element or component.
+
+### Example
+
+```tsx
+const Button = tw.button`btn`;
+
+// Render as an anchor tag
+<Button $as="a" href="/link">
+  Link Button
+</Button>;
+
+// Render as a custom component
+<Button $as={Link} href="/link">
+  Next.js Link
+</Button>;
+
+// Works with CVA components too
+const VariantButton = tw.button("btn", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+<VariantButton $as="a" href="/link" $variant="primary">
+  Link Button
+</VariantButton>;
+```
+
+### `PolymorphicComponentProps`
+
+Utility type for rendering CVA components as **custom React components** (TanStack Router `Link`, Next.js `Link`, etc.) while preserving every `$`-prefixed variant prop (`$variant`, `$size`, `$tone`, …) from the source component.
+
+Use it when the runtime `$as={SomeComponent}` form needs explicit typing (e.g. when wrapping in your own component):
+
+```tsx
+import { Link, type LinkProps } from "@tanstack/react-router";
+import tw, { type PolymorphicComponentProps } from "@styled-cva/react";
+
+const Button = tw.button("btn", {
+  variants: {
+    $variant: { primary: "btn-primary", secondary: "btn-secondary" },
+    $size: { sm: "px-2", md: "px-3" },
+  },
+});
+
+type ButtonLinkProps = PolymorphicComponentProps<typeof Button, typeof Link> &
+  LinkProps;
+
+const ButtonLink = (props: ButtonLinkProps) => (
+  <Button {...props} $as={Link} />
+);
+
+// Now type-safe end-to-end:
+<ButtonLink to="/about" $variant="primary" $size="md">
+  About
+</ButtonLink>;
+```
+
+For intrinsic elements (`$as="a"`, `$as="button"`, …) the typing already works without this utility — it's only needed when `$as` is a custom component.
+
+## Utilities
+
+### `cn`
+
+A utility function for combining Tailwind CSS classnames. It uses `cn` for intelligent merging and conflict resolution optimized for Tailwind CSS v4.
+
+```tsx
+import { cn } from "@styled-cva/react";
+
+const className = cn("text-red-500", "bg-blue-500");
+// className = "text-red-500 bg-blue-500"
+```
+
+### `isTaggedTemplateArg`
+
+From `@styled-cva/core`, re-exported by framework packages: `true` when the value is a tagged-template `TemplateStringsArray` (has `raw`). Used internally to distinguish ``tw.div`...` `` from `tw.div(base, config)`.
+
+```tsx
+import { isTaggedTemplateArg } from "@styled-cva/react";
+```
+
+### `cva`
+
+The underlying class-variance-authority function. You can use it directly if needed:
+
+```tsx
+import { cva } from "@styled-cva/react";
+
+const buttonVariants = cva("btn-base", {
+  variants: {
+    variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+// Use with className
+<button className={buttonVariants({ variant: "primary" })}>Click me</button>;
+```
+
+<Callout type="warn">
+  When using `cva` directly (not through `tw.element.cva()`), variant keys don't
+  need the `$` prefix since they're not passed as props to components. The `$`
+  prefix is only needed when using `tw.element.cva()` to prevent props from
+  being passed to the DOM.
+</Callout>
+
+## TypeScript Types
+
+### `TailwindComponent<P, O>`
+
+The base type for all styled components.
+
+- `P`: The base React props
+- `O`: Additional props added by the template function
+
+### `VariantProps<T>`
+
+Extracts variant props from a CVA configuration.
+
+```tsx
+import { cva, type VariantProps } from "@styled-cva/react";
+
+const buttonVariants = cva("btn", {
+  variants: {
+    $variant: {
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+    },
+  },
+});
+
+type ButtonVariants = VariantProps<typeof buttonVariants>;
+// { $variant?: 'primary' | 'secondary' }
+```
+
+## Advanced: `.withStyle()`
+
+For additional flexibility, basic styled components (not CVA components) support `.withStyle()` to add inline styles:
+
+```tsx
+const Button = tw.button`btn`.withStyle({
+  transition: "all 0.2s",
+});
+```
+
+<Callout type="warning">
+  This is only available on basic styled components created with template
+  literals. CVA components do not support this method.
+</Callout>

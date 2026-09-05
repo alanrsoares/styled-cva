@@ -1,0 +1,15 @@
+{
+  "title": "styled-cva",
+  "pages": [
+    "index",
+    "getting-started",
+    "examples",
+    "testing",
+    "api",
+    "eslint-plugin",
+    "prettier-plugin",
+    "biome-plugin",
+    "rescript",
+    "mcp"
+  ]
+}

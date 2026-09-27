@@ -14,11 +14,11 @@
     "@styled-cva/vue": "workspace:*"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^^4",
+    "@tailwindcss/vite": "^4",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/tsconfig": "^0.8.1",
-    "tailwindcss": "^^4",
+    "tailwindcss": "^4",
     "typescript": "~5.9.3",
     "vite": "^7.3.6",
     "vue-tsc": "^3.3.8"

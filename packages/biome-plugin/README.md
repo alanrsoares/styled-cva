@@ -6,14 +6,15 @@ Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo.
 
 ## Rules
 
-| Rule                    | What it does                                                                                     | Fix  |
-| ----------------------- | ------------------------------------------------------------------------------------------------ | ---- |
-| `normalize-tw-classes`  | Collapses whitespace runs and trims a single-line `tw` template's class string                   | safe |
-| `normalize-cva-classes` | Same normalization for `base`, `variants.*.*` and `compoundVariants[].class` in a `cva()` config | safe |
-| `multiline-long-tw`     | Wraps a class string with a line over 80 characters across lines                                 | safe |
-| `prefer-size-class`     | Rewrites identical width/height (`w-4 h-4`, `md:w-8 md:h-8`) to `size-n`                         | safe |
+| Rule                     | What it does                                                                                     | Fix  |
+| ------------------------ | ------------------------------------------------------------------------------------------------ | ---- |
+| `normalize-tw-classes`   | Collapses whitespace runs and trims a single-line `tw` template's class string                   | safe |
+| `normalize-cva-classes`  | Same normalization for `base`, `variants.*.*` and `compoundVariants[].class` in a `cva()` call   | safe |
+| `multiline-long-tw`      | Wraps a class string with a line over 80 characters across lines                                 | safe |
+| `multiline-long-variant` | Wraps a long `base` or `variants.*.*` string in a `cva()` call into an array, one chunk per line | safe |
+| `prefer-size-class`      | Rewrites identical width/height (`w-4 h-4`, `md:w-8 md:h-8`) to `size-n`                         | safe |
 
-All four register a **safe** fix, so `biome check --write` / `biome lint --write` applies them.
+All five register a **safe** fix, so `biome check --write` / `biome lint --write` applies them.
 
 ### Fixes converge, they do not just fire once
 
@@ -43,6 +44,32 @@ Lines are packed greedily to 74 characters, which leaves the 2-space indent insi
 
 **The budget and the indent are fixed.** GritQL cannot read plugin options, and the matched node carries no column information, so a deeply nested declaration is wrapped to the same 2-space indent as a top-level one. Reach for [`@styled-cva/prettier-plugin`](../prettier-plugin) when the indent has to follow the source column — it calls the real width-aware formatter in [`@styled-cva/core/formatting`](../core).
 
+### `cva()` call forms
+
+`normalize-cva-classes` and `multiline-long-variant` visit all four shapes that forward `(base, config)` to `cva`: `tw.tag(base, config)`, `tw(Component, base, config)`, and the deprecated `tw.tag.cva(base, config)` / `tw(Component).cva(base, config)`. `base` is the first positional argument — the config object has no `base` key.
+
+### `multiline-long-variant`
+
+```ts
+// before
+const Rail = tw(Sidebar, "group absolute inset-y-0", {
+  variants: {
+    $expanded: {
+      true: "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4 [&_[data-slot=sidebar-group-label]]:delay-300 [&_[data-sidebar=menu-button]>span:last-child]:animate-in",
+    },
+  },
+});
+
+// after
+      true: [
+        "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4",
+        "[&_[data-slot=sidebar-group-label]]:delay-300",
+        "[&_[data-sidebar=menu-button]>span:last-child]:animate-in",
+      ],
+```
+
+`ClassValue` accepts an array of strings, so types and runtime output do not change, and each chunk stays a separate class group in a diff. A string over 68 characters is split at its last space inside that budget; a long element of an array you wrote yourself is split the same way. A string with no space to split at is left alone. The indent is fixed (8 spaces for a variant option, 2 for `base`) — run the Biome formatter afterwards, or use the Prettier plugin, when it has to follow the source.
+
 ### Binding resolution
 
 The rules resolve the local styled-cva binding rather than hard-coding `tw`:
@@ -70,6 +97,7 @@ In `biome.json` reference the `.grit` files directly by path:
     "./node_modules/@styled-cva/biome-plugin/rules/normalize-tw-classes.grit",
     "./node_modules/@styled-cva/biome-plugin/rules/normalize-cva-classes.grit",
     "./node_modules/@styled-cva/biome-plugin/rules/multiline-long-tw.grit",
+    "./node_modules/@styled-cva/biome-plugin/rules/multiline-long-variant.grit",
     "./node_modules/@styled-cva/biome-plugin/rules/prefer-size-class.grit"
   ]
 }
@@ -94,7 +122,7 @@ Use both if you format with Prettier and lint with Biome. If Biome is your only 
 
 ## Tests
 
-Fixtures live under `fixtures/{valid,invalid}/`; the package's own `biome.json` enables all four rules and scopes linting to that directory. `src/rules.spec.ts` shells out to `biome lint --reporter=json` for diagnostics and to `biome lint --write` on throwaway fixtures for fixpoint output.
+Fixtures live under `fixtures/{valid,invalid}/`; the package's own `biome.json` enables all five rules and scopes linting to that directory. `src/rules.spec.ts` shells out to `biome lint --reporter=json` for diagnostics and to `biome lint --write` on throwaway fixtures for fixpoint output.
 
 ```bash
 bun test

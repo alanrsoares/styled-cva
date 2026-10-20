@@ -198,7 +198,7 @@ Three first-party plugins ship in the same monorepo. They are independent — in
 
 - **`@styled-cva/eslint-plugin`** — rule `prefer-styled-cva` (fixable) flags JSX elements whose `className` has more than `threshold` classes and offers to extract them into a styled component.
 - **`@styled-cva/prettier-plugin`** — Prettier preprocess that normalizes whitespace inside `tw.tag\`…\``, `tw(Component)\`…\``, and `tw.tag.cva({ base, variants })` constructs, and rewrites overflowing inline templates into multi-line form. Load **before** `prettier-plugin-tailwindcss` if both are present.
-- **`@styled-cva/biome-plugin`** — Biome 2.x GritQL rules (`normalize-tw-classes`, `multiline-long-tw`) that *flag* the same issues. Biome GritQL is diagnostics-only — pair with the Prettier plugin or the editor for fixes.
+- **`@styled-cva/biome-plugin`** — Biome 2.x GritQL rules (`normalize-tw-classes`, `normalize-cva-classes`, `multiline-long-tw`, `multiline-long-variant`, `prefer-size-class`) that flag and safe-fix class strings in templates and in `cva(base, config)` calls, including `tw.tag(base, config)` and `tw(Component, base, config)`.
 
 ## VSCode Tailwind IntelliSense
 

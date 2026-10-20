@@ -245,6 +245,93 @@ describe("normalize-cva-classes", () => {
   });
 });
 
+describe("multiline-long-variant", () => {
+  const LONG =
+    "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4 [&_[data-slot=sidebar-group-label]]:delay-300 [&_[data-sidebar=menu-button]>span:last-child]:animate-in";
+
+  test("flags a long variant option", () => {
+    expect(
+      countMatching("fixtures/invalid/long-variant.ts", "exceeds 80 chars"),
+    ).toBeGreaterThan(0);
+  });
+
+  test("wraps a long variant option into an array, one chunk per line", () => {
+    const { exitCode, text } = writeAndFix(
+      "temp-long-variant.ts",
+      [
+        'const Rail = tw(Sidebar, "group absolute inset-y-0", {',
+        "  variants: {",
+        "    $expanded: {",
+        `      true: "${LONG}",`,
+        '      false: "w-(--sidebar-width-icon)",',
+        "    },",
+        "  },",
+        "});",
+        "",
+      ].join("\n"),
+    );
+    expect(exitCode).toBe(0);
+    expect(text).toBe(
+      [
+        'const Rail = tw(Sidebar, "group absolute inset-y-0", {',
+        "  variants: {",
+        "    $expanded: {",
+        "      true: [",
+        '        "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4",',
+        '        "[&_[data-slot=sidebar-group-label]]:delay-300",',
+        '        "[&_[data-sidebar=menu-button]>span:last-child]:animate-in",',
+        "      ],",
+        '      false: "w-(--sidebar-width-icon)",',
+        "    },",
+        "  },",
+        "});",
+        "",
+      ].join("\n"),
+    );
+  });
+
+  test("wraps a long positional base", () => {
+    const { text } = writeAndFix(
+      "temp-long-base.ts",
+      `const A = tw.div("${LONG}", { variants: { size: { sm: "h-8" } } });\n`,
+    );
+    expect(text).toBe(
+      [
+        "const A = tw.div([",
+        '  "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4",',
+        '  "[&_[data-slot=sidebar-group-label]]:delay-300",',
+        '  "[&_[data-sidebar=menu-button]>span:last-child]:animate-in",',
+        '], { variants: { size: { sm: "h-8" } } });',
+        "",
+      ].join("\n"),
+    );
+  });
+
+  test("splits a long element of an existing array", () => {
+    const { text } = writeAndFix(
+      "temp-long-array.ts",
+      `const A = tw.div.cva("flex", { variants: { s: { a: ["x", "${LONG}"] } } });\n`,
+    );
+    expect(text).not.toContain(`"${LONG}"`);
+    expect(text).toContain('"x"');
+  });
+
+  test("leaves short strings and unsplittable tokens alone", () => {
+    const source = [
+      'const A = tw.div("flex gap-2", {',
+      `  variants: { s: { a: "flex gap-2", b: "${"x".repeat(90)}" } },`,
+      "});",
+      "",
+    ].join("\n");
+    expect(writeAndFix("temp-long-none.ts", source).text).toBe(source);
+  });
+
+  test("ignores a long string outside a cva call", () => {
+    const source = `const A = { variants: { s: { a: "${LONG}" } } };\n`;
+    expect(writeAndFix("temp-long-outside.ts", source).text).toBe(source);
+  });
+});
+
 describe("binding resolution", () => {
   test("matches an aliased default import from a @styled-cva adapter", () => {
     const diags = diagnosticsFor("fixtures/invalid/aliased-import.ts");

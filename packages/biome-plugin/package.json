@@ -14,6 +14,7 @@
     "./rules/normalize-tw-classes.grit": "./rules/normalize-tw-classes.grit",
     "./rules/normalize-cva-classes.grit": "./rules/normalize-cva-classes.grit",
     "./rules/multiline-long-tw.grit": "./rules/multiline-long-tw.grit",
+    "./rules/multiline-long-variant.grit": "./rules/multiline-long-variant.grit",
     "./rules/prefer-size-class.grit": "./rules/prefer-size-class.grit"
   },
   "scripts": {

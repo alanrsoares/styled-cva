@@ -4,9 +4,19 @@
     "./rules/normalize-tw-classes.grit",
     "./rules/normalize-cva-classes.grit",
     "./rules/multiline-long-tw.grit",
+    "./rules/multiline-long-variant.grit",
     "./rules/prefer-size-class.grit"
   ],
-  "linter": { "enabled": true, "rules": { "recommended": false } },
-  "formatter": { "enabled": false },
-  "files": { "includes": ["fixtures/**"] }
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": false
+    }
+  },
+  "formatter": {
+    "enabled": false
+  },
+  "files": {
+    "includes": ["fixtures/**"]
+  }
 }

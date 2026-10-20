@@ -27,7 +27,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@styled-cva/core": "workspace:*"
+    "@styled-cva/core": "^0.7.0"
   },
   "peerDependencies": {
     "prettier": "^3"

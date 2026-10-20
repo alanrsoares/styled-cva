@@ -75,18 +75,45 @@ function isStyledTwTag(tag: unknown): boolean {
   return rootIdentifier(tag) === "tw";
 }
 
-function getCvaCallObject(node: AnyNode): AnyNode | null {
+interface CvaCall {
+  base: AnyNode | null;
+  config: AnyNode | null;
+}
+
+const asObject = (node: unknown): AnyNode | null =>
+  isAnyNode(node) && node.type === "ObjectExpression" ? node : null;
+
+/**
+ * Resolve the `(base, config)` arguments of a styled-cva call in any of its
+ * four shapes: `tw.tag(base, c)`, `tw(Component, base, c)`, and the deprecated
+ * `tw.tag.cva(base, c)` / `tw(Component).cva(base, c)`.
+ */
+function getCvaCall(node: AnyNode): CvaCall | null {
   if (node.type !== "CallExpression") return null;
   const callee = (node as { callee?: unknown }).callee;
-  if (!isAnyNode(callee) || callee.type !== "MemberExpression") return null;
-  const property = (callee as { property?: unknown }).property;
-  if (getIdentifierName(property) !== "cva") return null;
-  if (rootIdentifier(callee) !== "tw") return null;
   const args = (node as { arguments?: unknown }).arguments;
-  if (!Array.isArray(args) || args.length === 0) return null;
-  const first = args[0];
-  if (!isAnyNode(first) || first.type !== "ObjectExpression") return null;
-  return first;
+  if (!isAnyNode(callee) || !Array.isArray(args)) return null;
+  if (rootIdentifier(callee) !== "tw") return null;
+
+  // `tw(Component, base, config)`
+  if (callee.type === "Identifier") {
+    return args.length >= 3
+      ? { base: isAnyNode(args[1]) ? args[1] : null, config: asObject(args[2]) }
+      : null;
+  }
+  if (callee.type !== "MemberExpression") return null;
+
+  // `tw.tag(base, config)` or `….cva(base, config)`
+  const property = (callee as { property?: unknown }).property;
+  const object = (callee as { object?: unknown }).object;
+  const isCva = getIdentifierName(property) === "cva";
+  const isShorthand = getIdentifierName(object) === "tw";
+  if (!isCva && !isShorthand) return null;
+  if (args.length < 2) return null;
+  return {
+    base: isAnyNode(args[0]) ? args[0] : null,
+    config: asObject(args[1]),
+  };
 }
 
 const objectProperties = (obj: AnyNode): AnyNode[] => {
@@ -148,27 +175,38 @@ function editForStringClassValue(node: AnyNode): Edit | null {
   };
 }
 
-function collectCvaEdits(obj: AnyNode): Edit[] {
+function collectCvaEdits({ base, config }: CvaCall): Edit[] {
   const edits: Edit[] = [];
-  for (const prop of objectProperties(obj)) {
+  const push = (node: AnyNode | null) => {
+    if (!node || stringLiteralValue(node) == null) return;
+    const edit = editForStringClassValue(node);
+    if (edit) edits.push(edit);
+  };
+  push(base);
+  if (!config) return edits;
+  for (const prop of objectProperties(config)) {
     const key = propertyKeyName(prop);
-    if (!key) continue;
     const value = propertyValue(prop);
-    if (!value) continue;
-    if (key === "base" && stringLiteralValue(value) != null) {
-      const edit = editForStringClassValue(value);
-      if (edit) edits.push(edit);
-      continue;
-    }
+    if (!key || !value) continue;
     if (key === "variants" && value.type === "ObjectExpression") {
       for (const variantProp of objectProperties(value)) {
         const variantValue = propertyValue(variantProp);
         if (!variantValue || variantValue.type !== "ObjectExpression") continue;
         for (const optionProp of objectProperties(variantValue)) {
-          const optionValue = propertyValue(optionProp);
-          if (!optionValue || stringLiteralValue(optionValue) == null) continue;
-          const edit = editForStringClassValue(optionValue);
-          if (edit) edits.push(edit);
+          push(propertyValue(optionProp));
+        }
+      }
+    }
+    if (key === "compoundVariants" && value.type === "ArrayExpression") {
+      const elements = (value as { elements?: unknown }).elements;
+      for (const element of Array.isArray(elements) ? elements : []) {
+        const entry = asObject(element);
+        if (!entry) continue;
+        for (const entryProp of objectProperties(entry)) {
+          const entryKey = propertyKeyName(entryProp);
+          if (entryKey === "class" || entryKey === "className") {
+            push(propertyValue(entryProp));
+          }
         }
       }
     }
@@ -206,8 +244,8 @@ export function collectEdits(
       return;
     }
     if (node.type === "CallExpression") {
-      const obj = getCvaCallObject(node);
-      if (obj) edits.push(...collectCvaEdits(obj));
+      const call = getCvaCall(node);
+      if (call) edits.push(...collectCvaEdits(call));
     }
   });
   return edits;

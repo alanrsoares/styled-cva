@@ -1,8 +1,11 @@
 // @styled-cva/biome-plugin: normalize-cva-classes
 //
-// Normalize whitespace in the class strings of a `tw.tag.cva({ … })` /
-// `tw(Component).cva({ … })` call: `base`, every `variants.*.*` option, and
-// the `class` / `className` of a `compoundVariants` entry.
+// Normalize whitespace in the class strings of a styled-cva `cva(base, config)`
+// call, in any of its four shapes: `tw.tag(base, config)`,
+// `tw(Component, base, config)`, and the deprecated `tw.tag.cva(base, config)` /
+// `tw(Component).cva(base, config)`. Visited are the positional `base`, every
+// `variants.*.*` option, and the `class` / `className` of a `compoundVariants`
+// entry.
 //
 // Only string *values* are visited. Object keys are a different node
 // (`JsLiteralMemberName`), so a quoted variant key such as `"2xl"` is never
@@ -49,15 +52,25 @@ pattern normalize_class_literal() {
   }
 }
 
+// The four call shapes that forward `(base, config)` to `cva`.
+pattern cva_call($sc, $base, $config) {
+  or {
+    `$sc.$_($base, $config)`,
+    `$sc($_, $base, $config)`,
+    `$sc.$_.cva($base, $config)`,
+    `$sc($_).cva($base, $config)`
+  }
+}
+
 file($body) where {
   $body <: styled_cva_binding($sc),
-  $body <: contains bubble($sc) `$sc.$_.cva($config)` where {
-    $config <: or {
-      contains `base: $b` where { $b <: normalize_class_literal() },
-      contains `variants: $v` where {
+  $body <: contains bubble($sc) cva_call($sc, $base, $config) where {
+    or {
+      $base <: normalize_class_literal(),
+      $config <: contains `variants: $v` where {
         $v <: contains bubble normalize_class_literal()
       },
-      contains `compoundVariants: $cv` where {
+      $config <: contains `compoundVariants: $cv` where {
         $cv <: contains bubble or {
           `class: $c` where { $c <: normalize_class_literal() },
           `className: $c` where { $c <: normalize_class_literal() }

@@ -172,8 +172,7 @@ describe("normalize-cva-classes", () => {
     const { exitCode, text } = writeAndFix(
       "temp-cva.ts",
       [
-        "const Btn = tw.button.cva({",
-        '  base: "inline-flex   items-center ",',
+        'const Btn = tw.button.cva("inline-flex   items-center ", {',
         "  variants: {",
         '    size: { sm: "h-8   px-3", "2xl": "  h-14  px-8" },',
         "  },",
@@ -186,8 +185,7 @@ describe("normalize-cva-classes", () => {
     expect(exitCode).toBe(0);
     expect(text).toBe(
       [
-        "const Btn = tw.button.cva({",
-        '  base: "inline-flex items-center",',
+        'const Btn = tw.button.cva("inline-flex items-center", {',
         "  variants: {",
         '    size: { sm: "h-8 px-3", "2xl": "h-14 px-8" },',
         "  },",
@@ -197,6 +195,53 @@ describe("normalize-cva-classes", () => {
         "",
       ].join("\n"),
     );
+  });
+
+  test("flags every call shape, once per call", () => {
+    expect(
+      countMatching(
+        "fixtures/invalid/cva-call-form.ts",
+        "irregular whitespace",
+      ),
+    ).toBe(3);
+  });
+
+  test("normalizes tw.tag(base, config) and tw(Component, base, config)", () => {
+    const { exitCode, text } = writeAndFix(
+      "temp-cva-call.ts",
+      [
+        'const A = tw.div("flex   gap-2", {',
+        '  variants: { size: { sm: "h-8   px-3" } },',
+        "});",
+        'const B = tw(Card, "rounded   border", {',
+        '  variants: { size: { sm: "h-8   px-3" } },',
+        "});",
+        'const C = tw(Card).cva("rounded   border", {',
+        '  variants: { size: { sm: "h-8   px-3" } },',
+        "});",
+        "",
+      ].join("\n"),
+    );
+    expect(exitCode).toBe(0);
+    expect(text).toBe(
+      [
+        'const A = tw.div("flex gap-2", {',
+        '  variants: { size: { sm: "h-8 px-3" } },',
+        "});",
+        'const B = tw(Card, "rounded border", {',
+        '  variants: { size: { sm: "h-8 px-3" } },',
+        "});",
+        'const C = tw(Card).cva("rounded border", {',
+        '  variants: { size: { sm: "h-8 px-3" } },',
+        "});",
+        "",
+      ].join("\n"),
+    );
+  });
+
+  test("leaves a tw(Component) template call alone", () => {
+    const source = 'const A = tw(Card)`flex gap-2`;\nconst B = tw("div");\n';
+    expect(writeAndFix("temp-cva-none.ts", source).text).toBe(source);
   });
 });
 

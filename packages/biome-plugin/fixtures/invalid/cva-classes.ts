@@ -1,5 +1,4 @@
-const Btn = tw.button.cva({
-  base: "inline-flex   items-center     gap-2 ",
+const Btn = tw.button.cva("inline-flex   items-center     gap-2 ", {
   variants: {
     size: { sm: "h-8   px-3", "2xl": "  h-14  px-8" },
   },

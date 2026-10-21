@@ -1,0 +1,126 @@
+// @styled-cva/biome-plugin: multiline-long-variant
+//
+// Flag a class string in a styled-cva `cva(base, config)` call — the positional
+// `base` or a `variants.*.*` option — whose content is too long for one line,
+// and wrap it into an array with one chunk per line. `ClassValue` accepts an
+// array of strings, so the type and the runtime class output do not change.
+//
+// Called as `tw.tag(base, config)`, `tw(Component, base, config)`, or the
+// deprecated `tw.tag.cva(…)` / `tw(Component).cva(…)`.
+//
+// The fix splits one chunk off per pass: a string over 68 characters becomes
+// `["head", "rest"]` (greedy, at the last space inside the budget), and a
+// string inside an array becomes two elements. Biome re-applies safe plugin
+// fixes until no rule rewrites, so any length converges in one
+// `biome check --write`. 68 characters + the 8-space indent + quotes + comma
+// stays inside an 80-column budget.
+//
+// The budget and the indent are fixed: GritQL cannot read plugin options, and
+// the node carries no column. A `variants` option is wrapped for the usual
+// nesting (8 spaces, then a 6-space closing bracket) and `base` for 2 spaces;
+// run the Biome formatter after it, or use `@styled-cva/prettier-plugin`, when
+// the indent must follow the source. A string with no space inside the budget,
+// or one that is not a direct array element (`active && "…"`), is left alone.
+// Both quote styles are matched and the source quote is kept.
+
+engine biome(1.0)
+language js
+
+// Resolve the local styled-cva binding: an aliased default import from any
+// `@styled-cva/*` adapter, else the conventional bare `tw` — but only when the
+// file does not import `tw` from somewhere else.
+pattern styled_cva_binding($sc) {
+  or {
+    contains `import $sc from $src` where { $src <: r"\"@styled-cva/[a-z]+\"" },
+    and {
+      not contains `import tw from $other` where {
+        $other <: not r"\"@styled-cva/[a-z]+\""
+      },
+      $sc = `tw`
+    }
+  }
+}
+
+// The four call shapes that forward `(base, config)` to `cva`.
+pattern cva_call($sc, $base, $config) {
+  or {
+    `$sc.$_($base, $config)`,
+    `$sc($_, $base, $config)`,
+    `$sc.$_.cva($base, $config)`,
+    `$sc($_).cva($base, $config)`
+  }
+}
+
+// A class string over 68 characters that has a space to split at, in either
+// quote style; `$q` is the source quote so a rewrite keeps it. Anchored match:
+// the `{69,}` guard admits the string, and `{1,68}` plus a required space is
+// the greedy split. A string that contains the other quote character is
+// skipped.
+pattern long_string($q, $head, $rest) {
+  JsStringLiteralExpression() as $s where {
+    $s <: r"[\"'][^\"'\n]{69,}[\"']",
+    $s <: r"([\"'])([^\"'\n]{1,68}) ([^\"'\n]+)[\"']"($q, $head, $rest)
+  }
+}
+
+// A direct, long string element of an array. `contains` would also reach a
+// string nested in an element expression such as `active && "…"`, and splitting
+// that one would change what the expression means.
+pattern array_string($s, $q, $head, $rest) {
+  JsArrayExpression(
+    elements = [..., long_string($q, $head, $rest) as $s, ...]
+  )
+}
+
+file($body) where {
+  $body <: styled_cva_binding($sc),
+  $body <: contains bubble($sc) cva_call($sc, $base, $config) where {
+    or {
+      // The `base` argument: a lone string opens an array...
+      $base <: long_string($q, $head, $rest) as $s where {
+        $s => `[\n  $q$head$q,\n  $q$rest$q,\n]`,
+        register_diagnostic(
+          span = $s,
+          message = "Class string exceeds 80 chars. Wrapped into an array.",
+          severity = "warn",
+          fix_kind = "safe"
+        )
+      },
+      // ...and a string directly in an array gains a sibling.
+      $base <: array_string($s, $q, $head, $rest) where {
+        $s => `$q$head$q,\n  $q$rest$q`,
+        register_diagnostic(
+          span = $s,
+          message = "Class string exceeds 80 chars. Wrapped into an array.",
+          severity = "warn",
+          fix_kind = "safe"
+        )
+      },
+      // A `variants.*.*` option, the same two ways.
+      $config <: contains `variants: $v` where {
+        $v <: contains bubble or {
+          JsPropertyObjectMember(
+            value = long_string($q, $head, $rest) as $s
+          ) where {
+            $s => `[\n        $q$head$q,\n        $q$rest$q,\n      ]`,
+            register_diagnostic(
+          span = $s,
+          message = "Class string exceeds 80 chars. Wrapped into an array.",
+          severity = "warn",
+          fix_kind = "safe"
+        )
+          },
+          array_string($s, $q, $head, $rest) where {
+            $s => `$q$head$q,\n        $q$rest$q`,
+            register_diagnostic(
+          span = $s,
+          message = "Class string exceeds 80 chars. Wrapped into an array.",
+          severity = "warn",
+          fix_kind = "safe"
+        )
+          }
+        }
+      }
+    }
+  }
+}

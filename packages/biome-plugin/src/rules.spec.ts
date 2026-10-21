@@ -172,8 +172,7 @@ describe("normalize-cva-classes", () => {
     const { exitCode, text } = writeAndFix(
       "temp-cva.ts",
       [
-        "const Btn = tw.button.cva({",
-        '  base: "inline-flex   items-center ",',
+        'const Btn = tw.button.cva("inline-flex   items-center ", {',
         "  variants: {",
         '    size: { sm: "h-8   px-3", "2xl": "  h-14  px-8" },',
         "  },",
@@ -186,8 +185,7 @@ describe("normalize-cva-classes", () => {
     expect(exitCode).toBe(0);
     expect(text).toBe(
       [
-        "const Btn = tw.button.cva({",
-        '  base: "inline-flex items-center",',
+        'const Btn = tw.button.cva("inline-flex items-center", {',
         "  variants: {",
         '    size: { sm: "h-8 px-3", "2xl": "h-14 px-8" },',
         "  },",
@@ -197,6 +195,170 @@ describe("normalize-cva-classes", () => {
         "",
       ].join("\n"),
     );
+  });
+
+  test("flags every call shape, once per call", () => {
+    expect(
+      countMatching(
+        "fixtures/invalid/cva-call-form.ts",
+        "irregular whitespace",
+      ),
+    ).toBe(3);
+  });
+
+  test("normalizes tw.tag(base, config) and tw(Component, base, config)", () => {
+    const { exitCode, text } = writeAndFix(
+      "temp-cva-call.ts",
+      [
+        'const A = tw.div("flex   gap-2", {',
+        '  variants: { size: { sm: "h-8   px-3" } },',
+        "});",
+        'const B = tw(Card, "rounded   border", {',
+        '  variants: { size: { sm: "h-8   px-3" } },',
+        "});",
+        'const C = tw(Card).cva("rounded   border", {',
+        '  variants: { size: { sm: "h-8   px-3" } },',
+        "});",
+        "",
+      ].join("\n"),
+    );
+    expect(exitCode).toBe(0);
+    expect(text).toBe(
+      [
+        'const A = tw.div("flex gap-2", {',
+        '  variants: { size: { sm: "h-8 px-3" } },',
+        "});",
+        'const B = tw(Card, "rounded border", {',
+        '  variants: { size: { sm: "h-8 px-3" } },',
+        "});",
+        'const C = tw(Card).cva("rounded border", {',
+        '  variants: { size: { sm: "h-8 px-3" } },',
+        "});",
+        "",
+      ].join("\n"),
+    );
+  });
+
+  test("normalizes the strings of an array base and an array option", () => {
+    const { text } = writeAndFix(
+      "temp-cva-array.ts",
+      [
+        'const A = tw.div(["flex   gap-2", "px-4"], {',
+        '  variants: { size: { sm: ["h-8   px-3", "p-1"] } },',
+        "});",
+        "",
+      ].join("\n"),
+    );
+    expect(text).toContain('"flex gap-2"');
+    expect(text).toContain('"h-8 px-3"');
+  });
+
+  test("leaves a tw(Component) template call alone", () => {
+    const source = 'const A = tw(Card)`flex gap-2`;\nconst B = tw("div");\n';
+    expect(writeAndFix("temp-cva-none.ts", source).text).toBe(source);
+  });
+});
+
+describe("multiline-long-variant", () => {
+  const LONG =
+    "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4 [&_[data-slot=sidebar-group-label]]:delay-300 [&_[data-sidebar=menu-button]>span:last-child]:animate-in";
+
+  test("flags a long variant option", () => {
+    expect(
+      countMatching("fixtures/invalid/long-variant.ts", "exceeds 80 chars"),
+    ).toBeGreaterThan(0);
+  });
+
+  test("wraps a long variant option into an array, one chunk per line", () => {
+    const { exitCode, text } = writeAndFix(
+      "temp-long-variant.ts",
+      [
+        'const Rail = tw(Sidebar, "group absolute inset-y-0", {',
+        "  variants: {",
+        "    $expanded: {",
+        `      true: "${LONG}",`,
+        '      false: "w-(--sidebar-width-icon)",',
+        "    },",
+        "  },",
+        "});",
+        "",
+      ].join("\n"),
+    );
+    expect(exitCode).toBe(0);
+    expect(text).toBe(
+      [
+        'const Rail = tw(Sidebar, "group absolute inset-y-0", {',
+        "  variants: {",
+        "    $expanded: {",
+        "      true: [",
+        '        "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4",',
+        '        "[&_[data-slot=sidebar-group-label]]:delay-300",',
+        '        "[&_[data-sidebar=menu-button]>span:last-child]:animate-in",',
+        "      ],",
+        '      false: "w-(--sidebar-width-icon)",',
+        "    },",
+        "  },",
+        "});",
+        "",
+      ].join("\n"),
+    );
+  });
+
+  test("wraps a long positional base", () => {
+    const { text } = writeAndFix(
+      "temp-long-base.ts",
+      `const A = tw.div("${LONG}", { variants: { size: { sm: "h-8" } } });\n`,
+    );
+    expect(text).toBe(
+      [
+        "const A = tw.div([",
+        '  "w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4",',
+        '  "[&_[data-slot=sidebar-group-label]]:delay-300",',
+        '  "[&_[data-sidebar=menu-button]>span:last-child]:animate-in",',
+        '], { variants: { size: { sm: "h-8" } } });',
+        "",
+      ].join("\n"),
+    );
+  });
+
+  test("splits a long element of an existing array", () => {
+    const { text } = writeAndFix(
+      "temp-long-array.ts",
+      `const A = tw.div.cva("flex", { variants: { s: { a: ["x", "${LONG}"] } } });\n`,
+    );
+    expect(text).not.toContain(`"${LONG}"`);
+    expect(text).toContain('"x"');
+  });
+
+  test("keeps single quotes", () => {
+    const { text } = writeAndFix(
+      "temp-long-single.ts",
+      `const A = tw.div('${LONG}', {});\n`,
+    );
+    expect(text).toContain(
+      "'w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4',",
+    );
+    expect(text).not.toContain('"');
+  });
+
+  test("leaves a string nested in an array element expression alone", () => {
+    const source = `const A = tw.div([active && "${LONG}", "x"], {});\n`;
+    expect(writeAndFix("temp-long-nested.ts", source).text).toBe(source);
+  });
+
+  test("leaves short strings and unsplittable tokens alone", () => {
+    const source = [
+      'const A = tw.div("flex gap-2", {',
+      `  variants: { s: { a: "flex gap-2", b: "${"x".repeat(90)}" } },`,
+      "});",
+      "",
+    ].join("\n");
+    expect(writeAndFix("temp-long-none.ts", source).text).toBe(source);
+  });
+
+  test("ignores a long string outside a cva call", () => {
+    const source = `const A = { variants: { s: { a: "${LONG}" } } };\n`;
+    expect(writeAndFix("temp-long-outside.ts", source).text).toBe(source);
   });
 });
 

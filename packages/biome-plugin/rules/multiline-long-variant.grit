@@ -19,8 +19,9 @@
 // the node carries no column. A `variants` option is wrapped for the usual
 // nesting (8 spaces, then a 6-space closing bracket) and `base` for 2 spaces;
 // run the Biome formatter after it, or use `@styled-cva/prettier-plugin`, when
-// the indent must follow the source. A string with no space inside the budget
-// is left alone.
+// the indent must follow the source. A string with no space inside the budget,
+// or one that is not a direct array element (`active && "…"`), is left alone.
+// Both quote styles are matched and the source quote is kept.
 
 engine biome(1.0)
 language js
@@ -50,14 +51,25 @@ pattern cva_call($sc, $base, $config) {
   }
 }
 
-// A class string over 68 characters that has a space to split at. Anchored
-// match: the `{69,}` guard admits the string, and `{1,68}` plus a required
-// space is the greedy split.
-pattern long_string($head, $rest) {
+// A class string over 68 characters that has a space to split at, in either
+// quote style; `$q` is the source quote so a rewrite keeps it. Anchored match:
+// the `{69,}` guard admits the string, and `{1,68}` plus a required space is
+// the greedy split. A string that contains the other quote character is
+// skipped.
+pattern long_string($q, $head, $rest) {
   JsStringLiteralExpression() as $s where {
-    $s <: r"\"[^\"\n]{69,}\"",
-    $s <: r"\"([^\"\n]{1,68}) ([^\"\n]+)\""($head, $rest)
+    $s <: r"[\"'][^\"'\n]{69,}[\"']",
+    $s <: r"([\"'])([^\"'\n]{1,68}) ([^\"'\n]+)[\"']"($q, $head, $rest)
   }
+}
+
+// A direct, long string element of an array. `contains` would also reach a
+// string nested in an element expression such as `active && "…"`, and splitting
+// that one would change what the expression means.
+pattern array_string($s, $q, $head, $rest) {
+  JsArrayExpression(
+    elements = [..., long_string($q, $head, $rest) as $s, ...]
+  )
 }
 
 file($body) where {
@@ -65,8 +77,8 @@ file($body) where {
   $body <: contains bubble($sc) cva_call($sc, $base, $config) where {
     or {
       // The `base` argument: a lone string opens an array...
-      $base <: long_string($head, $rest) as $s where {
-        $s => `[\n  "$head",\n  "$rest",\n]`,
+      $base <: long_string($q, $head, $rest) as $s where {
+        $s => `[\n  $q$head$q,\n  $q$rest$q,\n]`,
         register_diagnostic(
           span = $s,
           message = "Class string exceeds 80 chars. Wrapped into an array.",
@@ -74,40 +86,38 @@ file($body) where {
           fix_kind = "safe"
         )
       },
-      // ...and a string already in an array gains a sibling.
-      $base <: JsArrayExpression() where {
-        $base <: contains bubble long_string($head, $rest) as $s where {
-          $s => `"$head",\n  "$rest"`,
-          register_diagnostic(
-            span = $s,
-            message = "Class string exceeds 80 chars. Wrapped into an array.",
-            severity = "warn",
-            fix_kind = "safe"
-          )
-        }
+      // ...and a string directly in an array gains a sibling.
+      $base <: array_string($s, $q, $head, $rest) where {
+        $s => `$q$head$q,\n  $q$rest$q`,
+        register_diagnostic(
+          span = $s,
+          message = "Class string exceeds 80 chars. Wrapped into an array.",
+          severity = "warn",
+          fix_kind = "safe"
+        )
       },
       // A `variants.*.*` option, the same two ways.
       $config <: contains `variants: $v` where {
         $v <: contains bubble or {
-          JsPropertyObjectMember(value = long_string($head, $rest) as $s) where {
-            $s => `[\n        "$head",\n        "$rest",\n      ]`,
+          JsPropertyObjectMember(
+            value = long_string($q, $head, $rest) as $s
+          ) where {
+            $s => `[\n        $q$head$q,\n        $q$rest$q,\n      ]`,
             register_diagnostic(
-              span = $s,
-              message = "Class string exceeds 80 chars. Wrapped into an array.",
-              severity = "warn",
-              fix_kind = "safe"
-            )
+          span = $s,
+          message = "Class string exceeds 80 chars. Wrapped into an array.",
+          severity = "warn",
+          fix_kind = "safe"
+        )
           },
-          JsArrayExpression() as $arr where {
-            $arr <: contains bubble long_string($head, $rest) as $s where {
-              $s => `"$head",\n        "$rest"`,
-              register_diagnostic(
-                span = $s,
-                message = "Class string exceeds 80 chars. Wrapped into an array.",
-                severity = "warn",
-                fix_kind = "safe"
-              )
-            }
+          array_string($s, $q, $head, $rest) where {
+            $s => `$q$head$q,\n        $q$rest$q`,
+            register_diagnostic(
+          span = $s,
+          message = "Class string exceeds 80 chars. Wrapped into an array.",
+          severity = "warn",
+          fix_kind = "safe"
+        )
           }
         }
       }

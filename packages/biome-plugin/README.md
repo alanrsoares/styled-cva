@@ -68,7 +68,7 @@ const Rail = tw(Sidebar, "group absolute inset-y-0", {
       ],
 ```
 
-`ClassValue` accepts an array of strings, so types and runtime output do not change, and each chunk stays a separate class group in a diff. A string over 68 characters is split at its last space inside that budget; a long element of an array you wrote yourself is split the same way. A string with no space to split at is left alone. The indent is fixed (8 spaces for a variant option, 2 for `base`) — run the Biome formatter afterwards, or use the Prettier plugin, when it has to follow the source.
+`ClassValue` accepts an array of strings, so types and runtime output do not change, and each chunk stays a separate class group in a diff. A string over 68 characters is split at its last space inside that budget; a long element of an array you wrote yourself is split the same way. A string with no space to split at is left alone, and so is a string nested in an element expression such as `active && "…"`. Both quote styles are matched and the source quote is kept. The indent is fixed (8 spaces for a variant option, 2 for `base`) — run the Biome formatter afterwards, or use the Prettier plugin, when it has to follow the source.
 
 ### Binding resolution
 

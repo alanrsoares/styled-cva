@@ -239,6 +239,20 @@ describe("normalize-cva-classes", () => {
     );
   });
 
+  test("normalizes the strings of an array base and an array option", () => {
+    const { text } = writeAndFix(
+      "temp-cva-array.ts",
+      [
+        'const A = tw.div(["flex   gap-2", "px-4"], {',
+        '  variants: { size: { sm: ["h-8   px-3", "p-1"] } },',
+        "});",
+        "",
+      ].join("\n"),
+    );
+    expect(text).toContain('"flex gap-2"');
+    expect(text).toContain('"h-8 px-3"');
+  });
+
   test("leaves a tw(Component) template call alone", () => {
     const source = 'const A = tw(Card)`flex gap-2`;\nconst B = tw("div");\n';
     expect(writeAndFix("temp-cva-none.ts", source).text).toBe(source);
@@ -314,6 +328,22 @@ describe("multiline-long-variant", () => {
     );
     expect(text).not.toContain(`"${LONG}"`);
     expect(text).toContain('"x"');
+  });
+
+  test("keeps single quotes", () => {
+    const { text } = writeAndFix(
+      "temp-long-single.ts",
+      `const A = tw.div('${LONG}', {});\n`,
+    );
+    expect(text).toContain(
+      "'w-(--rail-width) [&_[data-slot=sidebar-group-label]]:px-4',",
+    );
+    expect(text).not.toContain('"');
+  });
+
+  test("leaves a string nested in an array element expression alone", () => {
+    const source = `const A = tw.div([active && "${LONG}", "x"], {});\n`;
+    expect(writeAndFix("temp-long-nested.ts", source).text).toBe(source);
   });
 
   test("leaves short strings and unsplittable tokens alone", () => {

@@ -121,6 +121,17 @@ describe("prettier plugin: cva(base, config) call forms", () => {
     expect(out).toContain('className: "p-1 m-1"');
   });
 
+  test("normalizes the strings of an array base and an array option", async () => {
+    const src = [
+      'const A = tw.div(["flex   gap-2", "px-4"], {',
+      '  variants: { size: { sm: ["h-8   px-3", "p-1"] } },',
+      "});\n",
+    ].join("\n");
+    const out = await format(src);
+    expect(out).toContain('"flex gap-2"');
+    expect(out).toContain('"h-8 px-3"');
+  });
+
   test("ignores a single-argument tw(Component) call and non-tw calls", async () => {
     const src = [
       'const A = tw(Card)("rounded   border");',

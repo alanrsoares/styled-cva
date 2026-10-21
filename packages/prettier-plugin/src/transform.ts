@@ -177,8 +177,18 @@ function editForStringClassValue(node: AnyNode): Edit | null {
 
 function collectCvaEdits({ base, config }: CvaCall): Edit[] {
   const edits: Edit[] = [];
-  const push = (node: AnyNode | null) => {
-    if (!node || stringLiteralValue(node) == null) return;
+  // A class value is a string, or an array whose string elements are class
+  // values (`ClassValue` accepts both).
+  const push = (node: AnyNode | null): void => {
+    if (!node) return;
+    if (node.type === "ArrayExpression") {
+      const elements = (node as { elements?: unknown }).elements;
+      for (const element of Array.isArray(elements) ? elements : []) {
+        push(isAnyNode(element) ? element : null);
+      }
+      return;
+    }
+    if (stringLiteralValue(node) == null) return;
     const edit = editForStringClassValue(node);
     if (edit) edits.push(edit);
   };

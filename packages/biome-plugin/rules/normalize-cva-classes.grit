@@ -4,8 +4,8 @@
 // call, in any of its four shapes: `tw.tag(base, config)`,
 // `tw(Component, base, config)`, and the deprecated `tw.tag.cva(base, config)` /
 // `tw(Component).cva(base, config)`. Visited are the positional `base`, every
-// `variants.*.*` option, and the `class` / `className` of a `compoundVariants`
-// entry.
+// `variants.*.*` option (a string, or the strings of an array), and the `class` /
+// `className` of a `compoundVariants` entry.
 //
 // Only string *values* are visited. Object keys are a different node
 // (`JsLiteralMemberName`), so a quoted variant key such as `"2xl"` is never
@@ -66,7 +66,7 @@ file($body) where {
   $body <: styled_cva_binding($sc),
   $body <: contains bubble($sc) cva_call($sc, $base, $config) where {
     or {
-      $base <: normalize_class_literal(),
+      $base <: contains bubble normalize_class_literal(),
       $config <: contains `variants: $v` where {
         $v <: contains bubble normalize_class_literal()
       },

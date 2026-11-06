@@ -10,14 +10,14 @@
   },
   "dependencies": {
     "@styled-cva/solid": "workspace:*",
-    "solid-js": "^1.9.14"
+    "solid-js": "^1.9.18"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4",
-    "@types/node": "^24.13.3",
+    "@types/node": "^24.19.2",
     "tailwindcss": "^4",
     "typescript": "~5.9.3",
-    "vite": "^7.3.6",
-    "vite-plugin-solid": "^2.11.13"
+    "vite": "^7.3.7",
+    "vite-plugin-solid": "^2.11.15"
   }
 }

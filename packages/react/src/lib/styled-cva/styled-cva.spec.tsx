@@ -910,7 +910,7 @@ describe("styled-cva", () => {
           };
 
           return (
-            <form onSubmit={handleSubmit}>
+            <form noValidate onSubmit={handleSubmit}>
               <Input
                 $hasError={error}
                 type="email"

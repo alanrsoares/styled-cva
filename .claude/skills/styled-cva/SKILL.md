@@ -1,6 +1,6 @@
 ---
 name: styled-cva
-description: Type-safe styled components with CVA variants for React, Solid, Vue, and ReScript. Use when authoring components with Tailwind CSS, implementing variant-based styling, using `tw` template literals or the intrinsic CVA shorthand (`tw.tag(base, config)`), refactoring `className`/`cn()` logic into named components, or configuring the companion lint/format tooling. Triggers on `@styled-cva/react`, `@styled-cva/solid`, `@styled-cva/vue`, `@styled-cva/rescript`, `@styled-cva/eslint-plugin`, `@styled-cva/prettier-plugin`, `@styled-cva/biome-plugin`, `tw.div`, `tw.button`, `tw(Component)`, `.cva(`, `.withProps(`, `$variant`, `$size`, `$as` props, `PolymorphicComponentProps`, and `VariantProps`. Also applies under Preact via the `preact/compat` alias.
+description: Type-safe styled components with CVA variants for React, Solid, Vue, and ReScript. Use when authoring components with Tailwind CSS, implementing variant-based styling, using `tw` template literals or the intrinsic CVA shorthand (`tw.tag(base, config)`), refactoring `className`/`cn()` logic into named components, or configuring the companion lint/format tooling. Triggers on `@styled-cva/react`, `@styled-cva/solid`, `@styled-cva/vue`, `@styled-cva/rescript`, `@styled-cva/eslint-plugin`, `@styled-cva/prettier-plugin`, `@styled-cva/biome-plugin`, `tw.div`, `tw.button`, `tw(Component)`, `.cva(`, `.withProps(`, `$variant`, `$size`, `$as` props, `PolymorphicComponentProps`, `VariantProps`, `VariantOf`, and `VariantsOf`. Also applies under Preact via the `preact/compat` alias.
 ---
 
 # styled-cva
@@ -165,13 +165,22 @@ const buttonVariants = cva("btn-base", {
 });
 <button className={buttonVariants({ variant: "primary" })}>Click</button>
 
-// VariantProps — extract the variant slice of a styled component's props
+// VariantProps — the variant props of a standalone `cva` function
+type ButtonVariantProps = VariantProps<typeof buttonVariants>;
+// { variant?: "primary" | null }
+
+// VariantsOf / VariantOf — the variant types of a styled component
+// (VariantProps does not work on a styled component: it gives `any`)
+import { type VariantOf, type VariantsOf } from "@styled-cva/react";
 const Button = tw.button("…", {
   variants: { $variant: { primary: "…" }, $size: { sm: "…", lg: "…" } },
 });
-type ButtonProps = VariantProps<typeof Button>;
-// { $variant?: "primary"; $size?: "sm" | "lg" }
+type ButtonVariants = VariantsOf<typeof Button>;
+// { $variant?: "primary" | null; $size?: "sm" | "lg" | null }
+type Size = VariantOf<typeof Button, "$size">; // "sm" | "lg"
 ```
+
+`VariantOf` removes `null` and `undefined`, and a boolean variant (`{ true, false }`) gives `boolean`. Both helpers work on `tw.tag(base, config)`, `tw(Component, base, config)`, `.withProps()` results and template components. They leave out `$as`. Use them to type a `Record<Size, …>` or a prop of a parent component without a second `cva` only for the types.
 
 ## When to reach for styled-cva
 

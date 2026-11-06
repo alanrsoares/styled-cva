@@ -335,6 +335,36 @@ type ButtonVariants = VariantProps<typeof buttonVariants>;
 // { $variant?: 'primary' | 'secondary' }
 ```
 
+`VariantProps` works on a `cva` function, not on a styled component. For a styled component, use `VariantsOf` and `VariantOf`.
+
+### `VariantsOf<C>` and `VariantOf<C, K>`
+
+Read the variant types from a styled component. Then you do not need a separate `cva` only for the types.
+
+```tsx
+import tw, { type VariantOf, type VariantsOf } from "@styled-cva/react";
+
+const Callout = tw.div("rounded p-4", {
+  variants: {
+    $tone: { info: "bg-blue-50", tip: "bg-green-50" },
+    $active: { true: "ring-2", false: "" },
+  },
+});
+
+type CalloutVariants = VariantsOf<typeof Callout>;
+// { $tone?: "info" | "tip" | null; $active?: boolean | null }
+
+type Tone = VariantOf<typeof Callout, "$tone">; // "info" | "tip"
+type Active = VariantOf<typeof Callout, "$active">; // boolean
+
+const toneIcon: Record<Tone, string> = { info: "ℹ️", tip: "💡" };
+```
+
+- `VariantsOf` gives all `$`-prefixed props of the component, without `$as`.
+- `VariantOf` gives the values of one variant, without `null` and `undefined`.
+- A boolean variant (`{ true, false }`) gives `boolean`.
+- They work on `tw.tag(base, config)`, `tw(Component, base, config)`, `.withProps()` results and template components. For a template component, they give the `$` props of its type parameter.
+
 ## Advanced: `.withStyle()`
 
 For additional flexibility, basic styled components (not CVA components) support `.withStyle()` to add inline styles:

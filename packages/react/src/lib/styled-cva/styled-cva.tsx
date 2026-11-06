@@ -195,6 +195,49 @@ type ExtractTransientProps<P> = {
   [K in keyof P as K extends `$${string}` ? K : never]?: P[K];
 };
 
+// The CVA component type has overloaded call signatures, so `infer` on it
+// gives `any`. `.withProps()` returns the plain forwardRef type, so infer the
+// props from that return type. The last branch is for that `.withProps()` result.
+type StyledPropsOf<C> = C extends AnyTailwindComponent
+  ? TailwindComponentAllInnerProps<C>
+  : C extends {
+        withProps: (...args: any[]) => ForwardRefExoticComponent<infer P>;
+      }
+    ? P
+    : C extends ForwardRefExoticComponent<infer P>
+      ? P
+      : never;
+
+/**
+ * The variant props of a styled component: its `$`-prefixed props, without `$as`.
+ *
+ * @example
+ * ```ts
+ * const Callout = tw.div("p-2", { variants: { $tone: { info: "…", tip: "…" } } });
+ * type CalloutVariants = VariantsOf<typeof Callout>; // { $tone?: "info" | "tip" | null }
+ * ```
+ */
+export type VariantsOf<C, P = StyledPropsOf<C>> = {
+  [K in keyof P as K extends "$as"
+    ? never
+    : K extends `$${string}`
+      ? K
+      : never]?: P[K];
+};
+
+/**
+ * The values of one variant prop, without `null` and `undefined`.
+ * A boolean variant (`{ true, false }`) gives `boolean`.
+ *
+ * @example
+ * ```ts
+ * type Tone = VariantOf<typeof Callout, "$tone">; // "info" | "tip"
+ * ```
+ */
+export type VariantOf<C, K extends keyof VariantsOf<C>> = NonNullable<
+  VariantsOf<C>[K]
+>;
+
 /**
  * Utility type to create polymorphic props for custom React components.
  * Use this when you need to render a CVA component as a custom React component

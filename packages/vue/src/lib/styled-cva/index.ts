@@ -1,2 +1,7 @@
-export { createStyledCVA, type StyledCVA } from "./styled-cva";
+export {
+  createStyledCVA,
+  type StyledCVA,
+  type VariantOf,
+  type VariantsOf,
+} from "./styled-cva";
 export * from "./types";

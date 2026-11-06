@@ -125,6 +125,25 @@ const Button = tw.button("btn-base", {
 </Button>;
 ```
 
+### Boolean shorthand
+
+A string as a variant is a boolean variant. The prop type is `boolean`.
+
+```tsx
+const Frame = tw.div("rounded p-4", {
+  variants: {
+    $active: "ring-2 ring-blue-500", // same as { true: "ring-2 ring-blue-500", false: "" }
+    $tone: { info: "bg-blue-50", tip: "bg-green-50" },
+  },
+  compoundVariants: [{ $active: true, $tone: "info", className: "font-bold" }],
+});
+
+<Frame $active={isActive} />;
+```
+
+Use the object form (`{ true: "…", false: "…" }`) when the `false` value also needs classes.
+`compoundVariants` and `defaultVariants` use `true` and `false` for the shorthand too.
+
 ### Transient Props
 
 <Callout type="info">
@@ -362,7 +381,7 @@ const toneIcon: Record<Tone, string> = { info: "ℹ️", tip: "💡" };
 
 - `VariantsOf` gives all `$`-prefixed props of the component, without `$as`.
 - `VariantOf` gives the values of one variant, without `null` and `undefined`.
-- A boolean variant (`{ true, false }`) gives `boolean`.
+- A boolean variant (`{ true, false }` or the string shorthand) gives `boolean`.
 - They work on `tw.tag(base, config)`, `tw(Component, base, config)`, `.withProps()` results and template components. For a template component, they give the `$` props of its type parameter.
 
 ## Advanced: `.withStyle()`

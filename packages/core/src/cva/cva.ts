@@ -28,98 +28,119 @@ export const cx = clsx;
 /* cva
   ============================================ */
 
-type ConfigSchema = Record<string, Record<string, ClassValue>>;
+/**
+ * A variant is an object that maps each value to its classes, or a string.
+ * A string is a boolean shorthand: `"ring-2"` is `{ true: "ring-2", false: "" }`.
+ */
+type VariantShape = Record<string, ClassValue> | string;
+
+type ConfigSchema = Record<string, VariantShape>;
+
+type VariantValue<V> = V extends string ? boolean : StringToBoolean<keyof V>;
 
 type ConfigVariants<T extends ConfigSchema> = {
-  [Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null | undefined;
+  [Variant in keyof T]?: VariantValue<T[Variant]> | null | undefined;
 };
 type ConfigVariantsMulti<T extends ConfigSchema> = {
   [Variant in keyof T]?:
-  | StringToBoolean<keyof T[Variant]>
-  | StringToBoolean<keyof T[Variant]>[]
-  | undefined;
+    VariantValue<T[Variant]> | VariantValue<T[Variant]>[] | undefined;
 };
+
+type NormalizedVariants = Record<string, Record<string, ClassValue>>;
+
+const normalizeVariants = (variants: ConfigSchema): NormalizedVariants =>
+  Object.fromEntries(
+    Object.entries(variants).map(([name, shape]) => [
+      name,
+      typeof shape === "string" ? { true: shape, false: "" } : shape,
+    ]),
+  );
 
 type Config<T> = T extends ConfigSchema
   ? {
-    variants?: T;
-    defaultVariants?: ConfigVariants<T>;
-    compoundVariants?: (T extends ConfigSchema
-      ? (ConfigVariants<T> | ConfigVariantsMulti<T>) & ClassProp
-      : ClassProp)[];
-  }
+      variants?: T;
+      defaultVariants?: ConfigVariants<T>;
+      compoundVariants?: (T extends ConfigSchema
+        ? (ConfigVariants<T> | ConfigVariantsMulti<T>) & ClassProp
+        : ClassProp)[];
+    }
   : never;
 
 type Props<T> = T extends ConfigSchema
   ? ConfigVariants<T> & ClassProp
   : ClassProp;
 
-export const cva =
-  <T>(base?: ClassValue, config?: Config<T>) =>
-    (props?: Props<T>) => {
-      if (config?.variants == null)
-        return cx(base, props?.class, props?.className);
+export const cva = <T>(base?: ClassValue, config?: Config<T>) => {
+  const variants =
+    config?.variants == null
+      ? undefined
+      : normalizeVariants(config.variants as ConfigSchema);
 
-      const { variants, defaultVariants } = config;
+  return (props?: Props<T>) => {
+    if (config == null || variants == null)
+      return cx(base, props?.class, props?.className);
 
-      const getVariantClassNames = Object.keys(variants).map(
-        (variant: keyof typeof variants) => {
-          const variantProp = props?.[variant as keyof typeof props];
-          const defaultVariantProp = defaultVariants?.[variant];
+    const { defaultVariants } = config;
 
-          if (variantProp === null) return null;
+    const getVariantClassNames = Object.keys(variants).map(
+      (variant: keyof typeof variants) => {
+        const variantProp = props?.[variant as keyof typeof props];
+        const defaultVariantProp = defaultVariants?.[variant];
 
-          const variantKey = (falsyToString(variantProp) ||
-            falsyToString(
-              defaultVariantProp,
-            )) as keyof (typeof variants)[typeof variant];
+        if (variantProp === null) return null;
 
-          return variants[variant][variantKey];
+        const variantKey = (falsyToString(variantProp) ||
+          falsyToString(
+            defaultVariantProp,
+          )) as keyof (typeof variants)[typeof variant];
+
+        return variants[variant][variantKey];
+      },
+    );
+
+    const propsWithoutUndefined =
+      props &&
+      Object.entries(props).reduce(
+        (acc, [key, value]) => {
+          if (value === undefined) {
+            return acc;
+          }
+
+          acc[key] = value;
+          return acc;
         },
+        {} as Record<string, unknown>,
       );
 
-      const propsWithoutUndefined =
-        props &&
-        Object.entries(props).reduce(
-          (acc, [key, value]) => {
-            if (value === undefined) {
-              return acc;
-            }
-
-            acc[key] = value;
-            return acc;
-          },
-          {} as Record<string, unknown>,
-        );
-
-      const getCompoundVariantClassNames = config?.compoundVariants?.reduce(
-        (
-          acc,
-          { class: cvClass, className: cvClassName, ...compoundVariantOptions },
-        ) =>
-          Object.entries(compoundVariantOptions).every(([key, value]) =>
-            Array.isArray(value)
-              ? value.includes(
+    const getCompoundVariantClassNames = config?.compoundVariants?.reduce(
+      (
+        acc,
+        { class: cvClass, className: cvClassName, ...compoundVariantOptions },
+      ) =>
+        Object.entries(compoundVariantOptions).every(([key, value]) =>
+          Array.isArray(value)
+            ? value.includes(
                 {
                   ...defaultVariants,
                   ...propsWithoutUndefined,
                 }[key],
               )
-              : {
+            : {
                 ...defaultVariants,
                 ...propsWithoutUndefined,
               }[key] === value,
-          )
-            ? [...acc, cvClass, cvClassName]
-            : acc,
-        [] as ClassValue[],
-      );
+        )
+          ? [...acc, cvClass, cvClassName]
+          : acc,
+      [] as ClassValue[],
+    );
 
-      return cx(
-        base,
-        getVariantClassNames,
-        getCompoundVariantClassNames,
-        props?.class,
-        props?.className,
-      );
-    };
+    return cx(
+      base,
+      getVariantClassNames,
+      getCompoundVariantClassNames,
+      props?.class,
+      props?.className,
+    );
+  };
+};

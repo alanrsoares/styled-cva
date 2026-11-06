@@ -1193,4 +1193,56 @@ describe("styled-cva", () => {
       expect(el.getAttribute("$tone")).toBeNull();
     });
   });
+
+  describe("withProps on template components (issue #12)", () => {
+    const Base = tw.button`px-2 rounded`;
+
+    it("applies default props to a tw.tag template component", () => {
+      const Button = Base.withProps({ type: "button", "data-x": "1" } as any);
+      render(Button, { slots: { default: "Go" } });
+      const el = screen.getByRole("button");
+      expect(el).toHaveAttribute("type", "button");
+      expect(el).toHaveAttribute("data-x", "1");
+      expect(el).toHaveClass("px-2", "rounded");
+    });
+
+    it("lets call-site props override the defaults", () => {
+      const Button = Base.withProps({ type: "button" });
+      render(Button, { attrs: { type: "submit" }, slots: { default: "Go" } });
+      expect(screen.getByRole("button")).toHaveAttribute("type", "submit");
+    });
+
+    it("pins a wrapped component's own props", () => {
+      const Link = defineComponent({
+        props: { variant: { type: String, default: undefined } },
+        setup(props, { slots }) {
+          return () =>
+            h("a", { "data-variant": props.variant }, slots.default?.());
+        },
+      });
+      const BannerLink = tw(Link)`underline`.withProps({ variant: "link" });
+      render(BannerLink, { slots: { default: "Go" } });
+      const el = screen.getByText("Go");
+      expect(el).toHaveAttribute("data-variant", "link");
+      expect(el).toHaveClass("underline");
+    });
+
+    it("chains withProps and withStyle", () => {
+      const Button = Base.withProps({ type: "button" })
+        .withProps({ title: "t" })
+        .withStyle({ color: "red" });
+      render(Button, { slots: { default: "Go" } });
+      const el = screen.getByRole("button");
+      expect(el).toHaveAttribute("type", "button");
+      expect(el).toHaveAttribute("title", "t");
+      expect(el.style.color).toBe("red");
+    });
+
+    it("types the defaults from the component props", () => {
+      type Params = Parameters<typeof Base.withProps>[0];
+      expectType<Params>({ type: "button", disabled: true });
+      // @ts-expect-error unknown prop
+      expectType<Params>({ notAProp: 1 });
+    });
+  });
 });

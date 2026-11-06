@@ -12,7 +12,7 @@ const format = (source: string, printWidth = 80) =>
 
 describe("prettier plugin: tw.tag tagged templates", () => {
   test("collapses whitespace inside tw.div template", async () => {
-    const src = `const A = tw.div\`   flex   items-center   gap-2  \`;\n`;
+    const src = "const A = tw.div`   flex   items-center   gap-2  `;\n";
     const out = await format(src);
     expect(out).toContain("tw.div`flex items-center gap-2`");
   });
@@ -27,13 +27,13 @@ describe("prettier plugin: tw.tag tagged templates", () => {
   });
 
   test("leaves short tw.div template unchanged", async () => {
-    const src = `const A = tw.div\`flex gap-2\`;\n`;
+    const src = "const A = tw.div`flex gap-2`;\n";
     const out = await format(src);
     expect(out).toContain("tw.div`flex gap-2`");
   });
 
   test("handles tw(Component) wrapper templates", async () => {
-    const src = `const A = tw(Button)\`  bg-blue-500   text-white  \`;\n`;
+    const src = "const A = tw(Button)`  bg-blue-500   text-white  `;\n";
     const out = await format(src);
     expect(out).toContain("tw(Button)`bg-blue-500 text-white`");
   });

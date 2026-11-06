@@ -65,11 +65,11 @@ const withDefaultProps = (
 };
 
 const templateFunctionFactory: TailwindInterface = (<
-  C extends string | Component,
->(
-  Element: C,
-) => {
-  return (
+    C extends string | Component,
+  >(
+    Element: C,
+  ) =>
+  (
     template: TemplateStringsArray,
     ...templateElements: ((props: any) => string | undefined | null)[]
   ) => {
@@ -86,7 +86,7 @@ const templateFunctionFactory: TailwindInterface = (<
         name:
           typeof Element === "string"
             ? `Tw${capitalize(Element)}`
-            : `TwComponent`,
+            : "TwComponent",
         inheritAttrs: false,
         setup(_, { slots, attrs }: SetupContext) {
           // Extract $as, class, and style from attrs (Vue doesn't like $ prefixed props)
@@ -119,10 +119,9 @@ const templateFunctionFactory: TailwindInterface = (<
             const entries = Object.entries(attrs).filter(
               ([key]) => key !== "class" && key !== "style" && key !== "$as",
             );
-            if (isTw(FinalElement.value)) {
-              return Object.fromEntries(entries);
-            }
-            return Object.fromEntries(entries.filter(removeTransientProps));
+            return isTw(FinalElement.value)
+              ? Object.fromEntries(entries)
+              : Object.fromEntries(entries.filter(removeTransientProps));
           });
 
           // Compute class names - reactive
@@ -177,8 +176,7 @@ const templateFunctionFactory: TailwindInterface = (<
     };
 
     return TwComponentConstructor();
-  };
-}) as any;
+  }) as any;
 
 type CVA<T = unknown> = typeof cva<T>;
 
@@ -256,11 +254,9 @@ type StyledPropsOf<C> = C extends AnyTailwindComponent
  * ```
  */
 export type VariantsOf<C, P = StyledPropsOf<C>> = {
-  [K in keyof P as K extends "$as"
-    ? never
-    : K extends `$${string}`
-      ? K
-      : never]?: P[K];
+  [
+    K in keyof P as K extends "$as" ? never : K extends `$${string}` ? K : never
+  ]?: P[K];
 };
 
 /**
@@ -348,8 +344,9 @@ export type StyledCVA = TailwindInterface &
     ): ComponentCVAWithPropsReturn<JSX.IntrinsicElements[C], T>;
   };
 
-const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
-  return (...args: Parameters<CVA>) => {
+const createCvaImpl =
+  (styledFn: any, Element: any, key?: string) =>
+  (...args: Parameters<CVA>) => {
     const variance = cva(...args);
 
     type Props = VariantProps<typeof variance> & {
@@ -380,10 +377,9 @@ const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
           const entries = Object.entries(attrs).filter(
             ([k]) => k !== "class" && k !== "$as",
           );
-          if (isTw(Element)) {
-            return Object.fromEntries(entries);
-          }
-          return Object.fromEntries(entries.filter(removeTransientProps));
+          return isTw(Element)
+            ? Object.fromEntries(entries)
+            : Object.fromEntries(entries.filter(removeTransientProps));
         });
 
         return () =>
@@ -433,16 +429,14 @@ const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
 
     return ComponentWithProps;
   };
-};
 
 const wrapTemplateFunction = (styledFn: any, Element: any, key?: string) => {
   const cvaImpl = createCvaImpl(styledFn, Element, key);
 
   const wrapped = function (this: unknown, ...args: unknown[]) {
-    if (isTaggedTemplateArg(args[0])) {
-      return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
-    }
-    return cvaImpl(...(args as Parameters<CVA>));
+    return isTaggedTemplateArg(args[0])
+      ? (styledFn as (...a: unknown[]) => unknown).apply(this, args)
+      : cvaImpl(...(args as Parameters<CVA>));
   };
 
   Object.assign(wrapped, styledFn, { cva: cvaImpl });
@@ -458,10 +452,7 @@ export function createStyledCVA(): StyledCVA {
       element,
       typeof element === "string" ? element : undefined,
     );
-    if (callArgs.length > 0) {
-      return (wrapped as any)(...callArgs);
-    }
-    return wrapped;
+    return callArgs.length > 0 ? (wrapped as any)(...callArgs) : wrapped;
   }) as any;
 
   const twCVA = Object.fromEntries(

@@ -130,9 +130,9 @@ describe("styled-cva", () => {
   });
 
   it("should style a custom component with className prop", () => {
-    const MyButton = ({ className }: { className: string }) => {
-      return <button className={className}>Hello</button>;
-    };
+    const MyButton = ({ className }: { className: string }) => (
+      <button className={className}>Hello</button>
+    );
 
     const StyledButton = tw(MyButton)`text-red-500`;
 
@@ -478,10 +478,10 @@ describe("styled-cva", () => {
       type WithPropsParams = Parameters<typeof StyledButton.withProps>[0];
 
       // Verify that data attributes ARE in the allowed props
-      type HasDataTestId = `data-testid` extends keyof WithPropsParams
+      type HasDataTestId = "data-testid" extends keyof WithPropsParams
         ? true
         : false;
-      type HasDataCustom = `data-custom-attr` extends keyof WithPropsParams
+      type HasDataCustom = "data-custom-attr" extends keyof WithPropsParams
         ? true
         : false;
 

@@ -430,10 +430,10 @@ describe("styled-cva", () => {
       type WithPropsParams = Parameters<typeof TestStyledButton.withProps>[0];
 
       // Verify that data attributes ARE in the allowed props
-      type HasDataTestId = `data-testid` extends keyof WithPropsParams
+      type HasDataTestId = "data-testid" extends keyof WithPropsParams
         ? true
         : false;
-      type HasDataCustom = `data-custom-attr` extends keyof WithPropsParams
+      type HasDataCustom = "data-custom-attr" extends keyof WithPropsParams
         ? true
         : false;
 

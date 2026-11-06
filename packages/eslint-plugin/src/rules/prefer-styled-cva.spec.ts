@@ -106,8 +106,8 @@ function A({ StyledDiv }) {
 
     it.each([
       ["an import", `import { StyledDiv } from "./x";`],
-      ["a function declaration", `function StyledDiv() { return null; }`],
-      ["a class declaration", `class StyledDiv {}`],
+      ["a function declaration", "function StyledDiv() { return null; }"],
+      ["a class declaration", "class StyledDiv {}"],
     ])("does not redeclare a name taken by %s", (_, taken) => {
       const output = fix(`import React from "react";
 ${taken}

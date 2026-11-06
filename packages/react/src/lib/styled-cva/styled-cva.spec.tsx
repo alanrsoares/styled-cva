@@ -1557,15 +1557,38 @@ describe("styled-cva", () => {
     it("gives the $ props of a template component", () => {
       const Item = tw.li<{ $selected?: boolean }>`p-2 ${(p) =>
         p.$selected ? "font-bold" : ""}`;
-      expectType<TypeEqual<VariantOf<typeof Item, "$selected">, boolean>>(
-        true,
-      );
+      expectType<TypeEqual<VariantOf<typeof Item, "$selected">, boolean>>(true);
     });
 
     it("rejects an unknown variant key", () => {
       // @ts-expect-error "$size" is not a variant of Callout
       type Bad = VariantOf<typeof Callout, "$size">;
       expectType<Bad | undefined>(undefined);
+    });
+  });
+  describe("boolean variant shorthand (issue #18)", () => {
+    const Frame = tw.div("p-2", {
+      variants: {
+        $active: "ring-2",
+        $tone: { info: "bg-blue-100", tip: "bg-green-100" },
+      },
+      compoundVariants: [{ $active: true, $tone: "info", class: "font-bold" }],
+    });
+
+    it("types the shorthand as a boolean variant", () => {
+      expectType<TypeEqual<VariantOf<typeof Frame, "$active">, boolean>>(true);
+      type Props = Parameters<typeof Frame.withProps>[0];
+      expectType<Props>({ $active: true });
+      // @ts-expect-error the shorthand takes a boolean, not a string
+      expectType<Props>({ $active: "ring-2" });
+    });
+
+    it.each([
+      [true, "p-2 ring-2 bg-blue-100 font-bold"],
+      [false, "p-2 bg-blue-100"],
+    ])("renders $active=%s", (active, expected) => {
+      const { container } = render(<Frame $active={active} $tone="info" />);
+      expect(container.firstElementChild?.className).toBe(expected);
     });
   });
 });

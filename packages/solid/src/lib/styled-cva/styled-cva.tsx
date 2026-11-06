@@ -396,7 +396,3 @@ export function createStyledCVA(): StyledCVA {
 
   return Object.assign(styledFnFactory, twCVA) as unknown as StyledCVA;
 }
-
-const tw: StyledCVA = createStyledCVA();
-
-export default tw;

@@ -53,25 +53,16 @@ const collectExistingNames = (ast: AST): Set<string> =>
       .map((d) => (d.id as { name: string }).name),
   );
 
-const isComponentBoundary = (node: ASTNode) =>
-  node.type === "FunctionDeclaration" ||
-  (node.type === "VariableDeclaration" &&
-    "declarations" in node &&
-    (node.declarations as Array<{ init?: { type: string } }>)[0]?.init?.type ===
-      "ArrowFunctionExpression");
-
-const isExportWrapper = (node?: ASTNode) =>
-  node?.type === "ExportDefaultDeclaration" ||
-  node?.type === "ExportNamedDeclaration";
-
-const findComponentBoundary = (node: ASTNode): ASTNode | null => {
+/**
+ * The module-level statement that holds `node`. The styled component goes
+ * before it: a declaration inside any function (a component or a local
+ * render helper) makes a new component type per render, and React remounts
+ * the element each time.
+ */
+const findTopLevelStatement = (node: ASTNode): ASTNode | null => {
   let current: ASTNode | undefined = node;
   while (current?.parent) {
-    if (isComponentBoundary(current.parent)) {
-      return isExportWrapper(current.parent.parent)
-        ? current.parent.parent
-        : current.parent;
-    }
+    if (current.parent.type === "Program") return current;
     current = current.parent;
   }
   return null;
@@ -155,7 +146,7 @@ const rule: Rule.RuleModule = {
             const styledDecl = `const ${componentName} = tw.${elementName}\`${normalizeClasses(classString)}\`;\n\n`;
             const lastImportEnd = getLastImportEnd(ast);
             const insertionPoint =
-              findComponentBoundary(attr)?.range?.[0] ??
+              findTopLevelStatement(attr)?.range?.[0] ??
               (lastImportEnd > 0 ? lastImportEnd + 1 : 0);
 
             const fixes: Rule.Fix[] = [];

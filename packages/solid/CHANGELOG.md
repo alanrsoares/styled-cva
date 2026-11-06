@@ -1,5 +1,15 @@
 # @styled-cva/solid
 
+## 0.6.4
+
+### Patch Changes
+
+- 1e6e76d: Pass `className` once in the React CVA path. Before, non-Tailwind classes from a wrapping CVA component were repeated in the output. Each adapter now builds the default `tw` once at import, not twice.
+- 985707b: Clean the class string of a template with no interpolations once, not on each render. Add `createTemplateClassResolver` to `@styled-cva/core`.
+- 17229b5: Add `.withProps()` to template-literal components (`tw.tag\`…\``and`tw(Component)\`…\``). Before, a call gave a type error and a runtime `TypeError: withProps is not a function`. Call-site props override the defaults, and the result keeps `.withStyle()`and`.withProps()` for chaining.
+- Updated dependencies [985707b]
+  - @styled-cva/core@0.7.1
+
 ## 0.6.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @styled-cva/core
 
+## 0.7.1
+
+### Patch Changes
+
+- 985707b: Clean the class string of a template with no interpolations once, not on each render. Add `createTemplateClassResolver` to `@styled-cva/core`.
+
 ## 0.7.0
 
 ### Minor Changes

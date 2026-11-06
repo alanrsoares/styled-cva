@@ -1,5 +1,15 @@
 # @styled-cva/rescript
 
+## 0.8.4
+
+### Patch Changes
+
+- 13bc0ae: Replace `workspace:*` internal dependency specifiers with concrete semver ranges to avoid unresolved workspace references on npm publish, fix double-caret typos in peerDependencies, and widen `@rescript/react` peer dependency to include `^0.14.0`.
+- Updated dependencies [1e6e76d]
+- Updated dependencies [985707b]
+- Updated dependencies [17229b5]
+  - @styled-cva/react@0.7.4
+
 ## 0.8.3
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@styled-cva/prettier-plugin",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -27,7 +27,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@styled-cva/core": "^0.7.0"
+    "@styled-cva/core": "^0.7.1"
   },
   "peerDependencies": {
     "prettier": "^3"

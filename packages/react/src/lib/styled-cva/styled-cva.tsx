@@ -88,7 +88,10 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
               // forward ref
               ref={ref}
               // set class names
-              className={resolveClassName({ ...props, $as }, props.className)}
+              className={resolveClassName(
+                () => ({ ...props, $as }),
+                props.className,
+              )}
               // forward $as prop when styling a tailwind-styled-component
               {...(isTw(Element) && $as ? { $as } : {})}
             />

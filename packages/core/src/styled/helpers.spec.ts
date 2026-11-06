@@ -40,22 +40,47 @@ describe("createTemplateClassResolver", () => {
         text-red-500   border
       `;
       const resolve = createTemplateClassResolver(t.strings, t.fns);
-      expect(resolve({}, inherited)).toBe(legacy(t, {}, inherited));
+      expect(resolve(() => ({}), inherited)).toBe(legacy(t, {}, inherited));
     },
   );
 
   it("returns the same static string on each call", () => {
     const t = tag`p-4 p-2 border`;
     const resolve = createTemplateClassResolver(t.strings, t.fns);
-    expect(resolve({})).toBe("p-2 border");
-    expect(resolve({})).toBe(resolve({}));
+    expect(resolve(() => ({}))).toBe("p-2 border");
+    expect(resolve(() => ({}))).toBe(resolve(() => ({})));
+  });
+
+  it("does not read props for a static template", () => {
+    const t = tag`p-4 border`;
+    const resolve = createTemplateClassResolver(t.strings, t.fns);
+    let reads = 0;
+    const getProps = () => {
+      reads++;
+      return {};
+    };
+    resolve(getProps);
+    resolve(getProps, "shadow-sm");
+    expect(reads).toBe(0);
+  });
+
+  it("reads props once per call for an interpolated template", () => {
+    const t = tag`${(p) => (p.$on ? "a" : "b")} ${() => "c"}`;
+    const resolve = createTemplateClassResolver(t.strings, t.fns);
+    let reads = 0;
+    const getProps = () => {
+      reads++;
+      return { $on: true };
+    };
+    expect(resolve(getProps)).toBe("a c");
+    expect(reads).toBe(1);
   });
 
   it("returns an empty string for an empty template", () => {
     const t = tag``;
     const resolve = createTemplateClassResolver(t.strings, t.fns);
-    expect(resolve({})).toBe("");
-    expect(resolve({}, "px-1")).toBe("px-1");
+    expect(resolve(() => ({}))).toBe("");
+    expect(resolve(() => ({}), "px-1")).toBe("px-1");
   });
 
   it.each([
@@ -68,7 +93,7 @@ describe("createTemplateClassResolver", () => {
       // the static `p-1` after the interpolation must win over `p-4`
       const t = tag`border ${(p) => (p.$on ? "p-4" : undefined)} p-1`;
       const resolve = createTemplateClassResolver(t.strings, t.fns);
-      expect(resolve(props, inherited)).toBe(legacy(t, props, inherited));
+      expect(resolve(() => props, inherited)).toBe(legacy(t, props, inherited));
     },
   );
 });

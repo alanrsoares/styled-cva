@@ -57,25 +57,30 @@ export function cleanTemplate(
  * is cleaned once, on the first call, and reused; only inherited classes are
  * merged per call. A template with interpolations keeps the full per-call
  * clean, because an interpolation can override a later static class.
+ *
+ * Props are passed as a function. The static path never calls it, so it does
+ * not copy props or, in a reactive adapter, subscribe to them.
  */
 export function createTemplateClassResolver<P>(
   template: TemplateStringsArray,
   templateElements: ReadonlyArray<(props: P) => Nullish<string>>,
-): (props: P, inheritedClasses?: string) => string {
+): (getProps: () => P, inheritedClasses?: string) => string {
   if (templateElements.length > 0) {
-    return (props, inheritedClasses) =>
-      cleanTemplate(
+    return (getProps, inheritedClasses) => {
+      const props = getProps();
+      return cleanTemplate(
         mergeArrays(
           template,
           templateElements.map((t) => t(props)),
         ),
         inheritedClasses,
       );
+    };
   }
 
   let staticClasses: string | undefined;
 
-  return (_props, inheritedClasses) => {
+  return (_getProps, inheritedClasses) => {
     staticClasses ??= cleanTemplate([...template]);
     return inheritedClasses
       ? cn(staticClasses, inheritedClasses)

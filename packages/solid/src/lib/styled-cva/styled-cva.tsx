@@ -92,7 +92,10 @@ const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
 
         // Compute class names - reactive
         const computedClass = createMemo(() =>
-          resolveClassName({ ...props, $as: local.$as }, local.class ?? ""),
+          resolveClassName(
+            () => ({ ...props, $as: local.$as }),
+            local.class ?? "",
+          ),
         );
 
         // Merge styles - reactive

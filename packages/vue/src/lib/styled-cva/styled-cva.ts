@@ -99,7 +99,10 @@ const templateFunctionFactory: TailwindInterface = (<
 
           // Compute class names - reactive
           const computedClass = computed(() =>
-            resolveClassName({ ...attrs, $as: $as.value }, classAttr.value),
+            resolveClassName(
+              () => ({ ...attrs, $as: $as.value }),
+              classAttr.value,
+            ),
           );
 
           // Merge styles - reactive

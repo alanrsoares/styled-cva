@@ -5,23 +5,37 @@ import rule from "./prefer-styled-cva";
 
 const CLASSES = "a1 a2 a3 a4 a5 a6";
 
-const fix = (code: string): string => {
-  const linter = new Linter({ configType: "flat" });
-  return linter.verifyAndFix(
+const languageOptions = {
+  ecmaVersion: "latest",
+  sourceType: "module",
+  parserOptions: { ecmaFeatures: { jsx: true } },
+} as const;
+
+const fix = (code: string): string =>
+  new Linter({ configType: "flat" }).verifyAndFix(
     code,
     {
       files: ["**/*.jsx"],
-      languageOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        parserOptions: { ecmaFeatures: { jsx: true } },
-      },
+      languageOptions,
       plugins: { "styled-cva": { rules: { "prefer-styled-cva": rule } } },
       rules: { "styled-cva/prefer-styled-cva": "warn" },
     },
     "file.jsx",
   ).output;
-};
+
+/** Parse errors and redeclarations in `code`; empty when the output is valid. */
+const problems = (code: string): string[] =>
+  new Linter({ configType: "flat" })
+    .verify(
+      code,
+      {
+        files: ["**/*.jsx"],
+        languageOptions,
+        rules: { "no-redeclare": "error" },
+      },
+      "file.jsx",
+    )
+    .map((m) => m.message);
 
 /** True when the `tw` declaration starts a line, so it is not in a function body. */
 const declaredAtTopLevel = (output: string, name: string) =>
@@ -76,5 +90,66 @@ const List = ({ items }) => (
     expect(output.indexOf(`const ${name} = tw.`)).toBeLessThan(
       output.indexOf(`<${name}`),
     );
+  });
+
+  describe("names", () => {
+    it("does not reuse a name that a local binding shadows", () => {
+      const output = fix(`import React from "react";
+function A({ StyledDiv }) {
+  return <section><StyledDiv /><div className="${CLASSES}" /></section>;
+}`);
+      expect(output).toContain("const StyledDiv1 = tw.div");
+      expect(output).toContain("<StyledDiv /><StyledDiv1");
+    });
+
+    it.each([
+      ["an import", `import { StyledDiv } from "./x";`],
+      ["a function declaration", `function StyledDiv() { return null; }`],
+      ["a class declaration", `class StyledDiv {}`],
+    ])("does not redeclare a name taken by %s", (_, taken) => {
+      const output = fix(`import React from "react";
+${taken}
+export function A() { return <div className="${CLASSES}" />; }`);
+      expect(output).toContain("const StyledDiv1 = tw.div");
+      expect(problems(output)).toEqual([]);
+    });
+  });
+
+  describe("tw import", () => {
+    it.each(["@styled-cva/solid", "@styled-cva/vue", "@styled-cva/react"])(
+      "reuses an existing default import from %s",
+      (pkg) => {
+        const output = fix(`import tw from "${pkg}";
+export function A() { return <div className="${CLASSES}" />; }`);
+        expect(output.match(/^import /gm)).toHaveLength(1);
+        expect(output).toContain("const StyledDiv = tw.div");
+        expect(problems(output)).toEqual([]);
+      },
+    );
+
+    it("uses the local name of an aliased default import", () => {
+      const output = fix(`import styled from "@styled-cva/react";
+export function A() { return <div className="${CLASSES}" />; }`);
+      expect(output.match(/^import /gm)).toHaveLength(1);
+      expect(output).toContain("const StyledDiv = styled.div");
+    });
+
+    it("picks a free name when module scope already has `tw`", () => {
+      const output = fix(`import React from "react";
+const tw = 1;
+export function A() { return <div className="${CLASSES}" />; }`);
+      expect(problems(output)).toEqual([]);
+      expect(output).toMatch(/^import (\w+) from "@styled-cva\/react";$/m);
+    });
+
+    it.each([
+      ["no imports", ""],
+      ["imports", `import React from "react";\n`],
+    ])("keeps a leading directive first in a file with %s", (_, imports) => {
+      const output = fix(`"use client";
+${imports}export function A() { return <div className="${CLASSES}" />; }`);
+      expect(output.startsWith(`"use client";`)).toBe(true);
+      expect(problems(output)).toEqual([]);
+    });
   });
 });

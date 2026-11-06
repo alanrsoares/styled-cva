@@ -9,7 +9,7 @@ Part of the [styled-cva](https://github.com/alanrsoares/styled-cva) monorepo. Pu
 Warns when a **native HTML element** (e.g. `button`, `div`) has a `className` with more than a set number of classes, and suggests extracting it to a styled component. Only elements with lowercase tags are considered (custom components are ignored).
 
 - **Default threshold:** 5 classes (configurable)
-- **Fixable:** yes — adds `import tw from "@styled-cva/react"` if missing, creates a styled component, and replaces the inline element with the new component
+- **Fixable:** yes — adds `import tw from "@styled-cva/react"` if missing, creates a styled component at module scope, and replaces the inline element with the new component. The new name does not clash with any name in the file.
 
 ### Example
 
@@ -32,7 +32,7 @@ const StyledButton = tw.button`rounded bg-blue-500 px-4 py-2 text-white font-bol
 <StyledButton>Submit</StyledButton>;
 ```
 
-The plugin recognizes both `styled-cva` and `@styled-cva/react` as the styled import.
+The plugin reuses an existing default import from `styled-cva`, `@styled-cva/react`, `@styled-cva/solid` or `@styled-cva/vue`, under its local name. A new import goes after imports and directives such as `"use client"`.
 
 ## Installation
 

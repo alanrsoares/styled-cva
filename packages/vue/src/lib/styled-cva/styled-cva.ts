@@ -238,6 +238,44 @@ export type CVAWithPropsReturn<
   T,
 > = ComponentCVAWithPropsReturn<JSX.IntrinsicElements[K], T>;
 
+// Template components are `TailwindComponent`s. CVA components and their
+// `.withProps()` results are `DefineComponent`s.
+type StyledPropsOf<C> = C extends AnyTailwindComponent
+  ? TailwindComponentAllInnerProps<C>
+  : C extends DefineComponent<infer P>
+    ? P
+    : never;
+
+/**
+ * The variant props of a styled component: its `$`-prefixed props, without `$as`.
+ *
+ * @example
+ * ```ts
+ * const Callout = tw.div("p-2", { variants: { $tone: { info: "…", tip: "…" } } });
+ * type CalloutVariants = VariantsOf<typeof Callout>; // { $tone?: "info" | "tip" | null }
+ * ```
+ */
+export type VariantsOf<C, P = StyledPropsOf<C>> = {
+  [K in keyof P as K extends "$as"
+    ? never
+    : K extends `$${string}`
+      ? K
+      : never]?: P[K];
+};
+
+/**
+ * The values of one variant prop, without `null` and `undefined`.
+ * A boolean variant (`{ true, false }`) gives `boolean`.
+ *
+ * @example
+ * ```ts
+ * type Tone = VariantOf<typeof Callout, "$tone">; // "info" | "tip"
+ * ```
+ */
+export type VariantOf<C, K extends keyof VariantsOf<C>> = NonNullable<
+  VariantsOf<C>[K]
+>;
+
 export interface ComponentTemplateFunction<
   in out P extends object,
   in out O extends object = object,

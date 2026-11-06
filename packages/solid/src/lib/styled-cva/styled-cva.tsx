@@ -93,6 +93,9 @@ const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
         // Compute class names - reactive
         const computedClass = createMemo(() =>
           resolveClassName(
+            // called synchronously inside this memo, so reads are tracked;
+            // a static template never calls it and does not track props
+            // eslint-disable-next-line solid/reactivity
             () => ({ ...props, $as: local.$as }),
             local.class ?? "",
           ),

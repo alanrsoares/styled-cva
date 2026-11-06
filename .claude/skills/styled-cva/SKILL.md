@@ -139,6 +139,12 @@ const Wrapper = tw.div("border rounded", {
 });
 <Wrapper $active={isActive}>…</Wrapper>
 
+// Boolean shorthand — a string adds classes only when the prop is true
+const Row = tw.li("p-2", {
+  variants: { $selected: "bg-blue-50 font-medium" }, // = { true: "…", false: "" }
+});
+<Row $selected={isSelected}>…</Row>
+
 // Compound variants — apply when multiple variants match
 const Btn = tw.button("px-4 py-2", {
   variants: {
@@ -180,7 +186,7 @@ type ButtonVariants = VariantsOf<typeof Button>;
 type Size = VariantOf<typeof Button, "$size">; // "sm" | "lg"
 ```
 
-`VariantOf` removes `null` and `undefined`, and a boolean variant (`{ true, false }`) gives `boolean`. Both helpers work on `tw.tag(base, config)`, `tw(Component, base, config)`, `.withProps()` results and template components. They leave out `$as`. Use them to type a `Record<Size, …>` or a prop of a parent component without a second `cva` only for the types.
+`VariantOf` removes `null` and `undefined`, and a boolean variant (`{ true, false }` or a string) gives `boolean`. Both helpers work on `tw.tag(base, config)`, `tw(Component, base, config)`, `.withProps()` results and template components. They leave out `$as`. Use them to type a `Record<Size, …>` or a prop of a parent component without a second `cva` only for the types.
 
 ## When to reach for styled-cva
 

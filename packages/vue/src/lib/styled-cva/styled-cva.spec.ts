@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import userEvent from "@testing-library/user-event";
 import { render, screen, waitFor } from "@testing-library/vue";
 import { expectType, type TypeEqual } from "ts-expect";

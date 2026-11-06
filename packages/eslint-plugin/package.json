@@ -32,14 +32,14 @@
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "@types/eslint": "^9.6.1",
     "@types/estree": "^1.0.10",
     "@types/estree-jsx": "^1.0.5",
-    "eslint": "^9.39.5",
+    "eslint": "^10.14.0",
     "prettier": "^3.9.10",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
+    "tsup": "^9.0.0",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1"
   }
 }

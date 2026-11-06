@@ -4,6 +4,18 @@ import { transformerTwoslash } from "fumadocs-twoslash";
 import { Popup, PopupContent, PopupTrigger } from "fumadocs-twoslash/ui";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 
+type HighlightComponents = NonNullable<
+  Parameters<typeof highlight>[1]["components"]
+>;
+
+// fumadocs-core types `components` as intrinsic tags only, but its renderer
+// looks up any tag name, and the twoslash transformer emits these three.
+const twoslashComponents = {
+  Popup,
+  PopupContent,
+  PopupTrigger,
+} as unknown as HighlightComponents;
+
 export const TwoslashSnippet = async ({
   code,
   lang = "tsx",
@@ -28,8 +40,6 @@ export const TwoslashSnippet = async ({
           <Pre>{props.children}</Pre>
         </CodeBlock>
       ),
-      Popup,
-      PopupContent,
-      PopupTrigger,
+      ...twoslashComponents,
     },
   });

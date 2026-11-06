@@ -161,6 +161,7 @@ Changesets-driven. See [`RELEASING.md`](./RELEASING.md). One-liner:
 
 ```bash
 bun run changeset      # add a changeset
+bun run release:all    # or, step by step:
 bun run version        # consume changesets, bump versions, write CHANGELOGs
 git add -A && git commit -m "chore(release): version packages"
 bun run release        # build + publish to npm

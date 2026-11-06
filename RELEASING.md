@@ -35,6 +35,8 @@ git push && git push --tags
 
 `bun run release` runs `bun run build` then `changeset publish`, which publishes only packages that had their version bumped.
 
+Shortcut: `bun run release:all` runs all of the steps above. It runs `bun run release:preflight` first. The preflight stops the release when you are not on `main`, when the working tree has changes, or when `npm whoami` fails. Run `bun run release:preflight` alone to check before a release.
+
 ### 3. Tagging
 
 The convention in this monorepo is **one git tag per published package per release**, formatted `@styled-cva/<pkg>@<version>` (e.g. `@styled-cva/core@0.7.0`). `bunx changeset tag` reads each `packages/*/package.json` after publish and creates exactly those tags — it is idempotent, so re-running on a release that's already tagged is a no-op.

@@ -2,11 +2,10 @@
 
 import {
   capitalize,
-  cleanTemplate,
   cn,
+  createTemplateClassResolver,
   cva,
   isTaggedTemplateArg,
-  mergeArrays,
   removeTransientProps,
   type VariantProps,
 } from "@styled-cva/core";
@@ -44,6 +43,10 @@ const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
     template: TemplateStringsArray,
     ...templateElements: ((props: any) => string | undefined | null)[]
   ) => {
+    const resolveClassName = createTemplateClassResolver(
+      template,
+      templateElements,
+    );
     const TwComponentConstructor = (
       styleArray: (JSX.CSSProperties | ((p: any) => JSX.CSSProperties))[] = [],
     ) => {
@@ -89,11 +92,11 @@ const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
 
         // Compute class names - reactive
         const computedClass = createMemo(() =>
-          cleanTemplate(
-            mergeArrays(
-              template,
-              templateElements.map((t) => t({ ...props, $as: local.$as })),
-            ),
+          resolveClassName(
+            // called synchronously inside this memo, so reads are tracked;
+            // a static template never calls it and does not track props
+            // eslint-disable-next-line solid/reactivity
+            () => ({ ...props, $as: local.$as }),
             local.class ?? "",
           ),
         );
@@ -399,7 +402,3 @@ export function createStyledCVA(): StyledCVA {
 
   return Object.assign(styledFnFactory, twCVA) as unknown as StyledCVA;
 }
-
-const tw: StyledCVA = createStyledCVA();
-
-export default tw;

@@ -1,5 +1,6 @@
 export {
   cleanTemplate,
+  createTemplateClassResolver,
   isTaggedTemplateArg,
   mergeArrays,
   removeTransientProps,

@@ -2,11 +2,10 @@
 
 import {
   capitalize,
-  cleanTemplate,
   cn,
+  createTemplateClassResolver,
   cva,
   isTaggedTemplateArg,
-  mergeArrays,
   removeTransientProps,
   type VariantProps,
 } from "@styled-cva/core";
@@ -47,6 +46,10 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
     template: TemplateStringsArray,
     ...templateElements: ((props: any) => string | undefined | null)[]
   ) => {
+    const resolveClassName = createTemplateClassResolver(
+      template,
+      templateElements,
+    );
     const TwComponentConstructor = (
       styleArray: (CSSProperties | ((p: any) => CSSProperties))[] = [],
     ) => {
@@ -85,11 +88,8 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
               // forward ref
               ref={ref}
               // set class names
-              className={cleanTemplate(
-                mergeArrays(
-                  template,
-                  templateElements.map((t) => t({ ...props, $as })),
-                ),
+              className={resolveClassName(
+                () => ({ ...props, $as }),
                 props.className,
               )}
               // forward $as prop when styling a tailwind-styled-component
@@ -362,7 +362,7 @@ const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
 
     const WithRef = forwardRef<HTMLElement, Props>(
       ({ className, $as, ...props }: any, ref) => {
-        const classNames = cn(variance({ ...props, className }), className);
+        const classNames = cn(variance(props), className);
         const forwardedProps = isTw(Element)
           ? props
           : (Object.fromEntries(
@@ -449,7 +449,3 @@ export function createStyledCVA(): StyledCVA {
 
   return Object.assign(styledFnFactory, twCVA) as unknown as StyledCVA;
 }
-
-const tw: StyledCVA = createStyledCVA();
-
-export default tw;

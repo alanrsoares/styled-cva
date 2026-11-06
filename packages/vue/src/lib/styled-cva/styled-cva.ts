@@ -2,11 +2,10 @@
 
 import {
   capitalize,
-  cleanTemplate,
   cn,
+  createTemplateClassResolver,
   cva,
   isTaggedTemplateArg,
-  mergeArrays,
   removeTransientProps,
   type VariantProps,
 } from "@styled-cva/core";
@@ -46,6 +45,10 @@ const templateFunctionFactory: TailwindInterface = (<
     template: TemplateStringsArray,
     ...templateElements: ((props: any) => string | undefined | null)[]
   ) => {
+    const resolveClassName = createTemplateClassResolver(
+      template,
+      templateElements,
+    );
     const TwComponentConstructor = (
       styleArray: (
         Record<string, any> | ((p: any) => Record<string, any>)
@@ -96,13 +99,7 @@ const templateFunctionFactory: TailwindInterface = (<
 
           // Compute class names - reactive
           const computedClass = computed(() =>
-            cleanTemplate(
-              mergeArrays(
-                template,
-                templateElements.map((t) => t({ ...attrs, $as: $as.value })),
-              ),
-              classAttr.value,
-            ),
+            resolveClassName({ ...attrs, $as: $as.value }, classAttr.value),
           );
 
           // Merge styles - reactive

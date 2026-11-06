@@ -5,7 +5,11 @@ import { useState, type ComponentProps, type ReactNode } from "react";
 import { expectType, type TypeEqual } from "ts-expect";
 import { vi } from "vitest";
 
-import { isTaggedTemplateArg } from "../../index";
+import {
+  isTaggedTemplateArg,
+  type VariantOf,
+  type VariantsOf,
+} from "../../index";
 import { createStyledCVA } from "./styled-cva";
 
 const tw = createStyledCVA();
@@ -1504,6 +1508,64 @@ describe("styled-cva", () => {
       expectType<Params>({ notAProp: 1 });
       // @ts-expect-error wrong value type
       expectType<Params>({ disabled: "yes" });
+    });
+  });
+  describe("VariantOf and VariantsOf (issue #17)", () => {
+    const Callout = tw.div("p-2", {
+      variants: {
+        $tone: { info: "bg-blue-100", tip: "bg-green-100" },
+        $active: { true: "ring-2", false: "" },
+      },
+    });
+
+    it("gives the values of one variant without null or undefined", () => {
+      expectType<TypeEqual<VariantOf<typeof Callout, "$tone">, "info" | "tip">>(
+        true,
+      );
+    });
+
+    it("gives boolean for a boolean variant", () => {
+      expectType<TypeEqual<VariantOf<typeof Callout, "$active">, boolean>>(
+        true,
+      );
+    });
+
+    it("gives all variant props, without $as", () => {
+      type All = VariantsOf<typeof Callout>;
+      expectType<TypeEqual<keyof All, "$tone" | "$active">>(true);
+      expectType<All>({ $tone: "tip" });
+      // @ts-expect-error unknown variant value
+      expectType<All>({ $tone: "nope" });
+    });
+
+    it("works on a wrapped component and on .withProps()", () => {
+      const Card = (props: { className?: string; title: string }) => (
+        <div className={props.className}>{props.title}</div>
+      );
+      const Panel = tw(Card, "p-2", {
+        variants: { $size: { sm: "p-1", lg: "p-4" } },
+      });
+      expectType<TypeEqual<VariantOf<typeof Panel, "$size">, "sm" | "lg">>(
+        true,
+      );
+      const Info = Callout.withProps({ $tone: "info" });
+      expectType<TypeEqual<VariantOf<typeof Info, "$tone">, "info" | "tip">>(
+        true,
+      );
+    });
+
+    it("gives the $ props of a template component", () => {
+      const Item = tw.li<{ $selected?: boolean }>`p-2 ${(p) =>
+        p.$selected ? "font-bold" : ""}`;
+      expectType<TypeEqual<VariantOf<typeof Item, "$selected">, boolean>>(
+        true,
+      );
+    });
+
+    it("rejects an unknown variant key", () => {
+      // @ts-expect-error "$size" is not a variant of Callout
+      type Bad = VariantOf<typeof Callout, "$size">;
+      expectType<Bad | undefined>(undefined);
     });
   });
 });

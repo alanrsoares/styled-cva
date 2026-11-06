@@ -80,7 +80,10 @@ type TailwindComponentPropsWith$As<
 export type TailwindComponent<
   P extends object,
   O extends object = {},
-> = IsTwElement & TailwindComponentBase<P, O> & WithStyle<P, O>;
+> = IsTwElement &
+  TailwindComponentBase<P, O> &
+  WithStyle<P, O> &
+  WithProps<P, O>;
 
 /**
  * An interface represent a component styled by tailwind-styled-components
@@ -121,6 +124,26 @@ export interface WithStyle<
     styles: React.CSSProperties | ((p: P & O & S) => React.CSSProperties),
   ) => TailwindComponent<P, O & S>;
 }
+/**
+ * An interface represent withProps functionality
+ *
+ * @export
+ * @interface WithProps
+ * @template P
+ * @template O
+ */
+export interface WithProps<
+  in out P extends object,
+  in out O extends object = {},
+> {
+  /**
+   * Sets default props. Props passed at the call site override them.
+   */
+  withProps: (
+    defaultProps: Partial<TailwindPropHelper<P, O>>,
+  ) => TailwindComponent<P, O>;
+}
+
 /**
  * Generice TailwindComponent
  */

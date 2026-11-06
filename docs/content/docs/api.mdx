@@ -176,6 +176,22 @@ const Button = tw.button("btn", {
   });
 ```
 
+Template components have `.withProps()` too. The result keeps `.withStyle()` and `.withProps()`, so you can chain them:
+
+```tsx
+// pin a wrapped component's own props
+const BannerLink = tw(Button)`h-auto p-0 underline`.withProps({
+  variant: "link",
+});
+
+const SubmitButton = tw.button`px-4 py-2`
+  .withProps({ type: "submit" })
+  .withStyle({ minWidth: 120 });
+```
+
+In Vue, `withProps` uses Vue's `mergeProps`, so a default `class` and a call-site `class` are joined.
+In React and Solid, a call-site prop replaces the default.
+
 ## `$as` Prop
 
 The `$as` prop allows you to render a component as a different element or component.

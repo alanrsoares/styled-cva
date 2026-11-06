@@ -86,6 +86,17 @@ const SubmitButton = tw
   });
 ```
 
+Template components have `.withProps()` too. Use it to pin a wrapped component's own props:
+
+```tsx
+const BannerLink = tw(Button)`h-auto p-0 underline`.withProps({
+  variant: "link",
+});
+```
+
+On a template component, the result keeps `.withStyle()` and `.withProps()`, so you can chain them.
+A CVA component's `.withProps()` result has no `.withProps()`.
+
 ### `$as` — polymorphic rendering
 
 Render as a different element or component:

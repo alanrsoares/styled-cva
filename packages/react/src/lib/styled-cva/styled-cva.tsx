@@ -39,6 +39,26 @@ import {
 
 const isTw = (c: any): c is AnyTailwindComponent => c[isTwElement] === true;
 
+/**
+ * Wraps a template component so `defaultProps` apply unless the call site
+ * passes the same prop. The result keeps `withStyle` and `withProps`.
+ */
+const withDefaultProps = (
+  Component: any,
+  defaultProps: Record<string, unknown>,
+): any => {
+  const WithDefaults: any = forwardRef((userProps: any, ref: any) => (
+    <Component {...defaultProps} {...userProps} ref={ref} />
+  ));
+  WithDefaults.displayName = `${Component.displayName}.withProps`;
+  WithDefaults[isTwElement] = true;
+  WithDefaults.withStyle = (styles: any) =>
+    withDefaultProps(Component.withStyle(styles), defaultProps);
+  WithDefaults.withProps = (more: Record<string, unknown>) =>
+    withDefaultProps(Component, { ...defaultProps, ...more });
+  return WithDefaults;
+};
+
 const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
   Element: C,
 ) => {
@@ -112,6 +132,9 @@ const templateFunctionFactory: TailwindInterface = (<C extends ElementType>(
       TwComponent.withStyle = (
         styles: ((p: any) => CSSProperties) | CSSProperties,
       ) => TwComponentConstructor(styleArray.concat(styles)) as any;
+
+      TwComponent.withProps = (defaultProps: Record<string, unknown>) =>
+        withDefaultProps(TwComponent, defaultProps);
 
       return TwComponent;
     };

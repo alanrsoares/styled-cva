@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useState, type ComponentProps } from "react";
+import { useState, type ComponentProps, type ReactNode } from "react";
 import { expectType, type TypeEqual } from "ts-expect";
 import { vi } from "vitest";
 
@@ -1305,7 +1305,7 @@ describe("styled-cva", () => {
         $as?: typeof CustomLink;
         to: string;
         $variant?: "primary" | "secondary";
-        children?: React.ReactNode;
+        children?: ReactNode;
       };
 
       const linkProps: LinkButtonProps = {
@@ -1437,6 +1437,73 @@ describe("styled-cva", () => {
       expect(link).toHaveAttribute("href", "/profile");
       expect(link).toHaveClass("btn-base", "btn-primary");
       expect(link.getAttribute("$variant")).toBeNull();
+    });
+  });
+
+  describe("withProps on template components (issue #12)", () => {
+    const Base = tw.button`px-2 rounded`;
+
+    it("applies default props to a tw.tag template component", () => {
+      const Button = Base.withProps({ type: "button", "data-x": "1" } as any);
+      render(<Button>Go</Button>);
+      const el = screen.getByRole("button");
+      expect(el).toHaveAttribute("type", "button");
+      expect(el).toHaveAttribute("data-x", "1");
+      expect(el).toHaveClass("px-2", "rounded");
+    });
+
+    it("lets call-site props override the defaults", () => {
+      const Button = Base.withProps({ type: "button" });
+      render(<Button type="submit">Go</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("type", "submit");
+    });
+
+    it("pins a wrapped component's own props", () => {
+      const Link = ({
+        variant,
+        className,
+        children,
+      }: {
+        variant?: "link" | "solid";
+        className?: string;
+        children?: ReactNode;
+      }) => (
+        <a href="#" data-variant={variant} className={className}>
+          {children}
+        </a>
+      );
+      const BannerLink = tw(Link)`underline`.withProps({ variant: "link" });
+      render(<BannerLink>Go</BannerLink>);
+      const el = screen.getByRole("link");
+      expect(el).toHaveAttribute("data-variant", "link");
+      expect(el).toHaveClass("underline");
+    });
+
+    it("chains withProps and withStyle", () => {
+      const Button = Base.withProps({ type: "button" })
+        .withProps({ title: "t" })
+        .withStyle({ color: "red" });
+      render(<Button>Go</Button>);
+      const el = screen.getByRole("button");
+      expect(el).toHaveAttribute("type", "button");
+      expect(el).toHaveAttribute("title", "t");
+      expect(el.style.color).toBe("red");
+    });
+
+    it("forwards the ref", () => {
+      const Button = Base.withProps({ type: "button" });
+      const ref = { current: null as HTMLButtonElement | null };
+      render(<Button ref={ref}>Go</Button>);
+      expect(ref.current).toBe(screen.getByRole("button"));
+    });
+
+    it("types the defaults from the component props", () => {
+      type Params = Parameters<typeof Base.withProps>[0];
+      expectType<Params>({ type: "button", disabled: true });
+      // @ts-expect-error unknown prop
+      expectType<Params>({ notAProp: 1 });
+      // @ts-expect-error wrong value type
+      expectType<Params>({ disabled: "yes" });
     });
   });
 });

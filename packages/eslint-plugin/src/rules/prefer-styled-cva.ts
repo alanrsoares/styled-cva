@@ -84,6 +84,9 @@ const findTopLevelStatement = (node: ASTNode): ASTNode | null => {
   return null;
 };
 
+/** Module of the `tw` default import that the autofix adds when none exists. */
+const DEFAULT_IMPORT_SOURCE = "@styled-cva/react";
+
 const STYLED_PACKAGES = new Set([
   "styled-cva",
   "@styled-cva/react",
@@ -92,10 +95,13 @@ const STYLED_PACKAGES = new Set([
 ]);
 
 /** Local name of an existing default import from any styled-cva adapter. */
-const findTwImportName = (ast: AST): string | undefined =>
+const findTwImportName = (ast: AST, importSource: string): string | undefined =>
   ast.body
     .filter((n) => n.type === "ImportDeclaration")
-    .filter((n) => STYLED_PACKAGES.has(String(n.source.value)))
+    .filter((n) => {
+      const source = String(n.source.value);
+      return source === importSource || STYLED_PACKAGES.has(source);
+    })
     .flatMap((n) => n.specifiers)
     .find((s) => s.type === "ImportDefaultSpecifier")?.local.name;
 
@@ -131,7 +137,14 @@ const rule: Rule.RuleModule = {
     schema: [
       {
         type: "object",
-        properties: { threshold: { type: "integer", minimum: 1, default: 5 } },
+        properties: {
+          threshold: { type: "integer", minimum: 1, default: 5 },
+          importSource: {
+            type: "string",
+            minLength: 1,
+            default: DEFAULT_IMPORT_SOURCE,
+          },
+        },
         additionalProperties: false,
       },
     ],
@@ -142,12 +155,16 @@ const rule: Rule.RuleModule = {
   },
 
   create(context) {
-    const threshold =
-      (context.options[0] as { threshold?: number })?.threshold ?? 5;
+    const options = (context.options[0] ?? {}) as {
+      threshold?: number;
+      importSource?: string;
+    };
+    const threshold = options.threshold ?? 5;
+    const importSource = options.importSource ?? DEFAULT_IMPORT_SOURCE;
     const { sourceCode } = context;
     const ast = sourceCode.ast as AST;
     const existingNames = collectExistingNames(sourceCode.scopeManager);
-    const existingTwName = findTwImportName(ast);
+    const existingTwName = findTwImportName(ast, importSource);
     const twName =
       existingTwName ??
       freeName("tw", collectModuleNames(sourceCode.scopeManager));
@@ -190,7 +207,7 @@ const rule: Rule.RuleModule = {
             const fixes: Rule.Fix[] = [];
 
             if (existingTwName === undefined) {
-              const twImport = `import ${twName} from "@styled-cva/react";`;
+              const twImport = `import ${twName} from "${importSource}";`;
               fixes.push(
                 importEnd > 0
                   ? fixer.insertTextAfterRange(

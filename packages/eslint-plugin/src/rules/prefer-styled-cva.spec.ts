@@ -11,14 +11,16 @@ const languageOptions = {
   parserOptions: { ecmaFeatures: { jsx: true } },
 } as const;
 
-const fix = (code: string): string =>
+const fix = (code: string, options?: Record<string, unknown>): string =>
   new Linter({ configType: "flat" }).verifyAndFix(
     code,
     {
       files: ["**/*.jsx"],
       languageOptions,
       plugins: { "styled-cva": { rules: { "prefer-styled-cva": rule } } },
-      rules: { "styled-cva/prefer-styled-cva": "warn" },
+      rules: {
+        "styled-cva/prefer-styled-cva": options ? ["warn", options] : "warn",
+      },
     },
     "file.jsx",
   ).output;
@@ -150,6 +152,43 @@ export function A() { return <div className="${CLASSES}" />; }`);
 ${imports}export function A() { return <div className="${CLASSES}" />; }`);
       expect(output.startsWith(`"use client";`)).toBe(true);
       expect(problems(output)).toEqual([]);
+    });
+  });
+
+  describe("importSource option", () => {
+    const component = `export function A() { return <div className="${CLASSES}" />; }`;
+
+    it("defaults new imports to @styled-cva/react", () => {
+      expect(fix(component)).toContain(`import tw from "@styled-cva/react";`);
+    });
+
+    it.each(["@styled-cva/solid", "~/lib/tw"])(
+      "uses %s for a new import",
+      (importSource) => {
+        const output = fix(component, { importSource });
+        expect(output).toContain(`import tw from "${importSource}";`);
+        expect(output).not.toContain("@styled-cva/react");
+      },
+    );
+
+    it("reuses an existing default import from a custom importSource", () => {
+      const output = fix(
+        `import styled from "~/lib/tw";
+${component}`,
+        {
+          importSource: "~/lib/tw",
+        },
+      );
+      expect(output.match(/^import /gm)).toHaveLength(1);
+      expect(output).toContain("const StyledDiv = styled.div");
+    });
+
+    it("keeps the threshold option working with importSource", () => {
+      const output = fix(component, {
+        importSource: "@styled-cva/vue",
+        threshold: 10,
+      });
+      expect(output).toBe(component);
     });
   });
 });

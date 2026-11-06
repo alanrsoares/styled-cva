@@ -241,7 +241,7 @@ describe("styled-cva", () => {
 
     expect(container.firstChild).toMatchInlineSnapshot(`
       <button
-        class="btn-base div-base div-primary div-base div-primary"
+        class="btn-base div-base div-primary"
       >
         I was once a div, but now I'm a button
       </button>

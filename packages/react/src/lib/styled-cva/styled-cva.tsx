@@ -362,7 +362,7 @@ const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
 
     const WithRef = forwardRef<HTMLElement, Props>(
       ({ className, $as, ...props }: any, ref) => {
-        const classNames = cn(variance({ ...props, className }), className);
+        const classNames = cn(variance(props), className);
         const forwardedProps = isTw(Element)
           ? props
           : (Object.fromEntries(

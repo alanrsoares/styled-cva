@@ -1,5 +1,11 @@
 # @styled-cva/core
 
+## 0.8.0
+
+### Minor Changes
+
+- 02453bb: Accept a string as a boolean variant: `$active: "ring-2"` is the same as `{ true: "ring-2", false: "" }`. The prop type is `boolean`, and `VariantOf` gives `boolean`.
+
 ## 0.7.1
 
 ### Patch Changes

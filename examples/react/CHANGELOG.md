@@ -1,5 +1,13 @@
 # @styled-cva/examples-react
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [02453bb]
+- Updated dependencies [e20bdac]
+  - @styled-cva/react@0.8.0
+
 ## 0.0.6
 
 ### Patch Changes

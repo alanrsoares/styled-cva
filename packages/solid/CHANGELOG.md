@@ -1,5 +1,17 @@
 # @styled-cva/solid
 
+## 0.7.0
+
+### Minor Changes
+
+- 02453bb: Accept a string as a boolean variant: `$active: "ring-2"` is the same as `{ true: "ring-2", false: "" }`. The prop type is `boolean`, and `VariantOf` gives `boolean`.
+- e20bdac: Add the `VariantsOf<typeof C>` and `VariantOf<typeof C, "$key">` type helpers. They read the variant types from a styled component, so you do not need a separate `cva` only for the types. `VariantOf` removes `null` and `undefined`, and a boolean variant gives `boolean`.
+
+### Patch Changes
+
+- Updated dependencies [02453bb]
+  - @styled-cva/core@0.8.0
+
 ## 0.6.4
 
 ### Patch Changes

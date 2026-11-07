@@ -5,8 +5,8 @@
  *   e.g. bump-patch.ts @styled-cva/core  or  bump-patch.ts packages/react
  */
 
-import { join, resolve, isAbsolute } from "node:path";
 import { readdirSync, statSync } from "node:fs";
+import { isAbsolute, join, resolve } from "node:path";
 
 const repoRoot = resolve(import.meta.dir, "..");
 const packagesDir = join(repoRoot, "packages");
@@ -34,18 +34,14 @@ interface BumpResult {
 
 function globToRegExp(pattern: string): RegExp {
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-  const regex =
-    "^" +
-    escaped.replace(/\\\*/g, ".*").replace(/\\\?/g, ".") +
-    "$";
+  const regex = "^" + escaped.replace(/\*/g, ".*").replace(/\?/g, ".") + "$";
   return new RegExp(regex);
 }
 
-function getAllPackageDirs(): string[] {
-  return readdirSync(packagesDir)
+const getAllPackageDirs = (): string[] =>
+  readdirSync(packagesDir)
     .map((name) => join(packagesDir, name))
     .filter((p) => statSync(p).isDirectory());
-}
 
 async function bumpPackageJson(pkgPath: string): Promise<BumpResult | null> {
   const jsonPath = join(pkgPath, "package.json");
@@ -84,21 +80,24 @@ async function main(): Promise<void> {
     } else if (arg.startsWith("@styled-cva/")) {
       const slug = arg.replace("@styled-cva/", "");
       const pkgPath = join(packagesDir, slug);
-      if (await Bun.file(join(pkgPath, "package.json")).exists()) dirs = [pkgPath];
+      if (await Bun.file(join(pkgPath, "package.json")).exists())
+        dirs = [pkgPath];
       else {
         console.error("Package not found:", arg);
         process.exit(1);
       }
     } else if (isAbsolute(arg) || arg.startsWith("packages/")) {
       const pkgPath = isAbsolute(arg) ? arg : join(repoRoot, arg);
-      if (await Bun.file(join(pkgPath, "package.json")).exists()) dirs = [pkgPath];
+      if (await Bun.file(join(pkgPath, "package.json")).exists())
+        dirs = [pkgPath];
       else {
         console.error("Path not found:", arg);
         process.exit(1);
       }
     } else {
       const pkgPath = join(packagesDir, arg);
-      if (await Bun.file(join(pkgPath, "package.json")).exists()) dirs = [pkgPath];
+      if (await Bun.file(join(pkgPath, "package.json")).exists())
+        dirs = [pkgPath];
       else {
         console.error("Package not found:", arg);
         process.exit(1);

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "allowJs": false,
     "useDefineForClassFields": true,
     "jsx": "preserve",

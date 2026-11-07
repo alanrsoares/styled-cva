@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import {
   capitalize,
   cn,
@@ -58,9 +56,9 @@ const withDefaultProps = (
 };
 
 const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
-  Element: C,
-) => {
-  return (
+    Element: C,
+  ) =>
+  (
     template: TemplateStringsArray,
     ...templateElements: ((props: any) => string | undefined | null)[]
   ) => {
@@ -116,7 +114,6 @@ const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
           resolveClassName(
             // called synchronously inside this memo, so reads are tracked;
             // a static template never calls it and does not track props
-            // eslint-disable-next-line solid/reactivity
             () => ({ ...props, $as: local.$as }),
             local.class ?? "",
           ),
@@ -167,8 +164,7 @@ const templateFunctionFactory: TailwindInterface = (<C extends ValidComponent>(
     };
 
     return TwComponentConstructor();
-  };
-}) as any;
+  }) as any;
 
 type CVA<T = unknown> = typeof cva<T>;
 
@@ -252,11 +248,13 @@ type StyledPropsOf<C> = C extends AnyTailwindComponent
  */
 export type VariantsOf<C, P = StyledPropsOf<C>> = {
   // `$ServerOnly` is a Solid DOM attribute, not a variant.
-  [K in keyof P as K extends "$as" | "$ServerOnly"
-    ? never
-    : K extends `$${string}`
-      ? K
-      : never]?: P[K];
+  [
+    K in keyof P as K extends "$as" | "$ServerOnly"
+      ? never
+      : K extends `$${string}`
+        ? K
+        : never
+  ]?: P[K];
 };
 
 /**
@@ -361,8 +359,9 @@ export type StyledCVA = TailwindInterface &
     ): ComponentCVAWithPropsReturn<JSX.IntrinsicElements[C], T>;
   };
 
-const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
-  return (...args: Parameters<CVA>) => {
+const createCvaImpl =
+  (styledFn: any, Element: any, key?: string) =>
+  (...args: Parameters<CVA>) => {
     const variance = cva(...args);
 
     type Props = VariantProps<typeof variance> & {
@@ -429,16 +428,14 @@ const createCvaImpl = (styledFn: any, Element: any, key?: string) => {
 
     return ComponentWithProps;
   };
-};
 
 const wrapTemplateFunction = (styledFn: any, Element: any, key?: string) => {
   const cvaImpl = createCvaImpl(styledFn, Element, key);
 
   const wrapped = function (this: unknown, ...args: unknown[]) {
-    if (isTaggedTemplateArg(args[0])) {
-      return (styledFn as (...a: unknown[]) => unknown).apply(this, args);
-    }
-    return cvaImpl(...(args as Parameters<CVA>));
+    return isTaggedTemplateArg(args[0])
+      ? (styledFn as (...a: unknown[]) => unknown).apply(this, args)
+      : cvaImpl(...(args as Parameters<CVA>));
   };
 
   Object.assign(wrapped, styledFn, { cva: cvaImpl });
@@ -454,10 +451,7 @@ export function createStyledCVA(): StyledCVA {
       element,
       typeof element === "string" ? element : undefined,
     );
-    if (callArgs.length > 0) {
-      return (wrapped as any)(...callArgs);
-    }
-    return wrapped;
+    return callArgs.length > 0 ? (wrapped as any)(...callArgs) : wrapped;
   }) as any;
 
   const twCVA = Object.fromEntries(

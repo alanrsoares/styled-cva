@@ -10,26 +10,24 @@ const LogoImg = tw.img`h-16 w-auto will-change-[filter]`;
 const Title = tw.h1`text-3xl font-semibold text-[#646cff] m-0`;
 const Subtitle = tw.p`text-[#888] m-0 text-sm`;
 
-function App() {
-  return (
-    <Root>
-      <Header>
-        <LogoRow>
-          <LogoLink
-            href="https://github.com/alanrsoares/styled-cva"
-            target="_blank"
-          >
-            <LogoImg src="/styled-cva.svg" alt="styled-cva" />
-          </LogoLink>
-        </LogoRow>
-        <Title>styled-cva + React</Title>
-        <Subtitle>
-          Type-safe, CVA-based styled components for React with Tailwind
-        </Subtitle>
-      </Header>
-      <Showcase />
-    </Root>
-  );
-}
+const App = () => (
+  <Root>
+    <Header>
+      <LogoRow>
+        <LogoLink
+          href="https://github.com/alanrsoares/styled-cva"
+          target="_blank"
+        >
+          <LogoImg src="/styled-cva.svg" alt="styled-cva" />
+        </LogoLink>
+      </LogoRow>
+      <Title>styled-cva + React</Title>
+      <Subtitle>
+        Type-safe, CVA-based styled components for React with Tailwind
+      </Subtitle>
+    </Header>
+    <Showcase />
+  </Root>
+);
 
 export default App;

@@ -45,7 +45,7 @@ bun run --filter @styled-cva/eslint-plugin build
 
 Or in another project, link the package (e.g. via `file:` or `link:` in `package.json` or `npm link`). Use the **built** package (`dist/`) so it is consumable in Node (CJS and ESM).
 
-**Peer dependencies:** `eslint` (^9), `typescript` (^5).
+**Peer dependencies:** `eslint` (^9 || ^10), `typescript` (^5 || ^6).
 
 ## Configuration
 

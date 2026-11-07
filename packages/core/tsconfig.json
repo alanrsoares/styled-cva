@@ -3,9 +3,10 @@
   "compilerOptions": {
     "lib": ["ESNext"],
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "allowJs": false,
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "types": ["bun"]
   },
   "include": ["src"]
 }

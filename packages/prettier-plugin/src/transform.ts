@@ -53,14 +53,15 @@ function getIdentifierName(node: unknown): string | null {
 function rootIdentifier(node: unknown): string | null {
   let current: unknown = node;
   while (isAnyNode(current)) {
-    if (current.type === "Identifier") return getIdentifierName(current);
-    if (current.type === "MemberExpression") {
-      current = (current as { object?: unknown }).object;
-      continue;
-    }
-    if (current.type === "CallExpression") {
-      current = (current as { callee?: unknown }).callee;
-      continue;
+    switch (current.type) {
+      case "Identifier":
+        return getIdentifierName(current);
+      case "MemberExpression":
+        current = (current as { object?: unknown }).object;
+        continue;
+      case "CallExpression":
+        current = (current as { callee?: unknown }).callee;
+        continue;
     }
     return null;
   }
@@ -158,8 +159,9 @@ function editForTaggedTemplate(
   const baseIndent = getIndentBefore(text, tagStart);
   const prefixLen = quasi.start - tagStart + 1;
   const result = formatClassQuasi(raw, baseIndent, prefixLen, options);
-  if (!result.changed) return null;
-  return { start: innerStart, end: innerEnd, replacement: result.text };
+  return !result.changed
+    ? null
+    : { start: innerStart, end: innerEnd, replacement: result.text };
 }
 
 function editForStringClassValue(node: AnyNode): Edit | null {
@@ -167,12 +169,13 @@ function editForStringClassValue(node: AnyNode): Edit | null {
   const raw = stringLiteralValue(node);
   if (raw == null) return null;
   const normalized = normalizeClasses(raw);
-  if (normalized === raw) return null;
-  return {
-    start: node.start + 1,
-    end: node.end - 1,
-    replacement: normalized,
-  };
+  return normalized === raw
+    ? null
+    : {
+        start: node.start + 1,
+        end: node.end - 1,
+        replacement: normalized,
+      };
 }
 
 function collectCvaEdits({ base, config }: CvaCall): Edit[] {

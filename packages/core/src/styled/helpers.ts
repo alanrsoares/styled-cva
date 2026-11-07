@@ -6,11 +6,9 @@ export type Nullish<T> = T | null | undefined;
  * True when `value` is the receiver’s first argument from a tagged template
  * call (`tag\`…\``): a template strings array carrying `raw` segments.
  */
-export function isTaggedTemplateArg(
+export const isTaggedTemplateArg = (
   value: unknown,
-): value is TemplateStringsArray {
-  return Array.isArray(value) && "raw" in value;
-}
+): value is TemplateStringsArray => Array.isArray(value) && "raw" in value;
 
 /**
  * Merges template literal segments with interpolated values (e.g. from styled tagged templates).

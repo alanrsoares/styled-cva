@@ -29,7 +29,7 @@ bun run version    # Consume changesets, bump package versions, update CHANGELOG
 bun install        # Update lockfile after version bumps
 git add -A && git commit -m "chore(release): version packages"
 bun run release    # Build and publish all versioned packages to npm
-bunx changeset tag # Create per-package git tags (@scope/pkg@version) for what just shipped
+bunx changeset git-tag # Create per-package git tags (@scope/pkg@version) for what just shipped
 git push && git push --tags
 ```
 
@@ -39,7 +39,7 @@ Shortcut: `bun run release:all` runs all of the steps above. It runs `bun run re
 
 ### 3. Tagging
 
-The convention in this monorepo is **one git tag per published package per release**, formatted `@styled-cva/<pkg>@<version>` (e.g. `@styled-cva/core@0.7.0`). `bunx changeset tag` reads each `packages/*/package.json` after publish and creates exactly those tags — it is idempotent, so re-running on a release that's already tagged is a no-op.
+The convention in this monorepo is **one git tag per published package per release**, formatted `@styled-cva/<pkg>@<version>` (e.g. `@styled-cva/core@0.7.0`). `bunx changeset git-tag` reads each `packages/*/package.json` after publish and creates exactly those tags — it is idempotent, so re-running on a release that's already tagged is a no-op.
 
 Avoid single-version "release tags" (e.g. `v0.7.0`) — they lie about every package except one, and break the npm-version-to-git-SHA mapping for the others.
 

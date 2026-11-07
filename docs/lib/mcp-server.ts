@@ -12,6 +12,7 @@ import {
   type ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+
 import { getReactVersion } from "./versions";
 
 // Documentation pages mapping
@@ -97,16 +98,14 @@ const TOOL_INPUT_SCHEMAS = {
 type ToolName = keyof typeof TOOL_INPUT_SCHEMAS;
 
 // Handler functions with proper types
-export async function listResources(): Promise<ListResourcesResult> {
-  return {
-    resources: DOCS_PAGES.map((page) => ({
-      uri: page.resource,
-      name: page.title,
-      description: `Documentation page: ${page.title}`,
-      mimeType: "text/markdown",
-    })),
-  };
-}
+export const listResources = async (): Promise<ListResourcesResult> => ({
+  resources: DOCS_PAGES.map((page) => ({
+    uri: page.resource,
+    name: page.title,
+    description: `Documentation page: ${page.title}`,
+    mimeType: "text/markdown",
+  })),
+});
 
 export async function readResource(uri: string): Promise<ReadResourceResult> {
   const page = DOCS_PAGES.find((p) => p.resource === uri);
@@ -137,34 +136,32 @@ export async function readResource(uri: string): Promise<ReadResourceResult> {
   }
 }
 
-export async function listTools(): Promise<ListToolsResult> {
-  return {
-    tools: [
-      {
-        name: "search_docs",
-        description: "Search the styled-cva documentation by keyword or topic",
-        inputSchema: {
-          type: "object",
-          properties: {
-            query: {
-              type: "string",
-              description: "Search query to find relevant documentation",
-            },
+export const listTools = async (): Promise<ListToolsResult> => ({
+  tools: [
+    {
+      name: "search_docs",
+      description: "Search the styled-cva documentation by keyword or topic",
+      inputSchema: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "Search query to find relevant documentation",
           },
-          required: ["query"],
         },
+        required: ["query"],
       },
-      {
-        name: "list_docs",
-        description: "List all available documentation pages",
-        inputSchema: {
-          type: "object",
-          properties: {},
-        },
+    },
+    {
+      name: "list_docs",
+      description: "List all available documentation pages",
+      inputSchema: {
+        type: "object",
+        properties: {},
       },
-    ],
-  };
-}
+    },
+  ],
+});
 
 export async function callTool(
   name: string,
@@ -201,40 +198,37 @@ export async function callTool(
     const lowerQuery = query.toLowerCase();
 
     // Simple keyword matching - in production, you might want more sophisticated search
-    const matchingPages = DOCS_PAGES.filter((page) => {
-      return (
+    const matchingPages = DOCS_PAGES.filter(
+      (page) =>
         page.title.toLowerCase().includes(lowerQuery) ||
-        page.route.toLowerCase().includes(lowerQuery)
-      );
-    });
+        page.route.toLowerCase().includes(lowerQuery),
+    );
 
-    if (matchingPages.length === 0) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `No documentation pages found matching "${query}". Available pages: ${DOCS_PAGES.map((p) => p.title).join(", ")}`,
-          },
-        ],
-      };
-    }
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(
-            matchingPages.map((page) => ({
-              title: page.title,
-              route: page.route,
-              resource: page.resource,
-            })),
-            null,
-            2,
-          ),
-        },
-      ],
-    };
+    return matchingPages.length === 0
+      ? {
+          content: [
+            {
+              type: "text",
+              text: `No documentation pages found matching "${query}". Available pages: ${DOCS_PAGES.map((p) => p.title).join(", ")}`,
+            },
+          ],
+        }
+      : {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                matchingPages.map((page) => ({
+                  title: page.title,
+                  route: page.route,
+                  resource: page.resource,
+                })),
+                null,
+                2,
+              ),
+            },
+          ],
+        };
   }
 
   throw new Error(`Unknown tool: ${name}`);
@@ -258,9 +252,9 @@ export function createMcpServer(): Server {
   server.setRequestHandler(ListResourcesRequestSchema, listResources);
 
   // Read documentation resource content
-  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    return readResource(request.params.uri);
-  });
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) =>
+    readResource(request.params.uri),
+  );
 
   // List available tools
   server.setRequestHandler(ListToolsRequestSchema, listTools);

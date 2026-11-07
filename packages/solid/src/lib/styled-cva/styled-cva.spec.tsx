@@ -1,5 +1,4 @@
 /// <reference types="vitest/globals" />
-/// <reference types="@testing-library/jest-dom" />
 import { render, screen, waitFor } from "@solidjs/testing-library";
 import userEvent from "@testing-library/user-event";
 import { createSignal, type Component, type JSX } from "solid-js";
@@ -145,9 +144,9 @@ describe("styled-cva", () => {
   });
 
   it("should style a custom component with class prop", () => {
-    const MyButton: Component<{ class: string }> = (props) => {
-      return <button class={props.class}>Hello</button>;
-    };
+    const MyButton: Component<{ class: string }> = (props) => (
+      <button class={props.class}>Hello</button>
+    );
 
     const StyledMyButton = tw(MyButton)`text-red-500`;
 
@@ -491,10 +490,10 @@ describe("styled-cva", () => {
       type WithPropsParams = Parameters<typeof TestStyledButton.withProps>[0];
 
       // Verify that data attributes ARE in the allowed props
-      type HasDataTestId = `data-testid` extends keyof WithPropsParams
+      type HasDataTestId = "data-testid" extends keyof WithPropsParams
         ? true
         : false;
-      type HasDataCustom = `data-custom-attr` extends keyof WithPropsParams
+      type HasDataCustom = "data-custom-attr" extends keyof WithPropsParams
         ? true
         : false;
 
@@ -1238,6 +1237,8 @@ describe("styled-cva", () => {
 
     it("forwards the ref", () => {
       const Button = Base.withProps({ type: "button" });
+      // The Solid compiler assigns `ref` through the `ref={ref}` binding.
+      // eslint-disable-next-line no-unassigned-vars
       let ref: HTMLButtonElement | undefined;
       render(() => <Button ref={ref}>Go</Button>);
       expect(ref).toBe(screen.getByRole("button"));

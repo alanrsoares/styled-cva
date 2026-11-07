@@ -39,8 +39,7 @@ const buttonCvaConfig = {
     {
       $variant: "primary",
       $size: "lg",
-      class:
-        "ring-2 ring-[#646cff]/60 ring-offset-2 ring-offset-[#1a1a1a]",
+      class: "ring-2 ring-[#646cff]/60 ring-offset-2 ring-offset-[#1a1a1a]",
     } as const,
   ],
 };
@@ -99,9 +98,8 @@ export default function Showcase() {
           <Code>
             {"tw.button.cva(base, { variants: { $variant, $size } })"}
           </Code>{" "}
-          or shorthand{" "}
-          <Code>{"tw.button(base, { variants: { … } })"}</Code>. Use{" "}
-          <Code>$</Code> prefix so props aren't forwarded to the DOM.
+          or shorthand <Code>{"tw.button(base, { variants: { … } })"}</Code>.
+          Use <Code>$</Code> prefix so props aren't forwarded to the DOM.
         </SectionDesc>
         <Row>
           <Label>Variant:</Label>
@@ -194,7 +192,7 @@ export default function Showcase() {
       <Section>
         <SectionTitle>5. Extend CVA — tw(Button)</SectionTitle>
         <SectionDesc>
-          <Code>{`tw(Button)\`extra classes\``}</Code> — wrap an existing CVA
+          <Code>{"tw(Button)`extra classes`"}</Code> — wrap an existing CVA
           component (Solid/Vue same pattern).
         </SectionDesc>
         <Row>
@@ -211,8 +209,8 @@ export default function Showcase() {
       <Section>
         <SectionTitle>6. Utilities — cn()</SectionTitle>
         <SectionDesc>
-          Re-exports from <Code>@styled-cva/react</Code> include{" "}
-          <Code>cn</Code>, <Code>cva</Code>, <Code>isTaggedTemplateArg</Code>.
+          Re-exports from <Code>@styled-cva/react</Code> include <Code>cn</Code>
+          , <Code>cva</Code>, <Code>isTaggedTemplateArg</Code>.
         </SectionDesc>
         <Row>
           <Label>cn():</Label>

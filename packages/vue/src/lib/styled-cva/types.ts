@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 
 import type { Component, DefineComponent } from "vue";
 import type { JSX } from "vue/jsx-runtime";

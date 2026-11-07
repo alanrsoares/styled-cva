@@ -26,36 +26,28 @@ const CallToolParamsSchema = z.object({
   arguments: z.unknown().optional(),
 });
 
-function getCorsHeaders(origin: string | null) {
-  return {
-    "Access-Control-Allow-Origin": origin || "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
-}
+const getCorsHeaders = (origin: string | null) => ({
+  "Access-Control-Allow-Origin": origin || "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+});
 
-function createJsonRpcError(
+const createJsonRpcError = (
   code: number,
   message: string,
   id: string | number | null | undefined,
-) {
-  return {
-    jsonrpc: "2.0" as const,
-    error: {
-      code,
-      message,
-    },
-    id: id ?? null,
-  };
-}
+) => ({
+  jsonrpc: "2.0" as const,
+  error: {
+    code,
+    message,
+  },
+  id: id ?? null,
+});
 
-export async function GET(request: NextRequest) {
-  return handleMcpRequest(request);
-}
+export const GET = async (request: NextRequest) => handleMcpRequest(request);
 
-export async function POST(request: NextRequest) {
-  return handleMcpRequest(request);
-}
+export const POST = async (request: NextRequest) => handleMcpRequest(request);
 
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get("origin");

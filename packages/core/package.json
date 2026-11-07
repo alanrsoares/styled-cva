@@ -32,11 +32,11 @@
     "compile": "tsc --noEmit"
   },
   "dependencies": {
-    "cn": "^0.2.5"
+    "cn": "^0.5.2"
   },
   "devDependencies": {
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "tsup": "^9.0.0",
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
     "typescript": ">=5.7.0"

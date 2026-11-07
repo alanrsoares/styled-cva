@@ -32,19 +32,19 @@
     "version": "changeset version",
     "release": "bun run build && changeset publish",
     "release:preflight": "test \"$(git branch --show-current)\" = main || { echo 'release: not on main' >&2; exit 1; }; test -z \"$(git status --porcelain)\" || { echo 'release: working tree not clean' >&2; exit 1; }; git pull --ff-only && npm whoami >/dev/null || { echo 'release: run npm login' >&2; exit 1; }",
-    "release:all": "bun run release:preflight && bun run version && bun install && git add -A && git commit -m 'chore(release): version packages' && bun run release && bunx changeset tag && git push && git push --tags"
+    "release:all": "bun run release:preflight && bun run version && bun install && git add -A && git commit -m 'chore(release): version packages' && bun run release && bunx changeset git-tag && git push && git push --tags"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.1",
-    "@commitlint/cli": "^21.2.1",
-    "@commitlint/config-conventional": "^21.2.0",
+    "@changesets/cli": "^3.0.3",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "@types/bun": "^1.3.14",
-    "lefthook": "^2.1.10",
-    "prettier": "^3.9.6",
-    "prettier-plugin-tailwindcss": "^0.7.4"
+    "@types/bun": "^1.4.4",
+    "lefthook": "^2.2.2",
+    "prettier": "^3.9.10",
+    "prettier-plugin-tailwindcss": "^0.8.1"
   }
 }

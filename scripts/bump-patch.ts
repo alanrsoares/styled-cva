@@ -34,8 +34,7 @@ interface BumpResult {
 
 function globToRegExp(pattern: string): RegExp {
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-  const regex =
-    "^" + escaped.replace(/\\\*/g, ".*").replace(/\\\?/g, ".") + "$";
+  const regex = "^" + escaped.replace(/\*/g, ".*").replace(/\?/g, ".") + "$";
   return new RegExp(regex);
 }
 

@@ -1,5 +1,11 @@
 # @styled-cva/eslint-plugin
 
+## 0.6.1
+
+### Patch Changes
+
+- d2d11ca: Widen the peer dependency ranges to `eslint` `^9 || ^10` and `typescript` `^5 || ^6`.
+
 ## 0.6.0
 
 ### Minor Changes
